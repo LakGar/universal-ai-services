@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
+import Image from "next/image";
 
 function Footer() {
   const footerLinks = [
@@ -28,13 +29,19 @@ function Footer() {
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col items-center">
           <motion.div
-            className="mb-8 rounded-full bg-primary/10 p-8"
+            className="mb-8 rounded-full  p-8"
             initial={{ opacity: 0, scale: 0.5 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <Icons.logo className="icon-class w-6" />
+            <Image
+              src="/logo.png"
+              alt="Universal AI Services"
+              width={62}
+              height={62}
+              className="dark:invert"
+            />
           </motion.div>
           <motion.nav
             className="mb-8 flex flex-wrap justify-center gap-6"

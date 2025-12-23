@@ -4,8 +4,9 @@ import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Heart } from "lucide-react";
+import { Heart, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/contexts/cart-context";
 import { useWishlist } from "@/contexts/wishlist-context";
@@ -39,6 +40,13 @@ export function ProductCard({
     isInWishlist,
   } = useWishlist();
   const inWishlist = isInWishlist(id);
+  const [imageLoading, setImageLoading] = React.useState(true);
+  const [imageError, setImageError] = React.useState(false);
+  const isVideo = React.useMemo(() => {
+    if (!image) return false;
+    const videoExtensions = [".mp4", ".webm", ".mov", ".avi", ".mkv", ".m4v"];
+    return videoExtensions.some((ext) => image.toLowerCase().includes(ext));
+  }, [image]);
 
   const handleAddToCart = () => {
     addItem({
@@ -84,7 +92,56 @@ export function ProductCard({
           {name}
         </h3>
         <div className="relative aspect-3/4 w-full rounded-lg overflow-hidden bg-muted cursor-pointer">
-          <Image src={image} alt={alt} fill className="object-cover" />
+          {imageLoading && (
+            <Skeleton className="absolute inset-0 w-full h-full" />
+          )}
+          {isVideo ? (
+            <div className="relative w-full h-full flex items-center justify-center bg-muted">
+              <video
+                src={image}
+                className="w-full h-full object-cover"
+                muted
+                playsInline
+                onLoadedData={() => setImageLoading(false)}
+                onError={() => {
+                  setImageError(true);
+                  setImageLoading(false);
+                }}
+              />
+              <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                <div className="bg-white/90 rounded-full p-3">
+                  <Play
+                    className="size-8 text-black ml-1"
+                    fill="currentColor"
+                  />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              {!imageError && (
+                <Image
+                  src={image}
+                  alt={alt}
+                  fill
+                  className={cn(
+                    "object-cover transition-opacity duration-300",
+                    imageLoading ? "opacity-0" : "opacity-100"
+                  )}
+                  onLoad={() => setImageLoading(false)}
+                  onError={() => {
+                    setImageError(true);
+                    setImageLoading(false);
+                  }}
+                />
+              )}
+              {imageError && (
+                <div className="absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground">
+                  <p className="text-sm">Image not available</p>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </Link>
       <Button

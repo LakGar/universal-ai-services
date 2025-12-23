@@ -22,124 +22,239 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heart, Play, ChevronLeft, ChevronRight, Check } from "lucide-react";
 import { useCart } from "@/contexts/cart-context";
 import { useWishlist } from "@/contexts/wishlist-context";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import buyData from "../data/buy_data.json";
 
-// Mock product data - in real app, fetch from API
-const products = [
-  {
-    id: 1,
-    name: "Industrial Robot Arm Pro",
-    description:
-      "The Industrial Robot Arm Pro is a state-of-the-art robotic solution designed for precision manufacturing and automation. With advanced AI capabilities and 6-axis movement, it delivers unmatched accuracy and efficiency in industrial applications.",
+// Helper function to check if URL is a video
+const isVideoUrl = (url: string): boolean => {
+  if (typeof url !== "string") return false;
+  const videoExtensions = [".mp4", ".webm", ".mov", ".avi", ".mkv", ".m4v"];
+  return videoExtensions.some((ext) => url.toLowerCase().includes(ext));
+};
+
+// Helper function to extract file ID from Google Drive URL
+const extractGoogleDriveFileId = (url: string): string | null => {
+  // Match: https://drive.google.com/file/d/FILE_ID/view
+  const fileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (fileMatch) {
+    return fileMatch[1];
+  }
+  // Match: https://drive.google.com/drive/folders/FOLDER_ID
+  const folderMatch = url.match(/\/folders\/([a-zA-Z0-9_-]+)/);
+  if (folderMatch) {
+    return folderMatch[1];
+  }
+  return null;
+};
+
+// Helper function to convert Google Drive link to direct URL
+const convertGoogleDriveUrl = (link: string, isVideo: boolean = false): string => {
+  if (link.startsWith("http") && !link.includes("drive.google.com")) {
+    return link; // Already a direct URL
+  }
+  
+  const fileId = extractGoogleDriveFileId(link);
+  if (!fileId) return link;
+  
+  if (isVideo) {
+    // For videos, try multiple formats
+    // First try the view URL (works if file is publicly shared)
+    return `https://drive.google.com/uc?export=view&id=${fileId}`;
+    // Alternative: `https://drive.google.com/file/d/${fileId}/preview` (for preview)
+    // Or: `https://drive.google.com/uc?export=download&id=${fileId}` (for download)
+  } else {
+    // For images, use the view URL
+    return `https://drive.google.com/uc?export=view&id=${fileId}`;
+  }
+};
+
+// Helper function to get media items (images and videos) from Google Drive
+const getProductMedia = (item: any): { images: string[]; videos: string[] } => {
+  const images: string[] = [];
+  const videos: string[] = [];
+
+  // If Images field exists and is an array, use it
+  if (item.Images && Array.isArray(item.Images) && item.Images.length > 0) {
+    item.Images.forEach((url: string) => {
+      if (isVideoUrl(url)) {
+        videos.push(url);
+      } else {
+        images.push(url);
+      }
+    });
+    if (images.length > 0 || videos.length > 0) {
+      return { images, videos };
+    }
+  }
+
+  // Check if Location ID is an array of Google Drive links
+  const locationId = item["Location ID"];
+  if (Array.isArray(locationId) && locationId.length > 0) {
+    locationId.forEach((link: any) => {
+      if (typeof link === "string") {
+        const isVideo = isVideoUrl(link);
+        const convertedUrl = convertGoogleDriveUrl(link, isVideo);
+        
+        if (isVideo) {
+          videos.push(convertedUrl);
+        } else if (link.includes("drive.google.com") || link.startsWith("http")) {
+          images.push(convertedUrl);
+        }
+      } else if (typeof link === "object" && link !== null) {
+        // Support object format: { url: "...", type: "video" | "image" }
+        const url = link.url || link.URL || link;
+        const type = link.type || link.Type;
+        const isVideo = type === "video" || isVideoUrl(url);
+        const convertedUrl = typeof url === "string" ? convertGoogleDriveUrl(url, isVideo) : url;
+        
+        if (isVideo) {
+          videos.push(convertedUrl);
+        } else {
+          images.push(convertedUrl);
+        }
+      }
+    });
+    
+    if (images.length > 0 || videos.length > 0) {
+      return { images, videos };
+    }
+  }
+
+  // Try to extract from single Google Drive link (string)
+  if (typeof locationId === "string" && locationId.includes("drive.google.com")) {
+    const isVideo = isVideoUrl(locationId);
+    const convertedUrl = convertGoogleDriveUrl(locationId, isVideo);
+    if (isVideo) {
+      videos.push(convertedUrl);
+    } else {
+      images.push(convertedUrl);
+    }
+    if (images.length > 0 || videos.length > 0) {
+      return { images, videos };
+    }
+  }
+
+  // Fallback to placeholder images
+  return {
     images: [
       "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1200&q=80",
       "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80",
       "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80",
       "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80",
     ],
-    video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    price: 45999,
-    monthlyPrice: 1916.62,
+    videos: [],
+  };
+};
+
+// Transform JSON item to product detail format
+const transformProductDetail = (item: any, index: number) => {
+  const msrp = parseFloat(item.MSRP?.toString().replace(/[^0-9.]/g, "") || "0");
+  const releaseYear = parseInt(item["Release Year"] || "0");
+  const isNew = releaseYear >= 2024;
+
+  // Get media (images and videos) from helper function
+  const { images: productImages, videos: productVideos } = getProductMedia(item);
+
+  // Parse specs from JSON
+  const parseSpecs = (specsString: string) => {
+    const specs: Record<string, string> = {};
+    if (!specsString || specsString === "Unknown") return specs;
+
+    // Try to extract key-value pairs from the specs string
+    const lines = specsString.split(/[•\n]/).filter((line) => line.trim());
+    lines.forEach((line) => {
+      const match = line.match(/(.+?):\s*(.+)/);
+      if (match) {
+        const key = match[1].trim();
+        const value = match[2].trim();
+        specs[key] = value;
+      }
+    });
+
+    // Also add direct fields from JSON
+    if (item["Unit Weight"]) specs["Weight"] = item["Unit Weight"];
+    if (item["Dimensions (Standing)"]) specs["Dimensions"] = item["Dimensions (Standing)"];
+    if (item["Payload (Max)"]) specs["Payload"] = item["Payload (Max)"];
+    if (item["Max Speed"]) specs["Max Speed"] = item["Max Speed"];
+    if (item["Runtime"]) specs["Runtime"] = item["Runtime"];
+    if (item["Battery Wh"]) specs["Battery"] = item["Battery Wh"];
+    if (item["Operating Environment"]) specs["Operating Environment"] = item["Operating Environment"];
+    if (item["IP Rating"] && item["IP Rating"] !== "Unknown") specs["IP Rating"] = item["IP Rating"];
+
+    return specs;
+  };
+
+  // Parse features from JSON
+  const parseFeatures = (featuresString: string) => {
+    if (!featuresString) return [];
+    // Split by bullet points, newlines, or semicolons
+    return featuresString
+      .split(/[•\n;]/)
+      .map((f) => f.trim())
+      .filter((f) => f.length > 0 && !f.includes("contentReference"));
+  };
+
+  // Standard add-ons for all products
+  const standardAddOns = [
+    {
+      id: "warranty",
+      name: "Extended Warranty (3 years)",
+      price: 2999,
+      description: item.Warranty || "Comprehensive coverage for 3 years",
+    },
+    {
+      id: "installation",
+      name: "Professional Installation",
+      price: 1999,
+      description: "Expert setup and configuration",
+    },
+    {
+      id: "training",
+      name: "Training & Support Package",
+      price: 1499,
+      description: "On-site training included",
+    },
+  ];
+
+  // Extract configurations from version/revision if available
+  const configurations = [
+    { id: "standard", name: "Standard Configuration", price: 0 },
+  ];
+
+  // If there are different versions, add them
+  if (item["Version/Revision"] && item["Version/Revision"] !== "Unknown") {
+    const version = item["Version/Revision"];
+    if (version.includes("Pro") || version.includes("Premium")) {
+      configurations.push({ id: "premium", name: "Premium Configuration", price: msrp * 0.1 });
+    }
+  }
+
+    return {
+      id: index + 1,
+      name: item["Model Name"] || "Unnamed Product",
+      description: item.Description || item["Short Description"] || "",
+      images: productImages,
+      videos: productVideos, // Array of video URLs
+      video: productVideos.length > 0 ? productVideos[0] : (item.Video || null), // First video or Video field
+    price: msrp,
+    monthlyPrice: msrp > 0 ? msrp / 24 : 0,
     monthlyMonths: 24,
-    isNew: true,
+    isNew,
     options: {
-      configurations: [
-        { id: "standard", name: "Standard Configuration", price: 0 },
-        { id: "premium", name: "Premium Configuration", price: 5000 },
-        { id: "enterprise", name: "Enterprise Configuration", price: 10000 },
-      ],
-      colors: [
-        { id: "blue", name: "Blue", value: "#3b82f6" },
-        { id: "red", name: "Red", value: "#ef4444" },
-        { id: "green", name: "Green", value: "#10b981" },
-        { id: "orange", name: "Orange", value: "#f59e0b" },
-      ],
+      configurations,
     },
-    addOns: [
-      {
-        id: "warranty",
-        name: "Extended Warranty (3 years)",
-        price: 2999,
-        description: "Comprehensive coverage for 3 years",
-      },
-      {
-        id: "installation",
-        name: "Professional Installation",
-        price: 1999,
-        description: "Expert setup and configuration",
-      },
-      {
-        id: "training",
-        name: "Training & Support Package",
-        price: 1499,
-        description: "On-site training included",
-      },
-    ],
-    specs: {
-      weight: "45 kg",
-      dimensions: "1200mm × 800mm × 600mm",
-      payload: "20 kg",
-      reach: "1500 mm",
-      repeatability: "±0.02 mm",
-      power: "3.5 kW",
-      controller: "Advanced AI Controller",
-      programming: "Visual Programming Interface",
-      connectivity: "Wi-Fi, Ethernet, USB",
-      safety: "ISO 10218-1 Certified",
-    },
-    features: [
-      "6-axis precision movement",
-      "AI-powered path optimization",
-      "Collision detection and avoidance",
-      "Real-time monitoring and analytics",
-      "Easy integration with existing systems",
-      "Cloud-based management platform",
-    ],
-  },
-  {
-    id: 2,
-    name: "Autonomous Delivery Bot",
-    description:
-      "Revolutionary autonomous delivery robot designed for last-mile logistics. Features advanced navigation, obstacle avoidance, and secure cargo handling.",
-    images: [
-      "https://images.unsplash.com/photo-1534723328310-e82dad3ee43f?w=1200&q=80",
-      "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1200&q=80",
-    ],
-    video: null,
-    price: 29999,
-    monthlyPrice: 1249.96,
-    monthlyMonths: 24,
-    isNew: true,
-    options: {
-      configurations: [
-        { id: "standard", name: "Standard", price: 0 },
-        { id: "premium", name: "Premium", price: 3000 },
-      ],
-      colors: [
-        { id: "white", name: "White", value: "#ffffff" },
-        { id: "black", name: "Black", value: "#000000" },
-      ],
-    },
-    addOns: [
-      { id: "warranty", name: "Extended Warranty", price: 1999, description: "Comprehensive coverage for 3 years" },
-      { id: "installation", name: "Installation", price: 999, description: "Expert setup and configuration" },
-    ],
-    specs: {
-      weight: "25 kg",
-      dimensions: "600mm × 500mm × 800mm",
-      payload: "30 kg",
-      speed: "5 km/h",
-      battery: "8 hours",
-      navigation: "LiDAR + Camera",
-    },
-    features: [
-      "Autonomous navigation",
-      "Weather resistant",
-      "Secure cargo compartment",
-      "Real-time tracking",
-    ],
-  },
-];
+    addOns: standardAddOns,
+    specs: parseSpecs(item.Specs || ""),
+    features: parseFeatures(item.Features || ""),
+    manufacturer: item.Manufacturer || "",
+    sku: item.SKU || "",
+    productId: item["Product ID"] || "",
+  };
+};
+
+// Transform all products
+const allProducts = buyData.map((item, index) => transformProductDetail(item, index));
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -148,13 +263,32 @@ export default function ProductDetailPage() {
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlist();
 
   const productId = parseInt(params.id as string);
-  const product = products.find((p) => p.id === productId);
+  const product = allProducts.find((p) => p.id === productId);
 
-  const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
+  // Combine images and videos into a single media array
+  const allMedia = React.useMemo(() => {
+    if (!product) return [];
+    const media: Array<{ type: "image" | "video"; url: string }> = [];
+    if (product.images && Array.isArray(product.images)) {
+      product.images.forEach((url) => media.push({ type: "image", url }));
+    }
+    if (product.videos && Array.isArray(product.videos)) {
+      product.videos.forEach((url) => media.push({ type: "video", url }));
+    }
+    return media;
+  }, [product]);
+
+  const [selectedMediaIndex, setSelectedMediaIndex] = React.useState(0);
   const [selectedConfig, setSelectedConfig] = React.useState(product?.options.configurations[0].id || "");
-  const [selectedColor, setSelectedColor] = React.useState(product?.options.colors[0].id || "");
   const [selectedAddOns, setSelectedAddOns] = React.useState<Set<string>>(new Set());
   const [isVideoPlaying, setIsVideoPlaying] = React.useState(false);
+  const [mediaLoading, setMediaLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    if (product) {
+      setSelectedConfig(product.options.configurations[0].id);
+    }
+  }, [product]);
 
   if (!product) {
     return (
@@ -168,7 +302,6 @@ export default function ProductDetailPage() {
   }
 
   const selectedConfigData = product.options.configurations.find((c) => c.id === selectedConfig);
-  const selectedColorData = product.options.colors.find((c) => c.id === selectedColor);
   const basePrice = product.price + (selectedConfigData?.price || 0);
   const addOnsTotal = Array.from(selectedAddOns).reduce((sum, addOnId) => {
     const addOn = product.addOns.find((a) => a.id === addOnId);
@@ -208,17 +341,24 @@ export default function ProductDetailPage() {
     setSelectedAddOns(newSet);
   };
 
-  const nextImage = () => {
-    setSelectedImageIndex((prev) => (prev + 1) % product.images.length);
+  const currentMedia = allMedia[selectedMediaIndex];
+  const isCurrentVideo = currentMedia?.type === "video";
+
+  const nextMedia = () => {
+    setSelectedMediaIndex((prev) => (prev + 1) % allMedia.length);
+    setIsVideoPlaying(false);
+    setMediaLoading(true);
   };
 
-  const prevImage = () => {
-    setSelectedImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length);
+  const prevMedia = () => {
+    setSelectedMediaIndex((prev) => (prev - 1 + allMedia.length) % allMedia.length);
+    setIsVideoPlaying(false);
+    setMediaLoading(true);
   };
 
   return (
     <>
-      <header className="fixed top-0 z-50 flex h-16 shrink-0 items-center justify-between gap-2 px-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b w-[calc(100%-var(--sidebar-width))] md:w-[calc(100%-var(--sidebar-width)-1rem)]">
+      <header className="fixed top-0 z-50 flex h-16 shrink-0 items-center justify-between gap-2 px-4 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 border-b w-[calc(100%-var(--sidebar-width))] md:w-[calc(100%-var(--sidebar-width)-1rem)]">
         <div className="flex items-center gap-2">
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
@@ -252,70 +392,113 @@ export default function ProductDetailPage() {
             <div className="space-y-4">
               {/* Main Image/Video */}
               <div className="relative aspect-square w-full rounded-lg overflow-hidden bg-muted">
-                {isVideoPlaying && product.video ? (
+                {mediaLoading && (
+                  <Skeleton className="absolute inset-0 w-full h-full" />
+                )}
+                {isVideoPlaying && isCurrentVideo && currentMedia ? (
                   <video
-                    src={product.video}
+                    src={currentMedia.url}
                     controls
                     autoPlay
                     className="w-full h-full object-cover"
+                    onLoadedData={() => setMediaLoading(false)}
                     onEnded={() => setIsVideoPlaying(false)}
                   />
-                ) : (
+                ) : currentMedia ? (
                   <>
-                    <Image
-                      src={product.images[selectedImageIndex]}
-                      alt={product.name}
-                      fill
-                      className="object-cover"
-                    />
-                    {product.video && (
-                      <button
-                        onClick={() => setIsVideoPlaying(true)}
-                        className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors"
-                      >
-                        <div className="bg-white/90 rounded-full p-4">
-                          <Play className="size-12 text-black ml-1" fill="currentColor" />
-                        </div>
-                      </button>
+                    {currentMedia.type === "video" ? (
+                      <div className="relative w-full h-full">
+                        <video
+                          src={currentMedia.url}
+                          className="w-full h-full object-cover"
+                          muted
+                          playsInline
+                          onLoadedData={() => setMediaLoading(false)}
+                        />
+                        <button
+                          onClick={() => setIsVideoPlaying(true)}
+                          className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors"
+                        >
+                          <div className="bg-white/90 rounded-full p-4">
+                            <Play className="size-12 text-black ml-1" fill="currentColor" />
+                          </div>
+                        </button>
+                      </div>
+                    ) : (
+                      <Image
+                        src={currentMedia.url}
+                        alt={product.name}
+                        fill
+                        className={cn(
+                          "object-cover transition-opacity duration-300",
+                          mediaLoading ? "opacity-0" : "opacity-100"
+                        )}
+                        onLoad={() => setMediaLoading(false)}
+                        onError={() => setMediaLoading(false)}
+                      />
                     )}
-                    {product.images.length > 1 && (
+                    {allMedia.length > 1 && (
                       <>
                         <button
-                          onClick={prevImage}
-                          className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors"
+                          onClick={prevMedia}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors z-10"
                         >
                           <ChevronLeft className="size-6" />
                         </button>
                         <button
-                          onClick={nextImage}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors"
+                          onClick={nextMedia}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors z-10"
                         >
                           <ChevronRight className="size-6" />
                         </button>
                       </>
                     )}
                   </>
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground">
+                    <p>No media available</p>
+                  </div>
                 )}
               </div>
 
               {/* Thumbnail Gallery */}
-              {product.images.length > 1 && (
+              {allMedia.length > 1 && (
                 <div className="grid grid-cols-4 gap-2">
-                  {product.images.map((image, index) => (
+                  {allMedia.map((media, index) => (
                     <button
                       key={index}
                       onClick={() => {
-                        setSelectedImageIndex(index);
+                        setSelectedMediaIndex(index);
                         setIsVideoPlaying(false);
+                        setMediaLoading(true);
                       }}
                       className={cn(
                         "relative aspect-square rounded-lg overflow-hidden border-2 transition-colors",
-                        selectedImageIndex === index
+                        selectedMediaIndex === index
                           ? "border-primary"
                           : "border-transparent hover:border-muted-foreground/50"
                       )}
                     >
-                      <Image src={image} alt={`${product.name} view ${index + 1}`} fill className="object-cover" />
+                      {media.type === "video" ? (
+                        <>
+                          <video
+                            src={media.url}
+                            className="w-full h-full object-cover"
+                            muted
+                            playsInline
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                            <Play className="size-6 text-white" fill="currentColor" />
+                          </div>
+                        </>
+                      ) : (
+                        <Image
+                          src={media.url}
+                          alt={`${product.name} view ${index + 1}`}
+                          fill
+                          className="object-cover"
+                        />
+                      )}
                     </button>
                   ))}
                 </div>
@@ -343,61 +526,39 @@ export default function ProductDetailPage() {
                     </span>
                   )}
                 </div>
-                <p className="text-muted-foreground">
-                  or ${product.monthlyPrice.toLocaleString()}/mo. for {product.monthlyMonths} mo.*
-                </p>
+                {product.monthlyPrice > 0 && (
+                  <p className="text-muted-foreground">
+                    or ${product.monthlyPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/mo. for {product.monthlyMonths} mo.*
+                  </p>
+                )}
               </div>
 
               {/* Configuration Options */}
-              <div className="border-t pt-6">
-                <h3 className="font-semibold mb-3">Configuration</h3>
-                <div className="space-y-2">
-                  {product.options.configurations.map((config) => (
-                    <button
-                      key={config.id}
-                      onClick={() => setSelectedConfig(config.id)}
-                      className={cn(
-                        "w-full text-left p-3 rounded-lg border-2 transition-colors",
-                        selectedConfig === config.id
-                          ? "border-primary bg-primary/5"
-                          : "border-muted hover:border-muted-foreground/50"
-                      )}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium">{config.name}</span>
-                        {config.price > 0 && (
-                          <span className="text-sm text-muted-foreground">+ ${config.price.toLocaleString()}</span>
-                        )}
-                        {selectedConfig === config.id && <Check className="size-5 text-primary" />}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Color Options */}
-              {product.options.colors.length > 0 && (
+              {product.options.configurations.length > 1 && (
                 <div className="border-t pt-6">
-                  <h3 className="font-semibold mb-3">Color</h3>
-                  <div className="flex gap-3">
-                    {product.options.colors.map((color) => (
+                  <h3 className="font-semibold mb-3">Configuration</h3>
+                  <div className="space-y-2">
+                    {product.options.configurations.map((config) => (
                       <button
-                        key={color.id}
-                        onClick={() => setSelectedColor(color.id)}
+                        key={config.id}
+                        onClick={() => setSelectedConfig(config.id)}
                         className={cn(
-                          "size-12 rounded-full border-2 transition-all",
-                          selectedColor === color.id
-                            ? "border-primary scale-110"
+                          "w-full text-left p-3 rounded-lg border-2 transition-colors",
+                          selectedConfig === config.id
+                            ? "border-primary bg-primary/5"
                             : "border-muted hover:border-muted-foreground/50"
                         )}
-                        style={{ backgroundColor: color.value }}
-                        aria-label={color.name}
-                      />
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium">{config.name}</span>
+                          {config.price > 0 && (
+                            <span className="text-sm text-muted-foreground">+ ${config.price.toLocaleString()}</span>
+                          )}
+                          {selectedConfig === config.id && <Check className="size-5 text-primary" />}
+                        </div>
+                      </button>
                     ))}
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    {selectedColorData?.name}
-                  </p>
                 </div>
               )}
 
@@ -471,42 +632,45 @@ export default function ProductDetailPage() {
           {/* Bottom Section - Specs and Technical Info */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Specifications */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Specifications</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <dl className="space-y-3">
-                  {Object.entries(product.specs).map(([key, value]) => (
-                    <div key={key} className="flex justify-between border-b pb-2">
-                      <dt className="font-medium capitalize">{key.replace(/([A-Z])/g, " $1").trim()}</dt>
-                      <dd className="text-muted-foreground">{value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </CardContent>
-            </Card>
+            {Object.keys(product.specs).length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Specifications</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <dl className="space-y-3">
+                    {Object.entries(product.specs).map(([key, value]) => (
+                      <div key={key} className="flex justify-between border-b pb-2">
+                        <dt className="font-medium capitalize">{key.replace(/([A-Z])/g, " $1").trim()}</dt>
+                        <dd className="text-muted-foreground">{value as string}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Features */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Key Features</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  {product.features.map((feature, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <Check className="size-5 text-primary shrink-0 mt-0.5" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
+            {product.features.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Key Features</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2">
+                    {product.features.map((feature, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <Check className="size-5 text-primary shrink-0 mt-0.5" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </div>
     </>
   );
 }
-
