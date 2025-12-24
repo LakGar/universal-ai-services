@@ -12,7 +12,7 @@ import { useCart } from "@/contexts/cart-context";
 import { useWishlist } from "@/contexts/wishlist-context";
 
 interface ProductCardProps {
-  id: number;
+  id: number | string;
   name: string;
   image: string;
   alt: string;
@@ -74,7 +74,7 @@ export function ProductCard({
   return (
     <motion.div
       className={cn(
-        "w-full flex flex-col gap-4 p-4 rounded-lg hover:bg-muted/50 transition-colors relative group",
+        "w-full flex flex-col gap-4 p-4 rounded-lg hover:bg-muted/50 transition-colors relative group h-full",
         className
       )}
       initial={{ opacity: 0, y: 20 }}
@@ -82,13 +82,8 @@ export function ProductCard({
       viewport={{ once: true }}
       transition={{ duration: 0.4 }}
     >
-      {isNew && (
-        <div className="absolute top-2 right-2 text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded w-fit z-10">
-          NEW
-        </div>
-      )}
-      <Link href={`/services/buy/${id}`} className="block">
-        <h3 className="text-lg font-semibold text-foreground hover:text-primary transition-colors">
+      <Link href={`/services/buy/${id}`} className="block flex-shrink-0">
+        <h3 className="text-lg font-semibold text-foreground hover:text-primary transition-colors h-[3.5rem] line-clamp-2 flex items-start">
           {name}
         </h3>
         <div className="relative aspect-3/4 w-full rounded-lg overflow-hidden bg-muted cursor-pointer">
@@ -160,13 +155,15 @@ export function ProductCard({
           className={cn("h-4 w-4", inWishlist && "fill-red-500 text-red-500")}
         />
       </Button>
-      <div className="flex flex-col gap-1">
-        <p className="text-sm text-foreground font-medium">{price}</p>
-        {monthlyPrice && (
-          <p className="text-xs text-muted-foreground">{monthlyPrice}</p>
+      <div className="flex flex-col gap-1 h-[3.5rem] flex-shrink-0">
+        <p className="text-sm text-foreground font-medium line-clamp-1 h-5">{price}</p>
+        {monthlyPrice ? (
+          <p className="text-xs text-muted-foreground line-clamp-2 h-8">{monthlyPrice}</p>
+        ) : (
+          <div className="h-8" />
         )}
       </div>
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-shrink-0 mt-auto">
         <Button
           onClick={(e) => {
             e.preventDefault();

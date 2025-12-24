@@ -139,7 +139,7 @@
 }
 
 /* Aurora Background CSS Variables */
-:root {
+  :root {
   --white: #ffffff;
   --black: #000000;
   --transparent: transparent;
@@ -148,7 +148,7 @@
   --blue-300: rgb(147, 197, 253);
   --indigo-300: rgb(165, 180, 252);
   --violet-200: rgb(221, 214, 254);
-}
+  }
 
 /* Aurora Animation */
 @keyframes aurora {

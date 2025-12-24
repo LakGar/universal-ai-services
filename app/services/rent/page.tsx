@@ -15,75 +15,51 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ProductCard } from "@/components/ui/product-card";
 import { CartIcon } from "@/components/cart-icon";
 import { WishlistIcon } from "@/components/wishlist-icon";
+import rentalData from "@/app/data.json";
 
-const rentalProducts = [
-  {
-    id: 1,
-    name: "Industrial Robot Arm Pro",
-    image:
-      "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80",
-    alt: "Industrial Robot Arm Pro",
-    price: "From $2,999/mo",
-    monthlyPrice: "Minimum 3 month rental",
-    colors: ["#3b82f6", "#ef4444", "#10b981", "#f59e0b"],
-    isNew: true,
-  },
-  {
-    id: 2,
-    name: "Autonomous Delivery Bot",
-    image:
-      "https://images.unsplash.com/photo-1534723328310-e82dad3ee43f?w=800&q=80",
-    alt: "Autonomous Delivery Bot",
-    price: "From $1,999/mo",
-    monthlyPrice: "Minimum 3 month rental",
-    colors: ["#ffffff", "#000000", "#3b82f6", "#10b981"],
-    isNew: true,
-  },
-  {
-    id: 3,
-    name: "AI-Powered Assistant",
-    image:
-      "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&q=80",
-    alt: "AI-Powered Assistant",
-    price: "From $1,299/mo",
-    monthlyPrice: "Minimum 3 month rental",
-    colors: ["#8b5cf6", "#ec4899", "#06b6d4", "#000000"],
-    isNew: false,
-  },
-  {
-    id: 4,
-    name: "Medical Robot System",
-    image:
-      "https://images.unsplash.com/photo-1555255707-c07966088b7b?w=800&q=80",
-    alt: "Medical Robot System",
-    price: "From $4,999/mo",
-    monthlyPrice: "Minimum 6 month rental",
-    colors: ["#ffffff", "#3b82f6", "#10b981"],
-    isNew: false,
-  },
-  {
-    id: 5,
-    name: "Warehouse Automation Bot",
-    image:
-      "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80",
-    alt: "Warehouse Automation Bot",
-    price: "From $2,499/mo",
-    monthlyPrice: "Minimum 3 month rental",
-    colors: ["#f59e0b", "#ef4444", "#000000"],
-    isNew: false,
-  },
-  {
-    id: 6,
-    name: "Service Robot",
-    image:
-      "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80",
-    alt: "Service Robot",
-    price: "From $1,499/mo",
-    monthlyPrice: "Minimum 3 month rental",
-    colors: ["#ffffff", "#3b82f6", "#10b981", "#f59e0b"],
-    isNew: false,
-  },
-];
+// Transform rental data to ProductCard format
+const transformRentals = () => {
+  const robotImages = [
+    "https://images.unsplash.com/photo-1625314887424-9f190599bd56?w=800&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1534723328310-e82dad3ee43f?w=800&q=80",
+    "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&q=80",
+    "https://images.unsplash.com/photo-1555255707-c07966088b7b?w=800&q=80",
+    "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80",
+    "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80",
+    "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80",
+    "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80",
+  ];
+
+  return rentalData.rentals.map((rental, index) => {
+    const dailyPrice = rental.pricing?.daily_usd;
+    const depositPercent = rental.pricing?.deposit_percent || 0;
+    
+    let price = "Contact for pricing";
+    let monthlyPrice = rental.availability || "";
+    
+    if (dailyPrice) {
+      const monthlyEstimate = dailyPrice * 30;
+      price = `From $${dailyPrice.toLocaleString()}/day`;
+      monthlyPrice = monthlyEstimate > 0 
+        ? `~$${Math.round(monthlyEstimate).toLocaleString()}/mo • ${depositPercent}% deposit`
+        : rental.availability || "";
+    } else if (rental.pricing?.model) {
+      price = rental.pricing.model;
+    }
+
+    return {
+      id: rental.id,
+      name: rental.name,
+      image: robotImages[index % robotImages.length],
+      alt: rental.name,
+      price,
+      monthlyPrice,
+      isNew: rental.year === 2025 || rental.year === 2024,
+    };
+  });
+};
+
+const rentalProducts = transformRentals();
 
 export default function RentPage() {
   return (
@@ -134,7 +110,7 @@ export default function RentPage() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch">
             {rentalProducts.map((product) => (
               <ProductCard
                 key={product.id}

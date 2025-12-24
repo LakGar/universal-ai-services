@@ -1,0 +1,210 @@
+{
+  "rentals": [
+    {
+      "id": "UNITREE-GO2-PRO-RENT",
+      "name": "Unitree Go2 Pro",
+      "category": "Quadruped Robot",
+      "manufacturer": "Unitree Robotics",
+      "model": "Go2 Pro",
+      "year": 2024,
+      "description": "Professional-grade quadruped robot dog rental for demos, R&D pilots, inspections, and events.",
+      "features": [
+        "4D LiDAR",
+        "SLAM mapping",
+        "Remote teleoperation",
+        "Programmable behaviors",
+        "Expandable payload"
+      ],
+      "specs": {
+        "weight_kg": 15,
+        "runtime_hours": "1–2",
+        "payload_kg": { "typical": 8, "max": 10 },
+        "top_speed_mps": 3.5,
+        "climb_angle_deg": 40
+      },
+      "environment": ["Indoor", "Outdoor"],
+      "software": ["Python", "C++", "ROS"],
+      "pricing": { "daily_usd": 909.6, "deposit_percent": 20 },
+      "availability": "On demand",
+      "origin": "China"
+    },
+    {
+      "id": "UNITREE-GO2-X-RENT",
+      "name": "Unitree Go2 X (Tracked)",
+      "category": "Tracked Quadruped Robot",
+      "manufacturer": "Unitree Robotics",
+      "year": 2024,
+      "description": "Tracked Go2 platform optimized for harsh terrain and high-traction environments.",
+      "environment": ["Outdoor", "Harsh terrain"],
+      "software": ["Python", "C++", "ROS"],
+      "pricing": { "daily_usd": 2685.6, "deposit_percent": 20 },
+      "availability": "Limited / On demand",
+      "origin": "China"
+    },
+    {
+      "id": "UNITREE-G1-BASIC-RENT",
+      "name": "Unitree G1 Basic",
+      "category": "Humanoid Robot",
+      "manufacturer": "Unitree Robotics",
+      "year": 2024,
+      "description": "Compact humanoid research platform for embodied AI demos and lab pilots.",
+      "specs": { "weight_kg": 35, "runtime_hours": 2, "dof": "23–43" },
+      "software": ["Python", "C++", "ROS2"],
+      "pricing": { "daily_usd": 5760, "deposit_percent": 20 },
+      "availability": "On demand"
+    },
+    {
+      "id": "UNITREE-G1-EDU-U3-RENT",
+      "name": "Unitree G1 EDU Ultimate A",
+      "category": "Advanced Humanoid Robot",
+      "manufacturer": "Unitree Robotics",
+      "year": 2025,
+      "description": "Advanced humanoid platform with dexterous hands and Jetson Orin compute.",
+      "specs": { "weight_kg": 35, "dof": 42, "runtime_hours": 2 },
+      "software": ["Python", "C++", "ROS2"],
+      "pricing": { "daily_usd": 15816, "deposit_percent": 20 },
+      "availability": "Pre-book"
+    },
+    {
+      "id": "UNITREE-R1-AIR-RENT",
+      "name": "Unitree R1 Air",
+      "category": "Lightweight Humanoid",
+      "manufacturer": "Unitree Robotics",
+      "year": 2025,
+      "description": "Ultra-light humanoid robot for education demos and light R&D.",
+      "specs": { "weight_kg": "22–24", "runtime_hours": "1–2" },
+      "pricing": { "daily_usd": 1800, "deposit_percent": 20 }
+    },
+    {
+      "id": "UNITREE-R1-STD-RENT",
+      "name": "Unitree R1 Standard",
+      "category": "Humanoid Robot",
+      "manufacturer": "Unitree Robotics",
+      "year": 2025,
+      "description": "Enhanced humanoid robot for demos and short research pilots.",
+      "pricing": { "daily_usd": 2040, "deposit_percent": 20 }
+    },
+    {
+      "id": "UNITREE-H1-2-RENT",
+      "name": "Unitree H1-2",
+      "category": "Full-size Humanoid Robot",
+      "manufacturer": "Unitree Robotics",
+      "year": 2025,
+      "description": "Full-size humanoid robot for enterprise R&D and autonomy pilots.",
+      "pricing": { "daily_usd": 30936, "deposit_percent": 20 },
+      "availability": "Pre-book"
+    },
+    {
+      "id": "UNITREE-H1-RENT",
+      "name": "Unitree H1",
+      "category": "High-performance Humanoid",
+      "manufacturer": "Unitree Robotics",
+      "year": 2025,
+      "pricing": { "daily_usd": 23976, "deposit_percent": 20 }
+    },
+    {
+      "id": "NOVA-KUKA-RENT",
+      "name": "KUKA Industrial Robot (Event Rental)",
+      "category": "Industrial Robot",
+      "manufacturer": "Nova Tech Innovations",
+      "year": 2025,
+      "description": "Industrial KUKA robot rental for events, shows, and kinetic installations.",
+      "pricing": { "model": "Quote only" }
+    },
+    {
+      "id": "OPENMIND-BRAINPACK-RENT",
+      "name": "OpenMind BrainPack",
+      "category": "Autonomy Module",
+      "manufacturer": "OpenMind",
+      "year": 2025,
+      "description": "AI autonomy module with perception, mapping, and semantic memory.",
+      "pricing": { "deposit_usd": 999, "model": "Quoted per deployment" }
+    }
+  ],
+
+  "services": [
+    {
+      "id": "UAIS-REPAIR-SF",
+      "name": "Robot Repair – SF Bay Area",
+      "provider": "UAIS",
+      "region": "San Francisco Bay Area",
+      "pricing": { "hourly_usd": 150, "deposit_percent": 50 },
+      "warranty": "30 days"
+    },
+    {
+      "id": "UAIS-REPAIR-LA",
+      "name": "Robot Repair – Los Angeles",
+      "provider": "UAIS",
+      "region": "Los Angeles",
+      "pricing": { "hourly_usd": 150, "deposit_percent": 50 },
+      "warranty": "30 days"
+    },
+    {
+      "id": "UAIS-ON-SITE-OPERATOR",
+      "name": "On-site Robot Operator",
+      "provider": "UAIS",
+      "pricing": { "model": "Quoted per job" }
+    },
+    {
+      "id": "UAIS-SAFETY-COMPLIANCE",
+      "name": "Safety & Compliance Planning",
+      "provider": "UAIS",
+      "pricing": { "model": "Quoted" }
+    },
+    {
+      "id": "UAIS-CUSTOM-INTEGRATION",
+      "name": "Custom Robot Integration",
+      "provider": "UAIS",
+      "pricing": { "model": "Quoted" }
+    }
+  ],
+
+  "accessories_addons": [
+    {
+      "id": "AI-FACEREC-SDK",
+      "name": "AI Facial Recognition SDK",
+      "provider": "Micro-IP",
+      "category": "Vision AI",
+      "deployment": "Edge",
+      "pricing": { "model": "Contact vendor" }
+    },
+    {
+      "id": "AI-GESTURE-SDK",
+      "name": "Gesture Recognition SDK",
+      "provider": "Micro-IP",
+      "category": "Vision AI",
+      "deployment": "Edge"
+    },
+    {
+      "id": "AI-VIRTUAL-FENCE",
+      "name": "Virtual Fence SDK",
+      "provider": "Micro-IP",
+      "category": "Security AI"
+    },
+    {
+      "id": "AI-FALL-DETECTION",
+      "name": "Fall Detection SDK",
+      "provider": "Micro-IP",
+      "category": "Healthcare AI"
+    },
+    {
+      "id": "AI-PEOPLE-FLOW",
+      "name": "People Flow Management SDK",
+      "provider": "Micro-IP",
+      "category": "Analytics AI"
+    },
+    {
+      "id": "AI-LPR-SDK",
+      "name": "License Plate Recognition SDK",
+      "provider": "Micro-IP",
+      "category": "Security AI"
+    },
+    {
+      "id": "INSPIRE-RH56DFQ",
+      "name": "Inspire RH56DFQ Dexterous Hands (Pair)",
+      "provider": "Inspire Robots",
+      "category": "Robotic Manipulators",
+      "pricing": { "price_usd": 19000 }
+    }
+  ]
+}
