@@ -17,40 +17,99 @@ import { CartIcon } from "@/components/cart-icon";
 import { WishlistIcon } from "@/components/wishlist-icon";
 import accessoryData from "@/app/data.json";
 
+// Helper function to extract file ID from Google Drive URL
+const extractFileId = (url: string): string | null => {
+  if (typeof url !== "string") return null;
+  const fileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (fileMatch) return fileMatch[1];
+  return null;
+};
+
+// Helper function to convert Google Drive URL to direct image URL
+const getImageUrl = (url: string): string => {
+  if (typeof url !== "string") {
+    return "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
+  }
+  
+  if (url.includes("drive.google.com")) {
+    const fileId = extractFileId(url);
+    if (fileId) {
+      return `https://drive.google.com/uc?export=view&id=${fileId}`;
+    }
+  }
+  
+  // If it's already a direct URL, return it
+  if (url.startsWith("http")) {
+    return url;
+  }
+  
+  // Fallback
+  return "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
+};
+
 // Transform accessories data to ProductCard format
 const transformAccessories = () => {
-  const accessoryImages = [
-    "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80",
-    "https://images.unsplash.com/photo-1609599006353-e629aaabfeae?w=800&q=80",
-    "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80",
-    "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80",
-    "https://images.unsplash.com/photo-1555255707-c07966088b7b?w=800&q=80",
-    "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80",
-    "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80",
-  ];
-
-  return accessoryData.accessories_addons.map((accessory, index) => {
-    const priceUsd = accessory.pricing?.price_usd;
-    const pricingModel = accessory.pricing?.model;
-
-    let price = "Contact for pricing";
-    let monthlyPrice = accessory.category || accessory.deployment || "";
-
-    if (priceUsd) {
-      price = `$${priceUsd.toLocaleString()}`;
-      monthlyPrice = accessory.category || accessory.deployment || "";
-    } else if (pricingModel) {
-      price = pricingModel;
+  return accessoryData.accessories_addons.map((accessory) => {
+    // Get first image from images array
+    let imageUrl = "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
+    if (accessory.images && Array.isArray(accessory.images) && accessory.images.length > 0) {
+      imageUrl = getImageUrl(accessory.images[0]);
     }
 
+    // Extract pricing information
+    let price = "Contact for pricing";
+    let monthlyPrice = "";
+
+    // Check MSRP first (skip if it says "Contact Micro-IP" or "N/A")
+    if (accessory.MSRP && 
+        accessory.MSRP !== "Contact Micro-IP" && 
+        accessory.MSRP !== "N/A" &&
+        typeof accessory.MSRP === "string") {
+      const msrpValue = parseFloat(accessory.MSRP.replace(/[^0-9.]/g, ""));
+      if (msrpValue > 0 && !isNaN(msrpValue)) {
+        price = `$${msrpValue.toLocaleString()}`;
+      }
+    }
+    
+    // Check UAIS Price (skip if it says "N/A")
+    if (accessory["UAIS Price"] && 
+        accessory["UAIS Price"] !== "N/A" && 
+        price === "Contact for pricing") {
+      const uaisPrice = accessory["UAIS Price"].toString();
+      if (uaisPrice.includes("$")) {
+        price = uaisPrice;
+      } else {
+        const uaisValue = parseFloat(uaisPrice.replace(/[^0-9.]/g, ""));
+        if (uaisValue > 0 && !isNaN(uaisValue)) {
+          price = `$${uaisValue.toLocaleString()}`;
+        }
+      }
+    }
+    
+    // If MSRP says "Contact Micro-IP", keep "Contact for pricing"
+    if (accessory.MSRP === "Contact Micro-IP") {
+      price = "Contact for pricing";
+    }
+
+    // Set monthly price based on manufacturer or category
+    if (accessory.Manufacturer) {
+      monthlyPrice = accessory.Manufacturer;
+    } else if (accessory["Short Description"]) {
+      monthlyPrice = accessory["Short Description"];
+    }
+
+    // Determine if product is new (released in 2024 or 2025)
+    const releaseYear = parseInt(accessory["Release Year"] || "0");
+    const isNew = releaseYear >= 2024;
+
     return {
-      id: accessory.id,
+      id: accessory["Product ID"] || accessory.SKU || accessory.name,
       name: accessory.name,
-      image: accessoryImages[index % accessoryImages.length],
-      alt: accessory.name,
+      image: imageUrl,
+      alt: accessory["Short Description"] || accessory.name,
       price,
-      monthlyPrice: monthlyPrice || accessory.provider || "",
-      isNew: false,
+      monthlyPrice,
+      isNew,
     };
   });
 };
@@ -117,6 +176,7 @@ export default function AccessoriesPage() {
                 price={accessory.price}
                 monthlyPrice={accessory.monthlyPrice}
                 isNew={accessory.isNew}
+                linkPath={`/services/accessories/${accessory.id}`}
               />
             ))}
           </div>

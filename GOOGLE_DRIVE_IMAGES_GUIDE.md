@@ -76,3 +76,4 @@ If you have folder links in your `Location ID` field, you need to:
 - If `Images` field is not provided, the code will try to extract from `Location ID`, otherwise use placeholders
 
 
+

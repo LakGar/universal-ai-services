@@ -17,39 +17,99 @@ import { CartIcon } from "@/components/cart-icon";
 import { WishlistIcon } from "@/components/wishlist-icon";
 import serviceData from "@/app/data.json";
 
+// Helper function to extract file ID from Google Drive URL
+const extractFileId = (url: string): string | null => {
+  if (typeof url !== "string") return null;
+  const fileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (fileMatch) return fileMatch[1];
+  return null;
+};
+
+// Helper function to convert Google Drive URL to direct image URL
+const getImageUrl = (url: string): string => {
+  if (typeof url !== "string") {
+    return "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80";
+  }
+  
+  if (url.includes("drive.google.com")) {
+    const fileId = extractFileId(url);
+    if (fileId) {
+      return `https://drive.google.com/uc?export=view&id=${fileId}`;
+    }
+  }
+  
+  // If it's already a direct URL, return it
+  if (url.startsWith("http")) {
+    return url;
+  }
+  
+  // Fallback
+  return "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80";
+};
+
 // Transform repair services to ProductCard format
 const transformRepairs = () => {
-  const repairImages = [
-    "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80",
-    "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80",
-    "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80",
-    "https://images.unsplash.com/photo-1555255707-c07966088b7b?w=800&q=80",
-    "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80",
-  ];
+  return serviceData.services.map((service) => {
+    // Get first image from images array
+    let imageUrl = "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80";
+    if (service.images && Array.isArray(service.images) && service.images.length > 0) {
+      imageUrl = getImageUrl(service.images[0]);
+    }
 
-  return serviceData.services.map((service, index) => {
-    const hourlyPrice = service.pricing?.hourly_usd;
-    const depositPercent = service.pricing?.deposit_percent;
-    
+    // Extract pricing information from UAIS Price field
     let price = "Contact for quote";
-    let monthlyPrice = service.warranty ? `${service.warranty} warranty` : "";
+    if (service["UAIS Price"] && service["UAIS Price"] !== "N/A") {
+      const uaisPrice = service["UAIS Price"].toString();
+      if (uaisPrice.includes("USD") || uaisPrice.includes("$")) {
+        price = uaisPrice;
+      } else {
+        const priceValue = parseFloat(uaisPrice.replace(/[^0-9.]/g, ""));
+        if (priceValue > 0 && !isNaN(priceValue)) {
+          price = `$${priceValue.toLocaleString()}`;
+        }
+      }
+    }
+
+    // Build monthly price with warranty and deposit info
+    let monthlyPrice = "";
+    if (service.Warranty && service.Warranty !== "N/A") {
+      monthlyPrice = service.Warranty;
+    }
     
-    if (hourlyPrice) {
-      price = `$${hourlyPrice}/hour`;
-      monthlyPrice = depositPercent 
-        ? `${depositPercent}% deposit • ${service.warranty || ""} warranty`
-        : service.warranty || "";
-    } else if (service.pricing?.model) {
-      price = service.pricing.model;
+    // Add deposit info if available
+    if (service["Deposit Required"] && service["Deposit Required"] !== "N/A" && service["Deposit Required"] !== "50% deposit") {
+      if (monthlyPrice) {
+        monthlyPrice += ` • ${service["Deposit Required"]}`;
+      } else {
+        monthlyPrice = service["Deposit Required"];
+      }
+    } else if (service["Deposit Required"] === "50% deposit") {
+      if (monthlyPrice) {
+        monthlyPrice += " • 50% deposit";
+      } else {
+        monthlyPrice = "50% deposit";
+      }
+    }
+
+    // Add location info if available
+    if (service["Version/Revision"]) {
+      const location = service["Version/Revision"];
+      if (location.includes("Bay Area") || location.includes("Los Angeles") || location.includes("LA")) {
+        if (monthlyPrice) {
+          monthlyPrice += ` • ${location}`;
+        } else {
+          monthlyPrice = location;
+        }
+      }
     }
 
     return {
-      id: service.id,
+      id: service["Product ID"] || service.SKU || service.name,
       name: service.name,
-      image: repairImages[index % repairImages.length],
-      alt: service.name,
+      image: imageUrl,
+      alt: service["Short Description"] || service.name,
       price,
-      monthlyPrice: monthlyPrice || service.region || "",
+      monthlyPrice: monthlyPrice || "",
       isNew: false,
     };
   });
@@ -117,6 +177,7 @@ export default function RepairsPage() {
                 price={service.price}
                 monthlyPrice={service.monthlyPrice}
                 isNew={service.isNew}
+                linkPath={`/services/repairs/${service.id}`}
               />
             ))}
           </div>

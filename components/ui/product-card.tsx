@@ -21,6 +21,8 @@ interface ProductCardProps {
   colors?: string[];
   isNew?: boolean;
   className?: string;
+  isVideo?: boolean;
+  linkPath?: string;
 }
 
 export function ProductCard({
@@ -32,6 +34,8 @@ export function ProductCard({
   monthlyPrice,
   isNew = false,
   className,
+  isVideo: isVideoProp,
+  linkPath,
 }: ProductCardProps) {
   const { addItem } = useCart();
   const {
@@ -43,10 +47,11 @@ export function ProductCard({
   const [imageLoading, setImageLoading] = React.useState(true);
   const [imageError, setImageError] = React.useState(false);
   const isVideo = React.useMemo(() => {
+    if (isVideoProp !== undefined) return isVideoProp;
     if (!image) return false;
     const videoExtensions = [".mp4", ".webm", ".mov", ".avi", ".mkv", ".m4v"];
     return videoExtensions.some((ext) => image.toLowerCase().includes(ext));
-  }, [image]);
+  }, [image, isVideoProp]);
 
   const handleAddToCart = () => {
     addItem({
@@ -82,7 +87,7 @@ export function ProductCard({
       viewport={{ once: true }}
       transition={{ duration: 0.4 }}
     >
-      <Link href={`/services/buy/${id}`} className="block flex-shrink-0">
+      <Link href={linkPath || `/services/buy/${id}`} className="block flex-shrink-0">
         <h3 className="text-lg font-semibold text-foreground hover:text-primary transition-colors h-[3.5rem] line-clamp-2 flex items-start">
           {name}
         </h3>
@@ -92,18 +97,33 @@ export function ProductCard({
           )}
           {isVideo ? (
             <div className="relative w-full h-full flex items-center justify-center bg-muted">
-              <video
-                src={image}
-                className="w-full h-full object-cover"
-                muted
-                playsInline
-                onLoadedData={() => setImageLoading(false)}
-                onError={() => {
-                  setImageError(true);
-                  setImageLoading(false);
-                }}
-              />
-              <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+              {image.includes("drive.google.com") && image.includes("/preview") ? (
+                <iframe
+                  src={image}
+                  className="w-full h-full border-0"
+                  allow="autoplay; encrypted-media"
+                  allowFullScreen
+                  onLoad={() => setImageLoading(false)}
+                  onError={() => {
+                    setImageError(true);
+                    setImageLoading(false);
+                  }}
+                />
+              ) : (
+                <video
+                  src={image}
+                  className="w-full h-full object-cover"
+                  muted
+                  playsInline
+                  onLoadedData={() => setImageLoading(false)}
+                  onError={() => {
+                    setImageError(true);
+                    setImageLoading(false);
+                  }}
+                  crossOrigin="anonymous"
+                />
+              )}
+              <div className="absolute inset-0 flex items-center justify-center bg-black/20 pointer-events-none">
                 <div className="bg-white/90 rounded-full p-3">
                   <Play
                     className="size-8 text-black ml-1"
@@ -173,9 +193,9 @@ export function ProductCard({
         >
           Buy
         </Button>
-        <Button asChild variant="outline" className="flex-1">
-          <Link href={`/services/buy/${id}`}>View Details</Link>
-        </Button>
+            <Button asChild variant="outline" className="flex-1">
+              <Link href={linkPath || `/services/buy/${id}`}>View Details</Link>
+            </Button>
       </div>
     </motion.div>
   );
