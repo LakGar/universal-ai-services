@@ -14,10 +14,10 @@ export function CartModal() {
   const { items: cartItems, removeItem, updateQuantity } = useCart();
   const router = useRouter();
 
-  const handleQuantityChange = (id: number, change: number) => {
-    const item = cartItems.find((i) => i.id === id);
+  const handleQuantityChange = (cartItemId: string, change: number) => {
+    const item = cartItems.find((i) => i.cartItemId === cartItemId);
     if (item) {
-      updateQuantity(id, item.quantity + change);
+      updateQuantity(cartItemId, item.quantity + change);
     }
   };
 
@@ -58,7 +58,7 @@ export function CartModal() {
       {cartItems.length > 0 ? (
         <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 mb-20">
           {cartItems.map((item) => (
-            <Card key={item.id} className="group overflow-hidden p-0">
+            <Card key={item.cartItemId} className="group overflow-hidden p-0">
               <div className="relative">
                 <AspectRatio ratio={1} className="bg-muted">
                   <Image
@@ -73,7 +73,7 @@ export function CartModal() {
                   variant="secondary"
                   size="icon"
                   className="absolute right-2 top-2 h-7 w-7 opacity-0 transition-opacity group-hover:opacity-100"
-                  onClick={() => removeItem(item.id)}
+                  onClick={() => removeItem(item.cartItemId)}
                 >
                   <Trash2 className="size-3.5" />
                 </Button>
@@ -83,6 +83,17 @@ export function CartModal() {
                 <h3 className="font-medium leading-tight text-sm line-clamp-2">
                   {item.name}
                 </h3>
+                {item.addOns && item.addOns.length > 0 && (
+                  <div className="text-xs text-muted-foreground space-y-0.5">
+                    <p className="font-medium">Includes:</p>
+                    {item.addOns.map((addOn) => (
+                      <p key={addOn.id} className="line-clamp-1">
+                        • {addOn.name}
+                        {addOn.price > 0 && ` (+$${addOn.price.toLocaleString()})`}
+                      </p>
+                    ))}
+                  </div>
+                )}
                 <div className="flex flex-col gap-1">
                   <span className="text-base font-semibold">{item.price}</span>
                 </div>
@@ -93,7 +104,7 @@ export function CartModal() {
                       variant="ghost"
                       size="icon"
                       className="h-7 w-7"
-                      onClick={() => handleQuantityChange(item.id, -1)}
+                      onClick={() => handleQuantityChange(item.cartItemId, -1)}
                       disabled={item.quantity <= 1}
                     >
                       <Minus className="size-3" />
@@ -105,7 +116,7 @@ export function CartModal() {
                       variant="ghost"
                       size="icon"
                       className="h-7 w-7"
-                      onClick={() => handleQuantityChange(item.id, 1)}
+                      onClick={() => handleQuantityChange(item.cartItemId, 1)}
                     >
                       <Plus className="size-3" />
                     </Button>

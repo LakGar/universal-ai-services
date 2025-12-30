@@ -2,19 +2,28 @@
 
 import * as React from "react";
 
+export interface CartAddOn {
+  id: string;
+  name: string;
+  price: number;
+}
+
 interface CartItem {
   id: number;
+  cartItemId: string; // Unique identifier for this specific cart item (product + config + add-ons)
   name: string;
   image: string;
   price: string;
   quantity: number;
+  addOns?: CartAddOn[];
+  selectedConfig?: string;
 }
 
 interface CartContextType {
   items: CartItem[];
-  addItem: (item: Omit<CartItem, "quantity">) => void;
-  removeItem: (id: number) => void;
-  updateQuantity: (id: number, quantity: number) => void;
+  addItem: (item: Omit<CartItem, "quantity" | "cartItemId">) => void;
+  removeItem: (cartItemId: string) => void;
+  updateQuantity: (cartItemId: string, quantity: number) => void;
   clearCart: () => void;
   itemCount: number;
 }
@@ -24,29 +33,36 @@ const CartContext = React.createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = React.useState<CartItem[]>([]);
 
-  const addItem = React.useCallback((item: Omit<CartItem, "quantity">) => {
+  const addItem = React.useCallback((item: Omit<CartItem, "quantity" | "cartItemId">) => {
     setItems((prev) => {
-      const existing = prev.find((i) => i.id === item.id);
+      // Create a unique cart item ID based on product ID, config, and add-ons
+      const addOnsKey = item.addOns?.map(a => a.id).sort().join(',') || '';
+      const cartItemId = `${item.id}-${item.selectedConfig || 'default'}-${addOnsKey}`;
+      
+      const existing = prev.find((i) => i.cartItemId === cartItemId);
+      
       if (existing) {
         return prev.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+          i.cartItemId === cartItemId
+            ? { ...i, quantity: i.quantity + 1 }
+            : i
         );
       }
-      return [...prev, { ...item, quantity: 1 }];
+      return [...prev, { ...item, cartItemId, quantity: 1 }];
     });
   }, []);
 
-  const removeItem = React.useCallback((id: number) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
+  const removeItem = React.useCallback((cartItemId: string) => {
+    setItems((prev) => prev.filter((item) => item.cartItemId !== cartItemId));
   }, []);
 
-  const updateQuantity = React.useCallback((id: number, quantity: number) => {
+  const updateQuantity = React.useCallback((cartItemId: string, quantity: number) => {
     if (quantity <= 0) {
-      removeItem(id);
+      removeItem(cartItemId);
       return;
     }
     setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, quantity } : item))
+      prev.map((item) => (item.cartItemId === cartItemId ? { ...item, quantity } : item))
     );
   }, [removeItem]);
 

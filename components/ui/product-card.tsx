@@ -43,7 +43,7 @@ export function ProductCard({
     removeItem: removeFromWishlist,
     isInWishlist,
   } = useWishlist();
-  const inWishlist = isInWishlist(id);
+  const inWishlist = isInWishlist(Number(id));
   const [imageLoading, setImageLoading] = React.useState(true);
   const [imageError, setImageError] = React.useState(false);
   const isVideo = React.useMemo(() => {
@@ -55,7 +55,7 @@ export function ProductCard({
 
   const handleAddToCart = () => {
     addItem({
-      id,
+      id: Number(id),
       name,
       image,
       price,
@@ -64,10 +64,10 @@ export function ProductCard({
 
   const handleWishlistToggle = () => {
     if (inWishlist) {
-      removeFromWishlist(id);
+      removeFromWishlist(Number(id));
     } else {
       addToWishlist({
-        id,
+        id: Number(id),
         name,
         image,
         price,
@@ -87,7 +87,7 @@ export function ProductCard({
       viewport={{ once: true }}
       transition={{ duration: 0.4 }}
     >
-      <Link href={linkPath || `/services/buy/${id}`} className="block flex-shrink-0">
+      <Link href={linkPath || `/services/buy/${id}`} className="block shrink-0">
         <h3 className="text-lg font-semibold text-foreground hover:text-primary transition-colors h-[3.5rem] line-clamp-2 flex items-start">
           {name}
         </h3>
@@ -95,9 +95,11 @@ export function ProductCard({
           {imageLoading && (
             <Skeleton className="absolute inset-0 w-full h-full" />
           )}
+
           {isVideo ? (
             <div className="relative w-full h-full flex items-center justify-center bg-muted">
-              {image.includes("drive.google.com") && image.includes("/preview") ? (
+              {image.includes("drive.google.com") &&
+              image.includes("/preview") ? (
                 <iframe
                   src={image}
                   className="w-full h-full border-0"
@@ -176,9 +178,13 @@ export function ProductCard({
         />
       </Button>
       <div className="flex flex-col gap-1 h-[3.5rem] flex-shrink-0">
-        <p className="text-sm text-foreground font-medium line-clamp-1 h-5">{price}</p>
+        <p className="text-sm text-foreground font-medium line-clamp-1 h-5">
+          {price}
+        </p>
         {monthlyPrice ? (
-          <p className="text-xs text-muted-foreground line-clamp-2 h-8">{monthlyPrice}</p>
+          <p className="text-xs text-muted-foreground line-clamp-2 h-8">
+            {monthlyPrice}
+          </p>
         ) : (
           <div className="h-8" />
         )}
@@ -193,9 +199,9 @@ export function ProductCard({
         >
           Buy
         </Button>
-            <Button asChild variant="outline" className="flex-1">
-              <Link href={linkPath || `/services/buy/${id}`}>View Details</Link>
-            </Button>
+        <Button asChild variant="outline" className="flex-1">
+          <Link href={linkPath || `/services/buy/${id}`}>View Details</Link>
+        </Button>
       </div>
     </motion.div>
   );

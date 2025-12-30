@@ -11,7 +11,6 @@
     "Discontinued": "FALSE",
     "Location ID": [
       "https://drive.google.com/file/d/1_sIUcDLN243dA2ThNqGfmfnyjMauflG2/view?usp=drive_link",
-
       "https://drive.google.com/file/d/1_UvTxcC1RFN7CNBuRSccBVWtflODtI27/view?usp=drive_link",
       "https://drive.google.com/file/d/14But6yeyBK-TyKvw0tvFpczwWSh0YoV6/view?usp=drive_link",
       "https://drive.google.com/file/d/1dQlge9LWX0VJ7VLfqNCtC_9OAlFnUQV2/view?usp=drive_link",
@@ -327,14 +326,9 @@
     "Release Year": "2025",
     "Discontinued": "FALSE",
     "Location ID": [
-      "https://robostore.com/cdn/shop/files/unitree-g1-edu-ultimate-a-robotic-humanoid-u3-8215619.jpg?v=1759440110&width=208",
-      "https://robostore.com/cdn/shop/files/unitree-g1-edu-ultimate-a-robotic-humanoid-u3-5446229.jpg?v=1759440110&width=208",
-      "https://robostore.com/cdn/shop/files/unitree-g1-edu-ultimate-a-robotic-humanoid-u3-5216830.jpg?v=1759440111&width=208",
-      "https://robostore.com/cdn/shop/files/unitree-g1-edu-ultimate-a-robotic-humanoid-u3-5216830.jpg?v=1759440111&width=208",
-      "https://robostore.com/cdn/shop/files/unitree-g1-edu-ultimate-a-robotic-humanoid-u3-7629503.jpg?v=1759440111&width=208",
-      "https://robostore.com/cdn/shop/files/unitree-g1-robotic-humanoid-965482.png?v=1759413717&width=1000",
-      "https://robostore.com/cdn/shop/files/unitree-g1-edu-ultimate-b-robotic-humanoid-u4-794685.png?v=1759413682&width=1000",
-      "https://robostore.com/cdn/shop/files/unitree-g1-edu-ultimate-a-robotic-humanoid-u3-187448.png?v=1759367025&width=208"
+      "https://drive.google.com/file/d/125ueDnw91-wA_lysv-ZgTbayA3EBlsU4/view?usp=drive_link",
+      "https://drive.google.com/file/d/1E3xIifz4Gnblri9I6Y3OTQ22JAp1Dd9F/view?usp=drive_link",
+      "https://drive.google.com/file/d/1XjEkfgXdU8WLM46PMpkWxZKjuzNWxNPx/view?usp=drive_link"
     ],
     "Short Description": "Educational humanoid with five-finger hands and advanced autonomy",
     "Description": "The Unitree G1 EDU Ultimate C (U5) is a research-oriented humanoid robot variant combining high DOF, five-finger dexterity, and AI compute for sophisticated interaction, manipulation, and embodied AI experiments.",
@@ -394,12 +388,11 @@
     "Release Year": "2025",
     "Discontinued": "FALSE",
     "Location ID": [
-      "https://www.usrobotstore.com/cdn/shop/files/Untitled_design-25.png?v=1753549714&width=1300",
-      "https://www.usrobotstore.com/cdn/shop/files/Untitled_design-26.png?v=1753549728&width=1300",
-
-      "https://www.usrobotstore.com/cdn/shop/files/Untitled_design-24.png?v=1753549699&width=240",
-
-      "https://www.usrobotstore.com/cdn/shop/files/Untitled_design-23.png?v=1753549704&width=1300"
+      "https://drive.google.com/file/d/17CChb6tkSrCVDAMUb6ZkmsqK6ejexcK3/view?usp=drive_link",
+      "https://drive.google.com/file/d/1R7TcZ8mGba1U57Wy3PZcSu6mmjx5esf7/view?usp=drive_link",
+      "https://drive.google.com/file/d/1_RIhHiqp7aD74yQZEsp66tiXAxbX-OIq/view?usp=drive_link",
+      "https://drive.google.com/file/d/1k6s2Z73Lvf7v8elhmKEdG8COXBYUkxCq/view?usp=drive_link",
+      "https://drive.google.com/file/d/1mD4zB-SvYd0EJ6_7n3Fafa71296YjjRv/view?usp=drive_link"
     ],
     "Short Description": "Entry-level ultra-light humanoid",
     "Description": "Base ultra-lightweight humanoid variant optimized for affordability, agility, and introductory humanoid research and education.",

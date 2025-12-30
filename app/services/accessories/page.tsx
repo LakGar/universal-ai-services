@@ -30,19 +30,19 @@ const getImageUrl = (url: string): string => {
   if (typeof url !== "string") {
     return "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
   }
-  
+
   if (url.includes("drive.google.com")) {
     const fileId = extractFileId(url);
     if (fileId) {
       return `https://drive.google.com/uc?export=view&id=${fileId}`;
     }
   }
-  
+
   // If it's already a direct URL, return it
   if (url.startsWith("http")) {
     return url;
   }
-  
+
   // Fallback
   return "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
 };
@@ -51,8 +51,13 @@ const getImageUrl = (url: string): string => {
 const transformAccessories = () => {
   return accessoryData.accessories_addons.map((accessory) => {
     // Get first image from images array
-    let imageUrl = "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
-    if (accessory.images && Array.isArray(accessory.images) && accessory.images.length > 0) {
+    let imageUrl =
+      "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
+    if (
+      accessory.images &&
+      Array.isArray(accessory.images) &&
+      accessory.images.length > 0
+    ) {
       imageUrl = getImageUrl(accessory.images[0]);
     }
 
@@ -61,20 +66,24 @@ const transformAccessories = () => {
     let monthlyPrice = "";
 
     // Check MSRP first (skip if it says "Contact Micro-IP" or "N/A")
-    if (accessory.MSRP && 
-        accessory.MSRP !== "Contact Micro-IP" && 
-        accessory.MSRP !== "N/A" &&
-        typeof accessory.MSRP === "string") {
+    if (
+      accessory.MSRP &&
+      accessory.MSRP !== "Contact Micro-IP" &&
+      accessory.MSRP !== "N/A" &&
+      typeof accessory.MSRP === "string"
+    ) {
       const msrpValue = parseFloat(accessory.MSRP.replace(/[^0-9.]/g, ""));
       if (msrpValue > 0 && !isNaN(msrpValue)) {
         price = `$${msrpValue.toLocaleString()}`;
       }
     }
-    
+
     // Check UAIS Price (skip if it says "N/A")
-    if (accessory["UAIS Price"] && 
-        accessory["UAIS Price"] !== "N/A" && 
-        price === "Contact for pricing") {
+    if (
+      accessory["UAIS Price"] &&
+      accessory["UAIS Price"] !== "N/A" &&
+      price === "Contact for pricing"
+    ) {
       const uaisPrice = accessory["UAIS Price"].toString();
       if (uaisPrice.includes("$")) {
         price = uaisPrice;
@@ -85,7 +94,7 @@ const transformAccessories = () => {
         }
       }
     }
-    
+
     // If MSRP says "Contact Micro-IP", keep "Contact for pricing"
     if (accessory.MSRP === "Contact Micro-IP") {
       price = "Contact for pricing";

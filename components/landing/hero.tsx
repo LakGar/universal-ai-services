@@ -2,69 +2,125 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { AuroraBackground } from "@/components/ui/aurora-background";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { X, Check, BarChart3, Globe2 } from "lucide-react";
 import { MeshGradient } from "@paper-design/shaders-react";
 import { RobotCards, RobotCard } from "@/components/ui/robot-cards";
 import { RobotCardsMobile } from "@/components/ui/robot-cards-mobile";
+import buyData from "@/app/services/buy/data/buy_data.json";
 
-const robots = [
-  {
-    id: 1,
-    name: "Industrial Robot Arm",
-    image:
-      "https://images.unsplash.com/photo-1625314887424-9f190599bd56?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8cm9ib3R8ZW58MHx8MHx8fDA%3D",
-    url: "#",
-  },
-  {
-    id: 2,
-    name: "Autonomous Delivery Bot",
-    image:
-      "https://images.unsplash.com/photo-1534723328310-e82dad3ee43f?w=800&q=80",
-    url: "#",
-  },
-  {
-    id: 3,
-    name: "AI-Powered Assistant",
-    image:
-      "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&q=80",
-    url: "#",
-  },
-  {
-    id: 4,
-    name: "Medical Robot System",
-    image:
-      "https://images.unsplash.com/photo-1555255707-c07966088b7b?w=800&q=80",
-    url: "#",
-  },
-  {
-    id: 5,
-    name: "Warehouse Automation",
-    image:
-      "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80",
-    url: "#",
-  },
-  {
-    id: 6,
-    name: "Service Robot",
-    image:
-      "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80",
-    url: "#",
-  },
-  {
-    id: 7,
-    name: "Robotic Assembly Line",
-    image:
-      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80",
-    url: "#",
-  },
-];
+// Helper function to check if URL is a video
+const isVideoUrl = (url: string): boolean => {
+  if (typeof url !== "string") return false;
+  const videoExtensions = [".mp4", ".webm", ".mov", ".avi", ".mkv", ".m4v"];
+  return videoExtensions.some((ext) => url.toLowerCase().includes(ext));
+};
+
+// Helper function to extract file ID from Google Drive URL
+const extractFileId = (url: string): string | null => {
+  const fileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (fileMatch) return fileMatch[1];
+  const folderMatch = url.match(/\/folders\/([a-zA-Z0-9_-]+)/);
+  if (folderMatch) return folderMatch[1];
+  return null;
+};
+
+// Helper function to get image from Google Drive or use provided images
+// Using the exact same logic as the buy page
+const getProductImage = (item: any): string => {
+  // If Images field exists and has URLs, use the first one
+  if (item.Images && Array.isArray(item.Images) && item.Images.length > 0) {
+    const firstImage = item.Images[0];
+    // Skip if it's a video
+    if (typeof firstImage === "string" && !isVideoUrl(firstImage)) {
+      return firstImage;
+    }
+  }
+  if (
+    item.Images &&
+    typeof item.Images === "string" &&
+    !isVideoUrl(item.Images)
+  ) {
+    return item.Images;
+  }
+
+  // Check if Location ID is an array of Google Drive links
+  const locationId = item["Location ID"];
+  if (Array.isArray(locationId) && locationId.length > 0) {
+    // Find first non-video item
+    for (const link of locationId) {
+      if (typeof link === "string") {
+        // Skip videos
+        if (isVideoUrl(link)) continue;
+
+        if (link.includes("drive.google.com")) {
+          const fileId = extractFileId(link);
+          if (fileId) {
+            return `https://drive.google.com/uc?export=view&id=${fileId}`;
+          }
+        } else if (link.startsWith("http")) {
+          // Direct image URL
+          return link;
+        }
+      }
+    }
+  }
+
+  // Try to extract from single Google Drive link (string)
+  if (
+    typeof locationId === "string" &&
+    locationId.includes("drive.google.com") &&
+    !isVideoUrl(locationId)
+  ) {
+    const fileId = extractFileId(locationId);
+    if (fileId) {
+      return `https://drive.google.com/uc?export=view&id=${fileId}`;
+    }
+  }
+
+  // Fallback to placeholder
+  return "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
+};
+
+// Transform buy data to robot cards format
+const transformRobots = () => {
+  // Filter to only "Buy" category items and limit to 7 for hero
+  const buyItems = buyData
+    .filter((item) => item.Category === "Buy")
+    .slice(0, 7);
+
+  return buyItems.map((item, index) => {
+    // Find the index in the full buyData array for the detail page
+    // The buy detail page uses index + 1 as the ID
+    const fullIndex = buyData.findIndex(
+      (p) => p["Product ID"] === item["Product ID"]
+    );
+    const detailPageId = fullIndex >= 0 ? fullIndex + 1 : index + 1;
+
+    const imageUrl = getProductImage(item);
+
+    // Debug: log the image URL to see what we're getting
+    if (typeof window !== "undefined" && index < 5) {
+      console.log(`Robot ${index + 1} (${item["Model Name"]}):`, imageUrl);
+    }
+
+    return {
+      id: index + 1,
+      name: item["Model Name"] || "Robot",
+      image: imageUrl,
+      url: `/services/buy/${detailPageId}`,
+    };
+  });
+};
 
 export const Hero = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [formStep, setFormStep] = useState<"idle" | "submitting" | "success">(
     "idle"
   );
+
+  // Transform buy data to robots
+  const robots = useMemo(() => transformRobots(), []);
 
   const handleExpand = () => setIsExpanded(true);
 
@@ -130,7 +186,7 @@ export const Hero = () => {
             Buy, rent, deploy, and scale production-ready robotics and AI
             solutions — with expert integration when you need it.
           </div>
-          <div className="flex items-center gap-4 md:justify-center w-full">
+          <div className="flex items-center gap-4 md:justify-center w-full z-1">
             <AnimatePresence initial={false}>
               {!isExpanded && (
                 <motion.div className="inline-block relative">
@@ -439,7 +495,7 @@ export const Hero = () => {
         )}
       </AnimatePresence>
       {/* overlay */}
-      <div className="absolute inset-0 bg-linear-to-br from-transparent to-white via-white/20 -z-1" />
+      <div className="absolute inset-0 bg-linear-to-b from-transparent to-white via-transparent z-0" />
     </>
   );
 };

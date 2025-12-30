@@ -19,12 +19,14 @@ import { WishlistIcon } from "@/components/wishlist-icon";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, Play, ChevronLeft, ChevronRight, Check } from "lucide-react";
+import { Heart, Play, ChevronLeft, ChevronRight, Check, ChevronDown, ChevronUp } from "lucide-react";
 import { useCart } from "@/contexts/cart-context";
 import { useWishlist } from "@/contexts/wishlist-context";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import rentalData from "@/app/data.json";
+import { addOns, getAllFilters } from "../../buy/data/addons";
 
 // Helper function to extract file ID from Google Drive URL
 const extractFileId = (url: string): string | null => {
@@ -115,6 +117,10 @@ export default function RentalDetailPage() {
   const [selectedMediaIndex, setSelectedMediaIndex] = React.useState(0);
   const [isVideoPlaying, setIsVideoPlaying] = React.useState(false);
   const [mediaLoading, setMediaLoading] = React.useState(true);
+  const [showAllAddOns, setShowAllAddOns] = React.useState(false);
+  const [selectedFilters, setSelectedFilters] = React.useState<Set<string>>(
+    new Set()
+  );
 
   if (!rental) {
     return (
@@ -742,6 +748,169 @@ export default function RentalDetailPage() {
               </Card>
             )}
           </div>
+
+          {/* Comprehensive Add-ons Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="mt-12"
+          >
+            <div className="mb-6">
+              <h2 className="text-3xl font-semibold mb-2 text-black dark:text-white">
+                Robot Add-ons & Features
+              </h2>
+              <p className="text-base text-black/70 dark:text-white/70">
+                Enhance your robot with powerful add-ons and features tailored
+                to your industry needs.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              {/* Filters Sidebar */}
+              <div className="lg:col-span-1">
+                <div className="sticky top-24 bg-background border rounded-lg p-4">
+                  <h3 className="text-lg font-semibold mb-4 text-black dark:text-white">
+                    Filter by Feature
+                  </h3>
+                  <div className="space-y-2 max-h-[600px] overflow-y-auto">
+                    {getAllFilters().map((filter) => (
+                      <div
+                        key={filter}
+                        className="flex items-center space-x-2 py-1"
+                      >
+                        <Checkbox
+                          id={filter}
+                          checked={selectedFilters.has(filter)}
+                          onCheckedChange={() => {
+                            setSelectedFilters((prev) => {
+                              const newSet = new Set(prev);
+                              if (newSet.has(filter)) {
+                                newSet.delete(filter);
+                              } else {
+                                newSet.add(filter);
+                              }
+                              return newSet;
+                            });
+                          }}
+                        />
+                        <label
+                          htmlFor={filter}
+                          className="text-sm cursor-pointer text-muted-foreground hover:text-foreground"
+                        >
+                          {filter}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                  {selectedFilters.size > 0 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="mt-4 w-full"
+                      onClick={() => setSelectedFilters(new Set())}
+                    >
+                      Clear Filters
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              {/* Add-ons List */}
+              <div className="lg:col-span-3">
+                {(() => {
+                  let filtered = addOns;
+                  if (selectedFilters.size > 0) {
+                    filtered = addOns.filter((addOn) =>
+                      addOn.filters.some((filter) => selectedFilters.has(filter))
+                    );
+                  }
+                  const displayed = showAllAddOns
+                    ? filtered
+                    : filtered.slice(0, 6);
+                  return (
+                    <>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {displayed.map((addOn) => (
+                          <motion.div
+                            key={addOn.id}
+                            className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-background"
+                          >
+                            <div className="flex items-start gap-3">
+                              <span className="text-2xl">{addOn.emoji}</span>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-start justify-between gap-2 mb-1">
+                                  <h4 className="font-semibold text-sm text-black dark:text-white">
+                                    {addOn.name}
+                                  </h4>
+                                </div>
+                                <p className="text-xs text-muted-foreground mb-2">
+                                  {addOn.description}
+                                </p>
+                                <div className="flex flex-wrap gap-1 mb-2">
+                                  {addOn.industries.slice(0, 3).map((industry) => (
+                                    <Badge
+                                      key={industry}
+                                      variant="outline"
+                                      className="text-xs"
+                                    >
+                                      {industry}
+                                    </Badge>
+                                  ))}
+                                  {addOn.industries.length > 3 && (
+                                    <Badge variant="outline" className="text-xs">
+                                      +{addOn.industries.length - 3}
+                                    </Badge>
+                                  )}
+                                </div>
+                                <div className="flex flex-wrap gap-1">
+                                  {addOn.filters.slice(0, 2).map((filter) => (
+                                    <Badge
+                                      key={filter}
+                                      variant="secondary"
+                                      className="text-xs"
+                                    >
+                                      {filter}
+                                    </Badge>
+                                  ))}
+                                  {addOn.filters.length > 2 && (
+                                    <Badge variant="secondary" className="text-xs">
+                                      +{addOn.filters.length - 2}
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                      {filtered.length > 6 && (
+                        <div className="mt-6 text-center">
+                          <Button
+                            variant="outline"
+                            onClick={() => setShowAllAddOns(!showAllAddOns)}
+                            className="w-full sm:w-auto"
+                          >
+                            {showAllAddOns ? (
+                              <>
+                                Show Less
+                                <ChevronUp className="ml-2 h-4 w-4" />
+                              </>
+                            ) : (
+                              <>
+                                View All {filtered.length} Add-ons
+                                <ChevronDown className="ml-2 h-4 w-4" />
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+            </div>
+          </motion.div>
         </div>
       </div>
     </>
