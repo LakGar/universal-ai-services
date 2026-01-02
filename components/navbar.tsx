@@ -87,21 +87,21 @@ const Navbar = ({
           title: "Rent",
           description: "Rent a robot for a short period of time",
           icon: <Receipt className="size-5 shrink-0" />,
-          url: "#",
+          url: "/services/rent",
         },
         {
           title: "Accessories",
           description:
             "Browse accessories and find the perfect fit for your robot",
           icon: <Gift className="size-5 shrink-0" />,
-          url: "#",
+          url: "/services/accessories",
         },
         {
           title: "Repairs",
           description:
             "Get in touch with our support team or visit our community forums",
           icon: <ToolCase className="size-5 shrink-0" />,
-          url: "#",
+          url: "/services/repairs",
         },
       ],
     },

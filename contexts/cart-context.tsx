@@ -8,7 +8,7 @@ export interface CartAddOn {
   price: number;
 }
 
-interface CartItem {
+export interface CartItem {
   id: number;
   cartItemId: string; // Unique identifier for this specific cart item (product + config + add-ons)
   name: string;
@@ -17,6 +17,7 @@ interface CartItem {
   quantity: number;
   addOns?: CartAddOn[];
   selectedConfig?: string;
+  isRent?: boolean; // Flag to indicate if this is a rental item
 }
 
 interface CartContextType {

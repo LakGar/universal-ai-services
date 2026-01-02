@@ -5,49 +5,34 @@ import { motion, useMotionValue, animate } from "motion/react";
 export const items = [
   {
     id: 1,
-    url: "https://images.unsplash.com/photo-1471899236350-e3016bf1e69e?q=80&w=880&auto=format&fit=crop",
-    title: "Misty Mountain Majesty",
+    url: "/carousel/video6.mp4",
   },
   {
     id: 2,
-    url: "https://images.unsplash.com/photo-1539552678512-4005a33c64db?q=80&w=880&auto=format&fit=crop",
-    title: "Winter Wonderland",
+    url: "/carousel/video1.mp4",
   },
   {
     id: 3,
-    url: "https://images.unsplash.com/photo-1709983966747-58c311fa6976?q=80&w=880&auto=format&fit=crop",
-    title: "Autumn Mountain Retreat",
+    url: "/carousel/video2.mp4",
   },
   {
     id: 4,
-    url: "https://images.unsplash.com/photo-1683722319473-f851deb3fdf2?q=80&w=880&auto=format&fit=crop",
-    title: "Tranquil Lake Reflection",
+    url: "/carousel/video3.mp4",
   },
   {
     id: 5,
-    url: "https://images.unsplash.com/photo-1560790671-b76ca4de55ef?q=80&w=734&auto=format&fit=crop",
-    title: "Misty Mountain Peaks",
+    url: "/carousel/video4.mp4",
   },
   {
     id: 6,
-    url: "https://images.unsplash.com/photo-1698774303292-7af9410c3a57?q=80&w=436&auto=format&fit=cropv",
-    title: "Golden Hour Glow",
-  },
-  {
-    id: 7,
-    url: "https://images.unsplash.com/photo-1643994542584-1247b5266429?q=80&w=869&auto=format&fit=crop",
-    title: "Snowy Mountain Highway",
-  },
-  {
-    id: 8,
-    url: "https://images.unsplash.com/photo-1613681230409-6423a38c43e1?q=80&w=871&auto=format&fit=crop",
-    title: "Foggy Mountain Forest",
+    url: "/carousel/video5.mp4",
   },
 ];
 
 export function FramerCarousel() {
   const [index, setIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   const x = useMotionValue(0);
 
@@ -64,18 +49,115 @@ export function FramerCarousel() {
     }
   }, [index, x]);
 
+  // Handle video end and auto-advance
+  useEffect(() => {
+    const currentVideo = videoRefs.current[index];
+
+    if (currentVideo) {
+      const handleVideoEnd = () => {
+        // Move to next video when current video ends
+        if (index < items.length - 1) {
+          setIndex(index + 1);
+        } else {
+          // Loop back to first video
+          setIndex(0);
+        }
+      };
+
+      const handleCanPlay = () => {
+        // Try to play when video is ready
+        const playPromise = currentVideo.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((error) => {
+            console.log(`Autoplay prevented for video ${index + 1}:`, error);
+          });
+        }
+      };
+
+      const handleError = (e: Event) => {
+        console.error(
+          `Video ${index + 1} (${items[index].url}) failed to load:`,
+          e
+        );
+        // Skip to next video if current one fails after a delay
+        setTimeout(() => {
+          if (index < items.length - 1) {
+            setIndex(index + 1);
+          } else {
+            setIndex(0);
+          }
+        }, 2000);
+      };
+
+      currentVideo.addEventListener("ended", handleVideoEnd);
+      currentVideo.addEventListener("canplay", handleCanPlay);
+      currentVideo.addEventListener("error", handleError);
+
+      // Ensure video plays if already loaded
+      if (currentVideo.readyState >= 2) {
+        const playPromise = currentVideo.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((error) => {
+            console.log(`Autoplay prevented for video ${index + 1}:`, error);
+          });
+        }
+      }
+
+      return () => {
+        currentVideo.removeEventListener("ended", handleVideoEnd);
+        currentVideo.removeEventListener("canplay", handleCanPlay);
+        currentVideo.removeEventListener("error", handleError);
+      };
+    }
+  }, [index]);
+
+  // Pause all other videos when index changes
+  useEffect(() => {
+    videoRefs.current.forEach((video, i) => {
+      if (video && i !== index) {
+        video.pause();
+        video.currentTime = 0;
+      }
+    });
+  }, [index]);
+
   return (
-    <div className="lg:p-10 sm:p-4 p-2 max-w-7xl mx-auto mt-20 h-[500px]">
+    <div className="lg:p-10 sm:p-4 p-2 max-w-7xl mx-auto mt-20 h-[700px]">
       <div className="flex flex-col gap-3">
         <div className="relative overflow-hidden rounded-lg" ref={containerRef}>
           <motion.div className="flex" style={{ x }}>
-            {items.map((item) => (
-              <div key={item.id} className="shrink-0 w-full h-[500px]">
-                <img
+            {items.map((item, i) => (
+              <div key={item.id} className="shrink-0 w-full h-[700px] relative">
+                <video
+                  ref={(el) => {
+                    videoRefs.current[i] = el;
+                  }}
                   src={item.url}
-                  alt={item.title}
                   className="w-full h-full object-cover rounded-lg select-none pointer-events-none"
                   draggable={false}
+                  autoPlay={i === index}
+                  muted
+                  playsInline
+                  preload={i === index ? "auto" : "metadata"}
+                  onError={(e) => {
+                    const target = e.target as HTMLVideoElement;
+                    console.error(
+                      `Error loading video ${i + 1} (${item.url}):`,
+                      {
+                        error: target.error,
+                        code: target.error?.code,
+                        message: target.error?.message,
+                      }
+                    );
+                  }}
+                  onLoadedData={() => {
+                    console.log(
+                      `Video ${i + 1} (${item.url}) loaded successfully`
+                    );
+                  }}
+                  onLoadStart={() => {
+                    console.log(`Video ${i + 1} (${item.url}) started loading`);
+                  }}
                 />
               </div>
             ))}

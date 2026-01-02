@@ -166,3 +166,17 @@
 .animate-aurora {
   animation: aurora 20s linear infinite;
 }
+
+/* Calendly Widget Styles */
+.calendly-inline-widget {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 1200px !important;
+}
+
+.calendly-inline-widget iframe {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 1200px !important;
+  border: none !important;
+}

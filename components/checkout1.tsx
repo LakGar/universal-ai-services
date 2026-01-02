@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Minus, Plus, Trash } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useMemo } from "react";
 import {
   Controller,
   FormProvider,
@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import accessoryData from "@/app/data.json";
 
 interface ProductPrice {
   regular: number;
@@ -950,35 +951,98 @@ const Cart = ({ cartItems, form }: CartProps) => {
     [update, fields]
   );
 
-  // Complementary add-on products
-  const addOnProducts = [
-    {
-      id: "addon-1",
-      name: "Extended Warranty Package",
-      image:
-        "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&q=80",
-      price: 2999,
-      description: "3-year extended warranty",
-    },
-    {
-      id: "addon-2",
-      name: "Installation Service",
-      image:
-        "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=80",
-      price: 1999,
-      description: "Professional installation",
-    },
-    {
-      id: "addon-3",
-      name: "Training & Support Package",
-      image:
-        "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&q=80",
-      price: 1499,
-      description: "On-site training included",
-    },
-  ];
+  // Helper function to extract file ID from Google Drive URL
+  const extractFileId = (url: string): string | null => {
+    const fileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (fileMatch) return fileMatch[1];
+    return null;
+  };
+
+  // Helper function to convert Google Drive URL to direct view URL
+  const convertGoogleDriveUrl = (url: string): string => {
+    if (!url || typeof url !== "string") {
+      return "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
+    }
+    
+    if (url.includes("uc?export=view") || url.includes("uc?export=download") || url.includes("/preview")) {
+      return url;
+    }
+    
+    if (url.includes("drive.google.com")) {
+      const fileId = extractFileId(url);
+      if (fileId) {
+        return `https://drive.google.com/uc?export=view&id=${fileId}`;
+      }
+    }
+    
+    if (url.startsWith("http")) {
+      return url;
+    }
+    
+    return "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
+  };
+
+  // Transform accessories data for checkout display
+  const addOnProducts = useMemo(() => {
+    return accessoryData.accessories_addons.slice(0, 6).map((accessory) => {
+      // Extract price
+      let price = 0;
+      let priceStr = "Contact for pricing";
+      
+      if (accessory.MSRP && 
+          accessory.MSRP !== "Contact Micro-IP" && 
+          accessory.MSRP !== "N/A" &&
+          typeof accessory.MSRP === "string") {
+        const msrpValue = parseFloat(accessory.MSRP.replace(/[^0-9.]/g, ""));
+        if (msrpValue > 0 && !isNaN(msrpValue)) {
+          price = msrpValue;
+          priceStr = `$${msrpValue.toLocaleString()}`;
+        }
+      }
+      
+      if (accessory["UAIS Price"] && 
+          accessory["UAIS Price"] !== "N/A" && 
+          price === 0) {
+        const uaisPrice = accessory["UAIS Price"].toString();
+        if (uaisPrice.includes("$")) {
+          const extracted = parseFloat(uaisPrice.replace(/[^0-9.]/g, ""));
+          if (!isNaN(extracted) && extracted > 0) {
+            price = extracted;
+            priceStr = uaisPrice;
+          }
+        } else {
+          const uaisValue = parseFloat(uaisPrice.replace(/[^0-9.]/g, ""));
+          if (uaisValue > 0 && !isNaN(uaisValue)) {
+            price = uaisValue;
+            priceStr = `$${uaisValue.toLocaleString()}`;
+          }
+        }
+      }
+
+      // Get image
+      let imageUrl = "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
+      if (accessory.images && Array.isArray(accessory.images) && accessory.images.length > 0) {
+        imageUrl = convertGoogleDriveUrl(accessory.images[0]);
+      }
+
+      return {
+        id: accessory["Product ID"] || accessory.SKU || accessory.name || "",
+        name: accessory.name || "Accessory",
+        image: imageUrl,
+        price: price,
+        priceStr: priceStr,
+        description: accessory["Short Description"] || accessory.Description || "",
+      };
+    });
+  }, []);
 
   const handleAddAddOn = (addOn: (typeof addOnProducts)[0]) => {
+    // Only add if price is available (not "Contact for pricing")
+    if (addOn.price === 0) {
+      // If price is 0 or "Contact for pricing", don't add directly - would need consultation
+      return;
+    }
+
     const existingIndex = formItems.findIndex((p) => p.product_id === addOn.id);
     if (existingIndex >= 0) {
       update(existingIndex, {
@@ -994,10 +1058,10 @@ const Cart = ({ cartItems, form }: CartProps) => {
     }
     // Also add to cart context
     addItem({
-      id: parseInt(addOn.id.replace("addon-", "")) + 1000,
+      id: addOn.id,
       name: addOn.name,
       image: addOn.image,
-      price: `$${addOn.price.toLocaleString()}`,
+      price: addOn.priceStr,
     });
   };
 
@@ -1052,11 +1116,11 @@ const Cart = ({ cartItems, form }: CartProps) => {
                 <div className="flex-1 flex items-center justify-between gap-4">
                   <div className="flex-1">
                     <h4 className="font-medium text-sm mb-1">{addOn.name}</h4>
-                    <p className="text-xs text-muted-foreground mb-1">
+                    <p className="text-xs text-muted-foreground mb-1 line-clamp-2">
                       {addOn.description}
                     </p>
                     <p className="text-sm font-semibold">
-                      ${addOn.price.toLocaleString()}
+                      {addOn.priceStr}
                     </p>
                   </div>
                   <Button
@@ -1065,8 +1129,9 @@ const Cart = ({ cartItems, form }: CartProps) => {
                     size="sm"
                     onClick={() => handleAddAddOn(addOn)}
                     className="shrink-0"
+                    disabled={addOn.price === 0}
                   >
-                    {isAdded ? "Added" : "Add"}
+                    {isAdded ? "Added" : addOn.price === 0 ? "Contact" : "Add"}
                   </Button>
                 </div>
               </div>

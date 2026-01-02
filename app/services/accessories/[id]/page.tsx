@@ -25,6 +25,7 @@ import { useWishlist } from "@/contexts/wishlist-context";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import accessoryData from "@/app/data.json";
+import { isPriceOnDemand } from "@/lib/consultation-utils";
 
 // Helper function to extract file ID from Google Drive URL
 const extractFileId = (url: string): string | null => {
@@ -166,6 +167,11 @@ export default function AccessoryDetailPage() {
   // Get item ID for cart/wishlist
   const itemId = accessory["Product ID"] || accessory.SKU || accessory.name || "";
 
+  // Check if consultation is required (accessories need consultation if price is on demand)
+  const needsConsultation = React.useMemo(() => {
+    return isPriceOnDemand(price) || priceValue === 0;
+  }, [price, priceValue]);
+
   const handleAddToCart = () => {
     addItem({
       id: itemId,
@@ -173,6 +179,11 @@ export default function AccessoryDetailPage() {
       image: allMedia[0]?.url || "",
       price,
     });
+    
+    // If consultation is needed, redirect to consultation page
+    if (needsConsultation) {
+      router.push("/checkout/consultation");
+    }
   };
 
   const handleToggleWishlist = () => {
@@ -391,9 +402,19 @@ export default function AccessoryDetailPage() {
 
               {/* Action Buttons */}
               <div className="border-t pt-6 space-y-3">
-                <Button onClick={handleAddToCart} size="lg" className="w-full">
-                  Add to Cart
-                </Button>
+                {needsConsultation ? (
+                  <Button
+                    onClick={handleAddToCart}
+                    size="lg"
+                    className="w-full"
+                  >
+                    Schedule Consultation & Add to Cart
+                  </Button>
+                ) : (
+                  <Button onClick={handleAddToCart} size="lg" className="w-full">
+                    Add to Cart
+                  </Button>
+                )}
                 <Button
                   onClick={handleToggleWishlist}
                   variant="outline"

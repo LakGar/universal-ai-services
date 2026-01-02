@@ -36,6 +36,7 @@ import { cn } from "@/lib/utils";
 import buyData from "../data/buy_data.json";
 import { addOns, getAllFilters, type AddOn } from "../data/addons";
 import accessoryData from "@/app/data.json";
+import { isPriceOnDemand } from "@/lib/consultation-utils";
 
 // Helper function to check if URL is a video
 const isVideoUrl = (url: string): boolean => {
@@ -375,6 +376,19 @@ export default function ProductDetailPage() {
     return sum + (addOn?.price || 0);
   }, 0);
   const totalPrice = basePrice + addOnsTotal;
+
+  // Check if consultation is required
+  const needsConsultation = React.useMemo(() => {
+    // Check if price is on demand
+    if (isPriceOnDemand(product.price) || product.price === 0) {
+      return true;
+    }
+    // Check if any add-ons/accessories are selected
+    if (selectedAddOns.size > 0) {
+      return true;
+    }
+    return false;
+  }, [product.price, selectedAddOns.size]);
 
   const handleAddToCart = () => {
     // Get selected add-ons details (from accessories)
@@ -778,9 +792,27 @@ export default function ProductDetailPage() {
 
               {/* Action Buttons */}
               <div className="border-t pt-6 space-y-3">
-                <Button onClick={handleAddToCart} size="lg" className="w-full">
-                  Add to Cart
-                </Button>
+                {needsConsultation ? (
+                  <Button
+                    onClick={() => {
+                      // Add to cart first, then redirect to consultation
+                      handleAddToCart();
+                      router.push("/checkout/consultation");
+                    }}
+                    size="lg"
+                    className="w-full"
+                  >
+                    Schedule Consultation & Add to Cart
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleAddToCart}
+                    size="lg"
+                    className="w-full"
+                  >
+                    Add to Cart
+                  </Button>
+                )}
                 <Button
                   onClick={handleToggleWishlist}
                   variant="outline"

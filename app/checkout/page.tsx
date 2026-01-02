@@ -4,14 +4,38 @@ import * as React from "react";
 import { useCart } from "@/contexts/cart-context";
 import { Checkout1 } from "@/components/checkout1";
 import { useRouter } from "next/navigation";
+import {
+  separateItemsByConsultationRequirement,
+  requiresConsultation,
+} from "@/lib/consultation-utils";
 
 export default function CheckoutPage() {
   const { items } = useCart();
   const router = useRouter();
 
+  // Separate items by consultation requirement
+  const { requiresConsultation: itemsNeedingConsultation, directCheckout } =
+    React.useMemo(
+      () => separateItemsByConsultationRequirement(items),
+      [items]
+    );
+
+  const hasItemsNeedingConsultation = itemsNeedingConsultation.length > 0;
+  const [consultationScheduled, setConsultationScheduled] = React.useState(false);
+
   // Convert cart items to checkout format
+  // If consultation is scheduled, include all items; otherwise only direct checkout items
   const cartItems = React.useMemo(() => {
-    return items.map((item, index) => ({
+    // Check sessionStorage directly to ensure we have the latest value
+    const isScheduled = typeof window !== "undefined" 
+      ? sessionStorage.getItem("consultationScheduled") === "true"
+      : consultationScheduled;
+    
+    const itemsToCheckout = isScheduled 
+      ? [...directCheckout, ...itemsNeedingConsultation]
+      : directCheckout;
+    
+    return itemsToCheckout.map((item, index) => ({
       product_id: `product-${item.id}`,
       link: "#",
       name: item.name,
@@ -23,10 +47,13 @@ export default function CheckoutPage() {
       quantity: item.quantity,
       details: [],
     }));
-  }, [items]);
+  }, [directCheckout, itemsNeedingConsultation, consultationScheduled]);
 
-  // Check if any items require consultation
-  const requiresConsultation = items.some((item) => item.id <= 3);
+  React.useEffect(() => {
+    // Check if consultation has been scheduled
+    const scheduled = sessionStorage.getItem("consultationScheduled") === "true";
+    setConsultationScheduled(scheduled);
+  }, []);
 
   React.useEffect(() => {
     if (items.length === 0) {
@@ -34,18 +61,28 @@ export default function CheckoutPage() {
       return;
     }
 
-    // If consultation is required, redirect to consultation page
-    if (requiresConsultation) {
+    // Always check sessionStorage directly (not just state) to avoid race conditions
+    const scheduled = sessionStorage.getItem("consultationScheduled") === "true";
+    
+    // Update state if scheduled
+    if (scheduled && !consultationScheduled) {
+      setConsultationScheduled(true);
+    }
+    
+    // If any items require consultation and consultation hasn't been scheduled, redirect to consultation page
+    if (hasItemsNeedingConsultation && !scheduled) {
       router.push("/checkout/consultation");
     }
-  }, [items.length, requiresConsultation, router]);
+  }, [items.length, hasItemsNeedingConsultation, consultationScheduled, router]);
 
   if (items.length === 0) {
     return null;
   }
 
-  // If consultation is required, show loading or redirect
-  if (requiresConsultation) {
+  // If consultation is required and not scheduled, show loading or redirect
+  // Check sessionStorage directly to avoid race conditions
+  const isConsultationScheduled = sessionStorage.getItem("consultationScheduled") === "true";
+  if (hasItemsNeedingConsultation && !isConsultationScheduled) {
     return null;
   }
 

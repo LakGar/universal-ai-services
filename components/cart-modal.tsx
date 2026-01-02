@@ -9,6 +9,11 @@ import { cn } from "@/lib/utils";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  separateItemsByConsultationRequirement,
+  requiresConsultation,
+} from "@/lib/consultation-utils";
+import { AlertCircle } from "lucide-react";
 
 export function CartModal() {
   const { items: cartItems, removeItem, updateQuantity } = useCart();
@@ -22,7 +27,12 @@ export function CartModal() {
   };
 
   const handleCheckout = () => {
-    router.push("/checkout");
+    // If any items need consultation, go to consultation page first
+    if (hasItemsNeedingConsultation) {
+      router.push("/checkout/consultation");
+    } else {
+      router.push("/checkout");
+    }
   };
 
   const total = cartItems.reduce((sum, item) => {
@@ -30,8 +40,14 @@ export function CartModal() {
     return sum + price * item.quantity;
   }, 0);
 
-  // Check if any items require consultation (for now, we'll check by ID or add a flag)
-  const requiresConsultation = cartItems.some((item) => item.id <= 3); // Example: first 3 items require consultation
+  // Separate items by consultation requirement
+  const { requiresConsultation: itemsNeedingConsultation, directCheckout } =
+    React.useMemo(
+      () => separateItemsByConsultationRequirement(cartItems),
+      [cartItems]
+    );
+
+  const hasItemsNeedingConsultation = itemsNeedingConsultation.length > 0;
 
   return (
     <div className="w-full relative">
@@ -139,11 +155,30 @@ export function CartModal() {
         </div>
       )}
 
+      {/* Consultation Notice */}
+      {hasItemsNeedingConsultation && (
+        <div className="mb-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800">
+          <div className="flex items-start gap-2">
+            <AlertCircle className="size-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+            <div className="text-sm">
+              <p className="font-medium text-amber-900 dark:text-amber-100">
+                Consultation Required
+              </p>
+              <p className="text-amber-700 dark:text-amber-300 mt-1">
+                {itemsNeedingConsultation.length} item{itemsNeedingConsultation.length > 1 ? "s" : ""} in your cart require{itemsNeedingConsultation.length === 1 ? "s" : ""} a consultation before purchase.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Checkout Button - Sticky at bottom right */}
       {cartItems.length > 0 && (
         <div className="sticky bottom-6 flex justify-end mt-6">
           <Button onClick={handleCheckout} size="lg" className="shadow-lg">
-            Proceed to Checkout
+            {hasItemsNeedingConsultation
+              ? "Schedule Consultation"
+              : "Proceed to Checkout"}
             <ArrowRight className="ml-2 size-4" />
           </Button>
         </div>

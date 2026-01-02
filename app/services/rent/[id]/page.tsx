@@ -160,11 +160,13 @@ export default function RentalDetailPage() {
       ? `From $${dailyPrice.toLocaleString()}/day`
       : rental.pricing?.model || "Contact for pricing";
     
+    // Rent always requires consultation - add to cart and redirect
     addItem({
       id: itemId,
       name: rentalName,
       image: allMedia[0]?.url || "",
       price,
+      isRent: true, // Mark as rental item
     });
   };
 
@@ -530,8 +532,15 @@ export default function RentalDetailPage() {
 
               {/* Action Buttons */}
               <div className="border-t pt-6 space-y-3">
-                <Button onClick={handleAddToCart} size="lg" className="w-full">
-                  Add to Cart
+                <Button
+                  onClick={() => {
+                    handleAddToCart();
+                    router.push("/checkout/consultation");
+                  }}
+                  size="lg"
+                  className="w-full"
+                >
+                  Schedule Consultation & Add to Cart
                 </Button>
                 <Button
                   onClick={handleToggleWishlist}
