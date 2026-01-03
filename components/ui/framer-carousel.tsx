@@ -5,23 +5,23 @@ import { motion, useMotionValue, animate } from "motion/react";
 export const items = [
   {
     id: 1,
-    url: "/carousel/video6.mp4",
+    url: "/carousel/video7.mp4",
   },
   {
     id: 2,
-    url: "/carousel/video1.mp4",
+    url: "/carousel/video6.mp4",
   },
   {
     id: 3,
-    url: "/carousel/video2.mp4",
-  },
-  {
-    id: 4,
     url: "/carousel/video3.mp4",
   },
   {
+    id: 4,
+    url: "/carousel/video1.mp4",
+  },
+  {
     id: 5,
-    url: "/carousel/video4.mp4",
+    url: "/carousel/video2.mp4",
   },
   {
     id: 6,
@@ -122,7 +122,7 @@ export function FramerCarousel() {
   }, [index]);
 
   return (
-    <div className="lg:p-10 sm:p-4 p-2 max-w-7xl mx-auto mt-20 h-[700px]">
+    <div className="lg:p-10 sm:p-4 p-2 max-w-7xl mx-auto  h-[800px]">
       <div className="flex flex-col gap-3">
         <div className="relative overflow-hidden rounded-lg" ref={containerRef}>
           <motion.div className="flex" style={{ x }}>

@@ -286,13 +286,13 @@ export function AddOnConsultationModal({
                       </motion.div>
                     )}
 
-                    <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-lg p-2 text-center">
+                    {/* <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-lg p-2 text-center">
                       <p className="text-white/70 text-xs leading-relaxed">
                         Sales will be finalized after the meeting. Our team will
                         contact you following the consultation to complete your
                         purchase.
                       </p>
-                    </div>
+                    </div> */}
 
                     <button
                       onClick={onClose}

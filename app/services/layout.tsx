@@ -14,6 +14,7 @@ export default function ServicesLayout({
       style={
         {
           "--sidebar-width": "19rem",
+          "--sidebar-width-icon": "3rem",
         } as React.CSSProperties
       }
     >

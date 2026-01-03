@@ -11,7 +11,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { ProductCard } from "@/components/ui/product-card";
 import { CartIcon } from "@/components/cart-icon";
 import { WishlistIcon } from "@/components/wishlist-icon";
@@ -118,12 +118,22 @@ const transformRepairs = () => {
 const repairServices = transformRepairs();
 
 export default function RepairsPage() {
+  const { state, isMobile } = useSidebar();
+
+  // Calculate header left position based on sidebar state
+  const getHeaderLeft = () => {
+    if (isMobile) return "0";
+    // When collapsed in icon mode with floating variant, sidebar is ~4rem (3rem icon + 1rem padding)
+    // When expanded, sidebar is 19rem wide (from layout)
+    return state === "collapsed" ? "4rem" : "19rem";
+  };
+
   return (
     <>
       <header 
-        className="fixed top-0 z-50 flex h-16 shrink-0 items-center justify-between gap-2 px-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b"
+        className="fixed top-0 z-50 flex h-16 shrink-0 items-center justify-between gap-2 px-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b transition-[left] duration-200 ease-linear"
         style={{
-          left: "var(--sidebar-width, 19rem)",
+          left: getHeaderLeft(),
           right: 0,
         }}
       >

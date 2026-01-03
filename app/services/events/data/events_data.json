@@ -1,0 +1,227 @@
+[
+  {
+    "id": "robotics-summit-2025",
+    "title": "Robotics Innovation Summit 2025",
+    "description": "Join industry leaders, researchers, and innovators at the premier robotics conference of the year. Explore cutting-edge AI and robotics solutions, network with experts, and discover the future of autonomous systems.",
+    "longDescription": "The Robotics Innovation Summit 2025 brings together the brightest minds in robotics and AI. This three-day event features keynote presentations from industry leaders, hands-on workshops, product demonstrations, and networking opportunities. Learn about the latest developments in quadruped robots, humanoid systems, autonomous navigation, and AI integration. Whether you're a researcher, engineer, or business leader, this summit offers valuable insights into the future of robotics.",
+    "date": "2025-06-15",
+    "endDate": "2025-06-17",
+    "location": "San Francisco Convention Center, San Francisco, CA",
+    "venue": "Moscone Center",
+    "category": "Conference",
+    "status": "upcoming",
+    "images": [
+      "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1200&q=80",
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80",
+      "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=1200&q=80"
+    ],
+    "speakers": [
+      {
+        "name": "Dr. Sarah Chen",
+        "title": "Chief Robotics Officer, TechCorp",
+        "image": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80"
+      },
+      {
+        "name": "Michael Rodriguez",
+        "title": "Founder, Autonomous Systems Inc.",
+        "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80"
+      }
+    ],
+    "agenda": [
+      {
+        "time": "09:00",
+        "title": "Registration & Networking",
+        "type": "networking"
+      },
+      {
+        "time": "10:00",
+        "title": "Opening Keynote: The Future of Robotics",
+        "type": "keynote",
+        "speaker": "Dr. Sarah Chen"
+      },
+      {
+        "time": "11:30",
+        "title": "Workshop: Building Autonomous Systems",
+        "type": "workshop"
+      },
+      {
+        "time": "13:00",
+        "title": "Lunch Break",
+        "type": "break"
+      },
+      {
+        "time": "14:00",
+        "title": "Product Demonstrations",
+        "type": "demo"
+      }
+    ],
+    "registrationUrl": "https://calendly.com/lakgarg2002/advisory-meeting-1",
+    "price": "Early Bird: $299 | Regular: $399",
+    "capacity": 500,
+    "tags": ["Robotics", "AI", "Innovation", "Technology"]
+  },
+  {
+    "id": "ai-automation-expo-2025",
+    "title": "AI & Automation Expo 2025",
+    "description": "Discover the latest AI-powered automation solutions and robotics technologies. Connect with vendors, attend technical sessions, and see live demonstrations of cutting-edge systems.",
+    "longDescription": "The AI & Automation Expo is the largest gathering of automation professionals in North America. This two-day event showcases the latest innovations in artificial intelligence, machine learning, and robotic automation. Explore hundreds of exhibitor booths, attend technical presentations, and participate in hands-on training sessions. Perfect for manufacturing professionals, system integrators, and technology enthusiasts.",
+    "date": "2025-08-20",
+    "endDate": "2025-08-21",
+    "location": "Las Vegas Convention Center, Las Vegas, NV",
+    "venue": "South Hall",
+    "category": "Expo",
+    "status": "upcoming",
+    "images": [
+      "https://images.unsplash.com/photo-1555255707-c07966088b7b?w=1200&q=80",
+      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80",
+      "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=1200&q=80"
+    ],
+    "speakers": [
+      {
+        "name": "Dr. James Park",
+        "title": "Director of AI Research, Innovate Labs",
+        "image": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80"
+      }
+    ],
+    "agenda": [
+      {
+        "time": "08:00",
+        "title": "Expo Hall Opens",
+        "type": "expo"
+      },
+      {
+        "time": "10:00",
+        "title": "Keynote: AI in Manufacturing",
+        "type": "keynote",
+        "speaker": "Dr. James Park"
+      },
+      {
+        "time": "14:00",
+        "title": "Live Demonstrations",
+        "type": "demo"
+      }
+    ],
+    "registrationUrl": "https://calendly.com/lakgarg2002/advisory-meeting-1",
+    "price": "Free with Registration",
+    "capacity": 2000,
+    "tags": ["AI", "Automation", "Manufacturing", "Expo"]
+  },
+  {
+    "id": "robotics-workshop-2025",
+    "title": "Hands-On Robotics Workshop",
+    "description": "A practical workshop for engineers and developers interested in building and programming robots. Learn from experts and get hands-on experience with real hardware.",
+    "longDescription": "This intensive one-day workshop provides hands-on experience with robotics development. Participants will work with actual robot hardware, learn programming techniques, and understand system integration. Perfect for engineers, developers, and students looking to expand their robotics skills. Limited to 30 participants for personalized instruction.",
+    "date": "2025-09-10",
+    "endDate": "2025-09-10",
+    "location": "Universal AI Services HQ, San Francisco, CA",
+    "venue": "Training Lab",
+    "category": "Workshop",
+    "status": "upcoming",
+    "images": [
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80",
+      "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1200&q=80"
+    ],
+    "speakers": [],
+    "agenda": [
+      {
+        "time": "09:00",
+        "title": "Introduction to Robotics Hardware",
+        "type": "workshop"
+      },
+      {
+        "time": "11:00",
+        "title": "Programming & Control Systems",
+        "type": "workshop"
+      },
+      {
+        "time": "13:00",
+        "title": "Lunch Break",
+        "type": "break"
+      },
+      {
+        "time": "14:00",
+        "title": "Hands-On Project Session",
+        "type": "workshop"
+      },
+      {
+        "time": "16:00",
+        "title": "Q&A and Networking",
+        "type": "networking"
+      }
+    ],
+    "registrationUrl": "https://calendly.com/lakgarg2002/advisory-meeting-1",
+    "price": "$199",
+    "capacity": 30,
+    "tags": ["Workshop", "Hands-On", "Training", "Development"]
+  },
+  {
+    "id": "tech-showcase-2024",
+    "title": "Technology Showcase 2024",
+    "description": "Annual showcase of the latest robotics and AI technologies. Featured product launches, demonstrations, and networking opportunities.",
+    "longDescription": "Our annual Technology Showcase brought together industry professionals to explore the latest innovations in robotics and AI. The event featured product launches, live demonstrations, and expert presentations on emerging technologies.",
+    "date": "2024-11-15",
+    "endDate": "2024-11-15",
+    "location": "San Francisco, CA",
+    "venue": "Moscone Center",
+    "category": "Showcase",
+    "status": "past",
+    "images": [
+      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80",
+      "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=1200&q=80",
+      "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=1200&q=80"
+    ],
+    "speakers": [
+      {
+        "name": "Dr. Emily Watson",
+        "title": "VP of Engineering, RoboTech",
+        "image": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&q=80"
+      }
+    ],
+    "agenda": [],
+    "registrationUrl": "",
+    "price": "Free",
+    "capacity": 300,
+    "tags": ["Showcase", "Product Launch", "Networking"],
+    "highlights": [
+      "Launched 5 new robot models",
+      "500+ attendees",
+      "15 product demonstrations",
+      "Networking reception"
+    ]
+  },
+  {
+    "id": "autonomous-systems-forum-2024",
+    "title": "Autonomous Systems Forum 2024",
+    "description": "Deep dive into autonomous systems, navigation, and AI integration. Technical presentations and expert panels.",
+    "longDescription": "The Autonomous Systems Forum provided a comprehensive look at the state of autonomous robotics. Experts discussed navigation systems, AI integration, safety protocols, and real-world deployment challenges. The event included technical deep-dives, case studies, and panel discussions.",
+    "date": "2024-09-20",
+    "endDate": "2024-09-22",
+    "location": "Boston, MA",
+    "venue": "Hynes Convention Center",
+    "category": "Forum",
+    "status": "past",
+    "images": [
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80",
+      "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1200&q=80"
+    ],
+    "speakers": [
+      {
+        "name": "Prof. David Kim",
+        "title": "MIT Robotics Lab",
+        "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&q=80"
+      }
+    ],
+    "agenda": [],
+    "registrationUrl": "",
+    "price": "Early Bird: $249 | Regular: $349",
+    "capacity": 400,
+    "tags": ["Autonomous Systems", "Navigation", "AI", "Technical"],
+    "highlights": [
+      "20+ technical presentations",
+      "400+ attendees",
+      "Expert panel discussions",
+      "Poster session"
+    ]
+  }
+]
+

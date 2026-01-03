@@ -2,6 +2,8 @@
 
 import * as React from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,10 +13,16 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import { ProductCard } from "@/components/ui/product-card";
+import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { CartIcon } from "@/components/cart-icon";
 import { WishlistIcon } from "@/components/wishlist-icon";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Heart, Calendar } from "lucide-react";
+import { AddOnConsultationModal } from "@/components/addon-consultation-modal";
+import { useWishlist } from "@/contexts/wishlist-context";
+import { cn } from "@/lib/utils";
 import accessoryData from "@/app/data.json";
 
 // Helper function to extract file ID from Google Drive URL
@@ -125,13 +133,183 @@ const transformAccessories = () => {
 
 const accessories = transformAccessories();
 
+interface AccessoryCardProps {
+  accessory: ReturnType<typeof transformAccessories>[0];
+  onConsultationClick: (
+    accessory: ReturnType<typeof transformAccessories>[0]
+  ) => void;
+}
+
+function AccessoryCard({ accessory, onConsultationClick }: AccessoryCardProps) {
+  const {
+    addItem: addToWishlist,
+    removeItem: removeFromWishlist,
+    isInWishlist,
+  } = useWishlist();
+  const inWishlist = isInWishlist(accessory.id);
+  const [imageLoading, setImageLoading] = React.useState(true);
+  const [imageError, setImageError] = React.useState(false);
+
+  React.useEffect(() => {
+    setImageLoading(true);
+    setImageError(false);
+  }, [accessory.image]);
+
+  const handleWishlistToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (inWishlist) {
+      removeFromWishlist(accessory.id);
+    } else {
+      addToWishlist({
+        id: accessory.id,
+        name: accessory.name,
+        image: accessory.image,
+        price: accessory.price,
+        monthlyPrice: accessory.monthlyPrice,
+      });
+    }
+  };
+
+  const handleConsultationClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onConsultationClick(accessory);
+  };
+
+  return (
+    <motion.div
+      className="w-full flex flex-col gap-4 p-4 rounded-lg hover:bg-muted/50 transition-colors relative group h-full"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4 }}
+    >
+      <Link
+        href={`/services/accessories/${accessory.id}`}
+        className="block shrink-0"
+      >
+        <div className="flex items-start justify-between mb-2">
+          <h3 className="text-lg font-semibold text-foreground hover:text-primary transition-colors line-clamp-2 flex-1">
+            {accessory.name}
+          </h3>
+          {/* {accessory.isNew && (
+            <Badge variant="default" className="ml-2 shrink-0">
+              New
+            </Badge>
+          )} */}
+        </div>
+        <div className="relative aspect-3/4 w-full rounded-lg overflow-hidden bg-muted cursor-pointer">
+          {imageLoading && (
+            <Skeleton className="absolute inset-0 w-full h-full z-10" />
+          )}
+          {!imageError && (
+            <Image
+              src={accessory.image}
+              alt={accessory.alt}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className={cn(
+                "object-cover transition-opacity duration-300 relative z-0",
+                imageLoading ? "opacity-0" : "opacity-100"
+              )}
+              onLoad={() => setImageLoading(false)}
+              onError={() => {
+                setImageError(true);
+                setImageLoading(false);
+              }}
+            />
+          )}
+          {imageError && (
+            <div className="absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground">
+              <p className="text-sm">Image not available</p>
+            </div>
+          )}
+        </div>
+      </Link>
+      <Button
+        variant="secondary"
+        size="icon"
+        className={cn(
+          "absolute top-16 right-6 opacity-0 transition-opacity group-hover:opacity-100 z-10",
+          inWishlist && "opacity-100"
+        )}
+        onClick={handleWishlistToggle}
+      >
+        <Heart
+          className={cn("h-4 w-4", inWishlist && "fill-red-500 text-red-500")}
+        />
+      </Button>
+      <div className="flex flex-col gap-1 h-[3.5rem] flex-shrink-0">
+        <p className="text-sm text-foreground font-medium line-clamp-1 h-5">
+          {accessory.price}
+        </p>
+        {accessory.monthlyPrice ? (
+          <p className="text-xs text-muted-foreground line-clamp-2 h-8">
+            {accessory.monthlyPrice}
+          </p>
+        ) : (
+          <div className="h-8" />
+        )}
+      </div>
+      <div className="flex gap-2 flex-shrink-0 mt-auto">
+        <Button onClick={handleConsultationClick} className="flex-1">
+          <Calendar className="w-4 h-4 mr-2" />
+          Book a Consult
+        </Button>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function AccessoriesPage() {
+  const { state, isMobile } = useSidebar();
+  const [selectedAccessory, setSelectedAccessory] = React.useState<
+    ReturnType<typeof transformAccessories>[0] | null
+  >(null);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+
+  // Calculate header left position based on sidebar state
+  const getHeaderLeft = () => {
+    if (isMobile) return "0";
+    // When collapsed in icon mode with floating variant, sidebar is ~4rem (3rem icon + 1rem padding)
+    // When expanded, sidebar is 19rem wide (from layout)
+    return state === "collapsed" ? "4rem" : "19rem";
+  };
+
+  const handleConsultationClick = (
+    accessory: ReturnType<typeof transformAccessories>[0]
+  ) => {
+    setSelectedAccessory(accessory);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setTimeout(() => setSelectedAccessory(null), 300);
+  };
+
+  // Get the original accessory data for description
+  const getAccessoryDescription = (accessoryId: string): string => {
+    const originalAccessory = accessoryData.accessories_addons.find(
+      (acc) =>
+        acc["Product ID"] === accessoryId ||
+        acc.SKU === accessoryId ||
+        acc.name === accessoryId
+    );
+    return (
+      originalAccessory?.["Short Description"] ||
+      originalAccessory?.["Description"] ||
+      ""
+    );
+  };
+
   return (
     <>
       <header
-        className="fixed top-0 z-50 flex h-16 shrink-0 items-center justify-between gap-2 px-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b"
+        className="fixed top-0 z-50 flex h-16 shrink-0 items-center justify-between gap-2 px-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b transition-[left] duration-200 ease-linear"
         style={{
-          left: "var(--sidebar-width, 19rem)",
+          left: getHeaderLeft(),
           right: 0,
         }}
       >
@@ -170,27 +348,37 @@ export default function AccessoriesPage() {
               Robot Accessories
             </h1>
             <p className="text-lg text-black/70 dark:text-white/70">
-              Enhance your robots with premium accessories.
+              Enhance your robots with premium accessories. Book a consultation
+              to learn more.
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch">
             {accessories.map((accessory) => (
-              <ProductCard
+              <AccessoryCard
                 key={accessory.id}
-                id={accessory.id}
-                name={accessory.name}
-                image={accessory.image}
-                alt={accessory.alt}
-                price={accessory.price}
-                monthlyPrice={accessory.monthlyPrice}
-                isNew={accessory.isNew}
-                linkPath={`/services/accessories/${accessory.id}`}
+                accessory={accessory}
+                onConsultationClick={handleConsultationClick}
               />
             ))}
           </div>
         </div>
       </div>
+
+      {/* Addon Consultation Modal */}
+      {selectedAccessory && (
+        <AddOnConsultationModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          addOn={{
+            id: selectedAccessory.id,
+            name: selectedAccessory.name,
+            image: selectedAccessory.image,
+            priceStr: selectedAccessory.price,
+            description: getAccessoryDescription(selectedAccessory.id),
+          }}
+        />
+      )}
     </>
   );
 }
