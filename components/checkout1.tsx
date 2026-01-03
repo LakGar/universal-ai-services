@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, Minus, Plus, ArrowLeft, X, ShoppingBag } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useCallback, useState, useMemo, useEffect } from "react";
 import {
   Controller,
@@ -22,11 +23,13 @@ const stripePromise = stripePublishableKey
   : null;
 
 import { cn } from "@/lib/utils";
+import { useCart } from "@/contexts/cart-context";
 
 import Image from "next/image";
 import { Price, PriceValue } from "@/components/shadcnblocks/price";
 import QuantityInput from "@/components/shadcnblocks/quantity-input";
 import { StripePaymentForm } from "@/components/stripe-payment-form";
+import { AddOnConsultationModal } from "@/components/addon-consultation-modal";
 import {
   Accordion,
   AccordionContent,
@@ -35,9 +38,8 @@ import {
 } from "@/components/ui/accordion";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
-import { Card, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useCart } from "@/contexts/cart-context";
 import {
   Field,
   FieldContent,
@@ -49,6 +51,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import accessoryData from "@/app/data.json";
 import buyData from "@/app/services/buy/data/buy_data.json";
 
 interface ProductPrice {
@@ -232,6 +235,7 @@ const Checkout1 = ({
   className,
   onSuccess,
 }: Checkout1Props) => {
+  const router = useRouter();
   const [activeAccordion, setActiveAccordion] = useState("item-1");
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -342,20 +346,13 @@ const Checkout1 = ({
       <div className="container max-w-7xl mx-auto">
         <div className="flex flex-col gap-6 pb-8 md:flex-row md:items-center md:justify-between md:gap-8">
           <div className="flex flex-col gap-4">
-            <Link href="/" className="flex items-center gap-2 mb-2">
-              <Image
-                src="/logo.png"
-                alt="Universal AI Services"
-                width={32}
-                height={32}
-                className="dark:invert"
-                unoptimized
-                priority
-              />
-              <span className="text-lg font-semibold zalando-sans-expanded">
-                Universal AI Services
-              </span>
-            </Link>
+            <button
+              onClick={() => router.back()}
+              className="flex items-center gap-2 mb-2 text-black dark:text-white hover:opacity-70 transition-opacity w-fit"
+            >
+              <X className="h-5 w-5" />
+              <span className="text-lg font-semibold">Close</span>
+            </button>
             <div className="flex flex-col gap-2">
               <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
                 Checkout
@@ -1080,8 +1077,11 @@ const DateInput = () => {
 
 // Helper function to extract file ID from Google Drive URL
 const extractFileId = (url: string): string | null => {
+  if (typeof url !== "string") return null;
   const fileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
   if (fileMatch) return fileMatch[1];
+  const folderMatch = url.match(/\/folders\/([a-zA-Z0-9_-]+)/);
+  if (folderMatch) return folderMatch[1];
   return null;
 };
 
@@ -1113,6 +1113,28 @@ const convertGoogleDriveUrl = (url: string): string => {
   return "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
 };
 
+// Helper function to convert Google Drive URL to direct image URL (same as accessories page)
+const getImageUrl = (url: string): string => {
+  if (typeof url !== "string") {
+    return "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
+  }
+
+  if (url.includes("drive.google.com")) {
+    const fileId = extractFileId(url);
+    if (fileId) {
+      return `https://drive.google.com/uc?export=view&id=${fileId}`;
+    }
+  }
+
+  // If it's already a direct URL, return it
+  if (url.startsWith("http")) {
+    return url;
+  }
+
+  // Fallback
+  return "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
+};
+
 // Helper function to check if URL is a video
 const isVideoUrl = (url: string): boolean => {
   if (typeof url !== "string") return false;
@@ -1120,7 +1142,8 @@ const isVideoUrl = (url: string): boolean => {
   return videoExtensions.some((ext) => url.toLowerCase().includes(ext));
 };
 
-// Helper function to get product image from buy data
+// Helper function to get product image from buy_data.json
+// Using the exact same logic as hero.tsx
 const getBuyProductImage = (item: {
   Images?: string | string[];
   "Location ID"?: string | string[];
@@ -1180,9 +1203,12 @@ const getBuyProductImage = (item: {
   return "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
 };
 
-// Transform buy data to recommended products
+// Get recommended products from buy_data.json
 const getRecommendedProducts = () => {
-  return buyData.slice(0, 6).map((item, index) => {
+  // Filter only "Buy" category products (exclude accessories)
+  const buyProducts = buyData.filter((item) => item.Category === "Buy");
+
+  return buyProducts.slice(0, 6).map((item, index) => {
     const msrp = parseFloat(
       item.MSRP?.toString().replace(/[^0-9.]/g, "") || "0"
     );
@@ -1190,25 +1216,48 @@ const getRecommendedProducts = () => {
       msrp > 0 ? `From $${msrp.toLocaleString()}` : "Price on request";
 
     const imageUrl = getBuyProductImage(item);
-    // getBuyProductImage already converts Google Drive URLs, so we just use it directly
-    // But ensure it's properly converted if it's still a view link
-    let finalImageUrl = imageUrl;
-    if (imageUrl.includes("drive.google.com/file/d/")) {
-      const fileId = extractFileId(imageUrl);
-      if (fileId) {
-        finalImageUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
-      }
-    }
 
     return {
-      id: (index + 1).toString(),
-      name: item["Model Name"] || "Unnamed Product",
-      image: finalImageUrl,
-      originalImage: imageUrl,
+      id: item["Product ID"] || item.SKU || `product-${index}`,
+      name: item["Model Name"] || "Product",
+      description: item["Short Description"] || item.Description || "",
+      category: item.Category || "Buy",
+      image: imageUrl,
       price: price,
-      priceValue: msrp,
     };
   });
+};
+
+// Get recommended accessories with their images
+const getRecommendedAddOns = () => {
+  return accessoryData.accessories_addons
+    .slice(0, 6)
+    .map((accessory, index) => {
+      // Get first image from images array
+      let imageUrl =
+        "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
+      if (
+        accessory.images &&
+        Array.isArray(accessory.images) &&
+        accessory.images.length > 0
+      ) {
+        imageUrl = getImageUrl(accessory.images[0]);
+      }
+
+      return {
+        id:
+          accessory["Product ID"] ||
+          accessory.SKU ||
+          accessory.name ||
+          `accessory-${index}`,
+        name: accessory.name || "Accessory",
+        emoji: "🔧", // Default emoji for accessories
+        description:
+          accessory["Short Description"] || accessory.Description || "",
+        category: accessory.Category || "Accessories+Add-ons",
+        image: imageUrl,
+      };
+    });
 };
 
 const Cart = ({ cartItems, form }: CartProps) => {
@@ -1217,7 +1266,16 @@ const Cart = ({ cartItems, form }: CartProps) => {
     name: "products",
   });
   const { addItem } = useCart();
+  const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
+  const [selectedAddOnForConsultation, setSelectedAddOnForConsultation] = useState<{
+    id: string;
+    name: string;
+    image: string;
+    priceStr: string;
+    description: string;
+  } | null>(null);
   const recommendedProducts = useMemo(() => getRecommendedProducts(), []);
+  const recommendedAddOns = useMemo(() => getRecommendedAddOns(), []);
 
   const formItems = form.watch("products");
 
@@ -1237,6 +1295,80 @@ const Cart = ({ cartItems, form }: CartProps) => {
     (index: number) => (newQty: number) =>
       update(index, { ...fields[index], quantity: newQty }),
     [update, fields]
+  );
+
+  const handleAddProductToCart = useCallback(
+    (product: { id: string; name: string; image: string; price: string }) => {
+      const priceValue = parseFloat(product.price.replace(/[^0-9.]/g, "")) || 0;
+
+      // Add to cart context (silently, no consultation prompt)
+      addItem({
+        id: product.id,
+        name: product.name,
+        image: product.image,
+        price: product.price,
+      });
+
+      // Add to form's products array
+      append({
+        product_id: product.id,
+        quantity: 1,
+        price: priceValue,
+      });
+    },
+    [append, addItem]
+  );
+
+  const handleAddOnConsultationClick = useCallback(
+    (addOn: {
+      id: string;
+      name: string;
+      image: string;
+      description: string;
+      category: string;
+    }) => {
+      // Set the selected add-on for consultation modal
+      setSelectedAddOnForConsultation({
+        id: addOn.id,
+        name: addOn.name,
+        image: addOn.image,
+        priceStr: "Consultation Required",
+        description: addOn.description,
+      });
+      setIsConsultationModalOpen(true);
+    },
+    []
+  );
+
+  const handleConsultationScheduled = useCallback(
+    (addOnId: string) => {
+      // Find the add-on that was scheduled
+      const addOn = recommendedAddOns.find((a) => a.id === addOnId);
+      if (addOn) {
+        // Add add-on to cart context as a consultation-required item
+        addItem({
+          id: `addon-${addOn.id}`,
+          name: addOn.name,
+          image: addOn.image || "",
+          price: "Consultation Required",
+          addOns: [
+            {
+              id: addOn.id,
+              name: addOn.name,
+              price: 0, // Add-ons don't have prices, consultation required
+            },
+          ],
+        });
+
+        // Add to form's products array with price 0 (consultation required)
+        append({
+          product_id: `addon-${addOn.id}`,
+          quantity: 1,
+          price: 0,
+        });
+      }
+    },
+    [recommendedAddOns, addItem, append]
   );
 
   return (
@@ -1288,70 +1420,68 @@ const Cart = ({ cartItems, form }: CartProps) => {
         </ul>
       )}
 
-      {/* Recommended Products Section */}
-      {fields.length > 0 && (
+      {/* Recommended Add-Ons Section */}
+      {fields.length > 0 && recommendedAddOns.length > 0 && (
         <div className="border-t py-7">
-          <h3 className="text-base font-semibold mb-6">You May Also Like</h3>
+          <h3 className="text-base font-semibold mb-6">Recommended Add-Ons</h3>
           <div className="overflow-x-auto pb-4 -mx-2 px-2">
             <div className="flex gap-4 min-w-max">
-              {recommendedProducts.map((product) => {
-                const isAdded = formItems.some(
-                  (p) => p.product_id === product.id
-                );
-                const imageUrl = product.image;
-
+              {recommendedAddOns.map((addOn) => {
                 return (
                   <div
-                    key={product.id}
+                    key={addOn.id}
                     className="w-48 shrink-0 flex flex-col gap-3 group"
                   >
-                    <Link href={`/services/buy/${product.id}`}>
-                      <div className="relative aspect-3/4 w-full rounded-lg overflow-hidden bg-muted">
-                        <img
-                          src={imageUrl}
-                          alt={product.name}
-                          className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-105"
+                    <div className="relative aspect-square w-full rounded-lg overflow-hidden bg-muted">
+                      {addOn.image ? (
+                        <Image
+                          src={addOn.image}
+                          alt={addOn.name}
+                          fill
+                          sizes="192px"
+                          className="object-cover transition-transform group-hover:scale-105"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            target.src =
-                              "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
+                            // Fallback to emoji if image fails to load
+                            target.style.display = "none";
+                            const emojiDiv =
+                              target.nextElementSibling as HTMLElement;
+                            if (emojiDiv) {
+                              emojiDiv.style.display = "flex";
+                            }
                           }}
                           loading="lazy"
                         />
+                      ) : null}
+                      <div
+                        className={`absolute inset-0 flex items-center justify-center ${
+                          addOn.image ? "hidden" : "flex"
+                        }`}
+                        style={{ display: addOn.image ? "none" : "flex" }}
+                      >
+                        <div className="text-6xl">{addOn.emoji}</div>
                       </div>
-                    </Link>
-                    <div className="flex flex-col gap-1">
-                      <Link href={`/services/buy/${product.id}`}>
-                        <h4 className="font-medium text-sm line-clamp-2 group-hover:text-primary transition-colors">
-                          {product.name}
+                    </div>
+                    <div className="flex flex-col gap-1 flex-1 justify-between">
+                      <div>
+                        <h4 className="font-medium text-sm line-clamp-2">
+                          {addOn.name}
                         </h4>
-                      </Link>
-                      <p className="text-xs text-muted-foreground">
-                        {product.price}
-                      </p>
+                        <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
+                          {addOn.description}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {addOn.category}
+                        </p>
+                      </div>
                       <Button
                         type="button"
-                        variant={isAdded ? "secondary" : "default"}
+                        variant="outline"
                         size="sm"
                         className="w-full mt-2"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          if (!isAdded) {
-                            addItem({
-                              id: product.id,
-                              name: product.name,
-                              image: product.image,
-                              price: product.price,
-                            });
-                            append({
-                              product_id: product.id.toString(),
-                              quantity: 1,
-                              price: product.priceValue,
-                            });
-                          }
-                        }}
+                        onClick={() => handleAddOnConsultationClick(addOn)}
                       >
-                        {isAdded ? "Added" : "Add to Cart"}
+                        Consultation Required
                       </Button>
                     </div>
                   </div>
@@ -1361,6 +1491,73 @@ const Cart = ({ cartItems, form }: CartProps) => {
           </div>
         </div>
       )}
+
+      {/* You May Also Like Section */}
+      {fields.length > 0 && recommendedProducts.length > 0 && (
+        <div className="border-t py-7">
+          <h3 className="text-base font-semibold mb-6">You May Also Like</h3>
+          <div className="overflow-x-auto pb-4 -mx-2 px-2">
+            <div className="flex gap-4 min-w-max">
+              {recommendedProducts.map((product) => {
+                return (
+                  <div
+                    key={product.id}
+                    className="w-48 shrink-0 flex flex-col gap-3 group"
+                  >
+                    <div className="relative aspect-square w-full rounded-lg overflow-hidden bg-muted">
+                      {product.image ? (
+                        <Image
+                          src={product.image}
+                          alt={product.name}
+                          fill
+                          sizes="192px"
+                          className="object-cover transition-transform group-hover:scale-105"
+                          loading="lazy"
+                        />
+                      ) : null}
+                    </div>
+                    <div className="flex flex-col gap-1 flex-1 justify-between">
+                      <div>
+                        <h4 className="font-medium text-sm line-clamp-2">
+                          {product.name}
+                        </h4>
+                        <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
+                          {product.description}
+                        </p>
+                        {product.price && (
+                          <p className="text-xs font-medium text-primary mt-1">
+                            {product.price}
+                          </p>
+                        )}
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="w-full mt-2"
+                        onClick={() => handleAddProductToCart(product)}
+                      >
+                        Add to Cart
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add-On Consultation Modal */}
+      <AddOnConsultationModal
+        isOpen={isConsultationModalOpen}
+        onClose={() => {
+          setIsConsultationModalOpen(false);
+          setSelectedAddOnForConsultation(null);
+        }}
+        addOn={selectedAddOnForConsultation}
+        onConsultationScheduled={handleConsultationScheduled}
+      />
 
       <div>
         <div className="space-y-3.5 border-y py-7">
