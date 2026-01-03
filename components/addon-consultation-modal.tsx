@@ -27,65 +27,124 @@ export function AddOnConsultationModal({
   onConsultationScheduled,
 }: AddOnConsultationModalProps) {
   const [consultationScheduled, setConsultationScheduled] = useState(false);
+  const [widgetLoading, setWidgetLoading] = useState(true);
+  const [widgetError, setWidgetError] = useState(false);
   const widgetRef = useRef<HTMLDivElement>(null);
+  const widgetInitialized = useRef(false);
+  const loadCalendlyRef = useRef<(() => void) | null>(null);
   const calendlyUrl = "https://calendly.com/lakgarg2002/advisory-meeting-1";
 
   // Load Calendly widget
   useEffect(() => {
     if (!isOpen || !widgetRef.current) return;
 
+    // Load Calendly widget script
     const loadCalendly = () => {
+      // Check if script already exists
       const existingScript = document.querySelector(
         'script[src="https://assets.calendly.com/assets/external/widget.js"]'
       );
 
       const initWidget = () => {
-        if (widgetRef.current && (window as any).Calendly?.initInlineWidget) {
+        // Prevent double initialization - check if widget already exists
+        if (!widgetRef.current) return;
+
+        // Check if widget is already initialized by looking for iframe
+        const hasWidget = widgetRef.current.querySelector("iframe");
+        if (hasWidget) {
+          widgetInitialized.current = true;
+          setWidgetLoading(false);
+          return;
+        }
+
+        if ((window as any).Calendly?.initInlineWidget) {
           try {
+            // Clear any existing content in the widget container
+            widgetRef.current.innerHTML = "";
+
             (window as any).Calendly.initInlineWidget({
               url: calendlyUrl,
               parentElement: widgetRef.current,
             });
+            widgetInitialized.current = true;
+            setWidgetLoading(false);
+            setWidgetError(false);
           } catch (error) {
             console.error("Error initializing Calendly widget:", error);
+            setWidgetLoading(false);
+            setWidgetError(true);
           }
         }
       };
 
       if (existingScript && (window as any).Calendly) {
+        // Calendly is already loaded, initialize widget
         initWidget();
         return;
       }
 
       if (!existingScript) {
+        // Load the script
         const script = document.createElement("script");
         script.src = "https://assets.calendly.com/assets/external/widget.js";
         script.async = true;
+        script.crossOrigin = "anonymous";
         script.onload = () => {
-          setTimeout(() => {
-            initWidget();
+          // Wait a bit for Calendly to fully initialize, then check multiple times
+          let attempts = 0;
+          const maxAttempts = 50; // 5 seconds total
+          const checkInterval = setInterval(() => {
+            attempts++;
+            if ((window as any).Calendly?.initInlineWidget) {
+              clearInterval(checkInterval);
+              initWidget();
+            } else if (attempts >= maxAttempts) {
+              clearInterval(checkInterval);
+              console.error("Calendly script loaded but failed to initialize");
+              setWidgetLoading(false);
+              setWidgetError(true);
+            }
           }, 100);
         };
         script.onerror = () => {
-          console.error("Failed to load Calendly script");
+          console.error(
+            "Failed to load Calendly script - check network or ad blocker"
+          );
+          setWidgetLoading(false);
+          setWidgetError(true);
         };
-        document.body.appendChild(script);
+        document.head.appendChild(script);
       } else {
+        // Script exists but might not be loaded yet, wait for it
+        let attempts = 0;
+        const maxAttempts = 100; // 10 seconds total
         const checkCalendly = setInterval(() => {
+          attempts++;
           if ((window as any).Calendly?.initInlineWidget) {
             initWidget();
             clearInterval(checkCalendly);
+          } else if (attempts >= maxAttempts) {
+            clearInterval(checkCalendly);
+            console.error("Calendly script exists but failed to initialize");
+            setWidgetLoading(false);
+            setWidgetError(true);
+            // Try to reload the script
+            const oldScript = existingScript as HTMLScriptElement;
+            if (oldScript && oldScript.parentNode) {
+              oldScript.parentNode.removeChild(oldScript);
+              widgetInitialized.current = false;
+              // Retry loading
+              setTimeout(() => {
+                loadCalendly();
+              }, 1000);
+            }
           }
         }, 100);
-
-        setTimeout(() => {
-          clearInterval(checkCalendly);
-          if (!(window as any).Calendly) {
-            console.error("Calendly script failed to load");
-          }
-        }, 10000);
       }
     };
+
+    // Store loadCalendly function in ref so it can be accessed elsewhere
+    loadCalendlyRef.current = loadCalendly;
 
     loadCalendly();
 
@@ -105,6 +164,12 @@ export function AddOnConsultationModal({
 
     return () => {
       window.removeEventListener("message", handleCalendlyEvent);
+      // Reset widget state when modal closes
+      if (!isOpen) {
+        widgetInitialized.current = false;
+        setWidgetLoading(true);
+        setWidgetError(false);
+      }
     };
   }, [isOpen, addOn, onConsultationScheduled, calendlyUrl]);
 
@@ -254,6 +319,59 @@ export function AddOnConsultationModal({
                 <div className="w-full max-w-2xl mx-auto flex flex-col h-full gap-4">
                   {/* Calendly Widget Container */}
                   <div className="flex-1 w-full overflow-hidden rounded-lg mb-2 relative min-h-0">
+                    {widgetLoading && !widgetError && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 z-10 rounded-lg">
+                        <div className="text-center">
+                          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-white border-r-transparent mb-2" />
+                          <p className="text-sm text-white/80">
+                            Loading calendar...
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    {widgetError && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 z-10 rounded-lg px-6">
+                        <div className="text-center max-w-md">
+                          <p className="text-sm text-white/90 mb-4">
+                            Unable to load calendar widget. This might be due to an
+                            ad blocker or network issue.
+                          </p>
+                          <button
+                            onClick={() => {
+                              window.open(calendlyUrl, "_blank", "noopener,noreferrer");
+                            }}
+                            className="w-full px-6 py-3 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-colors text-sm font-medium mb-2"
+                          >
+                            Open Calendar in New Tab
+                          </button>
+                          <button
+                            onClick={() => {
+                              setWidgetError(false);
+                              setWidgetLoading(true);
+                              widgetInitialized.current = false;
+                              if (widgetRef.current) {
+                                widgetRef.current.innerHTML = "";
+                              }
+                              // Retry loading
+                              const script = document.querySelector(
+                                'script[src="https://assets.calendly.com/assets/external/widget.js"]'
+                              );
+                              if (script) {
+                                script.remove();
+                              }
+                              setTimeout(() => {
+                                if (loadCalendlyRef.current) {
+                                  loadCalendlyRef.current();
+                                }
+                              }, 500);
+                            }}
+                            className="w-full px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors text-sm font-medium"
+                          >
+                            Retry Loading Widget
+                          </button>
+                        </div>
+                      </div>
+                    )}
                     <div
                       ref={widgetRef}
                       className="w-full h-full calendly-inline-widget"
