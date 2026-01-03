@@ -36,7 +36,25 @@ export function AddOnConsultationModal({
 
   // Load Calendly widget
   useEffect(() => {
-    if (!isOpen || !widgetRef.current) return;
+    // Wait for modal to be open and ref to be available
+    if (!isOpen) {
+      // Reset state when modal closes
+      widgetInitialized.current = false;
+      setWidgetLoading(true);
+      setWidgetError(false);
+      return;
+    }
+
+    // Wait for ref to be available
+    if (!widgetRef.current) {
+      // Small delay to ensure ref is set
+      const timeout = setTimeout(() => {
+        if (widgetRef.current) {
+          // Trigger re-run by setting a flag
+        }
+      }, 100);
+      return () => clearTimeout(timeout);
+    }
 
     // Load Calendly widget script
     const loadCalendly = () => {
@@ -47,20 +65,26 @@ export function AddOnConsultationModal({
 
       const initWidget = () => {
         // Prevent double initialization - check if widget already exists
-        if (!widgetRef.current) return;
+        if (!widgetRef.current) {
+          setWidgetLoading(false);
+          setWidgetError(true);
+          return;
+        }
 
         // Check if widget is already initialized by looking for iframe
         const hasWidget = widgetRef.current.querySelector("iframe");
-        if (hasWidget) {
-          widgetInitialized.current = true;
+        if (hasWidget && widgetInitialized.current) {
           setWidgetLoading(false);
+          setWidgetError(false);
           return;
         }
 
         if ((window as any).Calendly?.initInlineWidget) {
           try {
-            // Clear any existing content in the widget container
-            widgetRef.current.innerHTML = "";
+            // Only clear if not already initialized
+            if (!widgetInitialized.current) {
+              widgetRef.current.innerHTML = "";
+            }
 
             (window as any).Calendly.initInlineWidget({
               url: calendlyUrl,
@@ -74,12 +98,17 @@ export function AddOnConsultationModal({
             setWidgetLoading(false);
             setWidgetError(true);
           }
+        } else {
+          // Calendly not ready yet, keep waiting
+          setWidgetLoading(true);
         }
       };
 
       if (existingScript && (window as any).Calendly) {
         // Calendly is already loaded, initialize widget
-        initWidget();
+        setTimeout(() => {
+          initWidget();
+        }, 100);
         return;
       }
 
@@ -97,19 +126,17 @@ export function AddOnConsultationModal({
             attempts++;
             if ((window as any).Calendly?.initInlineWidget) {
               clearInterval(checkInterval);
-              initWidget();
+              setTimeout(() => {
+                initWidget();
+              }, 100);
             } else if (attempts >= maxAttempts) {
               clearInterval(checkInterval);
-              console.error("Calendly script loaded but failed to initialize");
               setWidgetLoading(false);
               setWidgetError(true);
             }
           }, 100);
         };
         script.onerror = () => {
-          console.error(
-            "Failed to load Calendly script - check network or ad blocker"
-          );
           setWidgetLoading(false);
           setWidgetError(true);
         };
@@ -121,23 +148,13 @@ export function AddOnConsultationModal({
         const checkCalendly = setInterval(() => {
           attempts++;
           if ((window as any).Calendly?.initInlineWidget) {
-            initWidget();
             clearInterval(checkCalendly);
+            initWidget();
           } else if (attempts >= maxAttempts) {
             clearInterval(checkCalendly);
-            console.error("Calendly script exists but failed to initialize");
             setWidgetLoading(false);
             setWidgetError(true);
-            // Try to reload the script
-            const oldScript = existingScript as HTMLScriptElement;
-            if (oldScript && oldScript.parentNode) {
-              oldScript.parentNode.removeChild(oldScript);
-              widgetInitialized.current = false;
-              // Retry loading
-              setTimeout(() => {
-                loadCalendly();
-              }, 1000);
-            }
+            // Don't try to reload automatically - let user retry manually
           }
         }, 100);
       }
@@ -146,7 +163,10 @@ export function AddOnConsultationModal({
     // Store loadCalendly function in ref so it can be accessed elsewhere
     loadCalendlyRef.current = loadCalendly;
 
-    loadCalendly();
+    // Small delay to ensure DOM is ready
+    const initTimeout = setTimeout(() => {
+      loadCalendly();
+    }, 100);
 
     // Listen for Calendly event when consultation is scheduled
     const handleCalendlyEvent = (e: MessageEvent) => {
@@ -163,13 +183,8 @@ export function AddOnConsultationModal({
     window.addEventListener("message", handleCalendlyEvent);
 
     return () => {
+      clearTimeout(initTimeout);
       window.removeEventListener("message", handleCalendlyEvent);
-      // Reset widget state when modal closes
-      if (!isOpen) {
-        widgetInitialized.current = false;
-        setWidgetLoading(true);
-        setWidgetError(false);
-      }
     };
   }, [isOpen, addOn, onConsultationScheduled, calendlyUrl]);
 
