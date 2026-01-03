@@ -239,11 +239,10 @@ export const Hero = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 max-w-4xl md:text-center"
           >
-            Marketplace for{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-br from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">
-              Intelligent
+              Robotics
             </span>{" "}
-            Robotics & AI Systems
+            Marketplace, Engineering Lab & Consultancy
           </motion.h1>
 
           {/* Robot Cards */}

@@ -145,57 +145,8 @@ const transformProducts = (): ProductData[] => {
 
 const allProducts = transformProducts();
 
-// Model filter options
-const models = [
-  { id: "all", label: "All", value: "all" },
-  { id: "g02", label: "G02", value: "g02" },
-  { id: "g1", label: "G1", value: "g1" },
-  { id: "r1", label: "R1", value: "r1" },
-  { id: "h1", label: "H1", value: "h1" },
-];
-
-// Helper function to extract model from product name
-const extractModel = (productName: string): string => {
-  if (!productName) return "";
-  const nameLower = productName.toLowerCase();
-  
-  // Check for G02/Go2 variations (check first to avoid matching G1)
-  if (nameLower.includes("go2") || nameLower.includes("g02")) {
-    return "g02";
-  }
-  
-  // Check for H1 (check before G1 to avoid matching H1-2 as G1)
-  if (nameLower.includes("h1")) {
-    return "h1";
-  }
-  
-  // Check for R1
-  if (nameLower.includes("r1")) {
-    return "r1";
-  }
-  
-  // Check for G1 (must be separate from G02, check after H1 to avoid H1 matching)
-  if (nameLower.includes("g1")) {
-    return "g1";
-  }
-  
-  return "";
-};
-
 export default function BuyPage() {
   const { state, isMobile } = useSidebar();
-  const [selectedModel, setSelectedModel] = React.useState("all");
-
-  // Filter products by model
-  const filteredProducts = React.useMemo(() => {
-    if (selectedModel === "all") {
-      return allProducts;
-    }
-    return allProducts.filter((product: ProductData) => {
-      const model = extractModel(product.name);
-      return model === selectedModel;
-    });
-  }, [selectedModel]);
 
   // Calculate header left position based on sidebar state
   const getHeaderLeft = () => {
@@ -253,32 +204,9 @@ export default function BuyPage() {
             </p>
           </motion.div>
 
-          {/* Model Filter Slider */}
-          <div
-            className="mb-8 overflow-x-auto"
-            style={{ scrollbarWidth: "thin" }}
-          >
-            <div className="flex gap-4 min-w-max pb-4">
-              {models.map((model) => (
-                <button
-                  key={model.id}
-                  onClick={() => setSelectedModel(model.value)}
-                  className={cn(
-                    "px-6 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap rounded-t-lg",
-                    selectedModel === model.value
-                      ? "border-blue-600 text-blue-600 bg-blue-50 dark:bg-blue-950/20"
-                      : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                  )}
-                >
-                  {model.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {filteredProducts.length > 0 ? (
+          {allProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch">
-              {filteredProducts.map((product: ProductData) => (
+              {allProducts.map((product: ProductData) => (
                 <ProductCard
                   key={product.id}
                   id={product.id}
