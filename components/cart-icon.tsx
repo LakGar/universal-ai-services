@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
@@ -38,6 +39,9 @@ export function CartIcon() {
       </SheetTrigger>
       <SheetContent className="w-full sm:max-w-4xl overflow-y-auto p-6 pt-10">
         <SheetTitle className="sr-only">Shopping Cart</SheetTitle>
+        <SheetDescription className="sr-only">
+          View and manage items in your shopping cart
+        </SheetDescription>
         <CartModal />
       </SheetContent>
     </Sheet>

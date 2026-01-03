@@ -1,8 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Minus, Plus, Trash } from "lucide-react";
-import { useCallback, useState, useMemo } from "react";
+import { Link, Minus, Plus, ArrowLeft, X, ShoppingBag } from "lucide-react";
+import { useCallback, useState, useMemo, useEffect } from "react";
 import {
   Controller,
   FormProvider,
@@ -12,12 +12,21 @@ import {
   UseFormReturn,
 } from "react-hook-form";
 import z from "zod";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+
+// Initialize Stripe only if publishable key is available
+const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+const stripePromise = stripePublishableKey
+  ? loadStripe(stripePublishableKey)
+  : null;
 
 import { cn } from "@/lib/utils";
 
 import Image from "next/image";
 import { Price, PriceValue } from "@/components/shadcnblocks/price";
 import QuantityInput from "@/components/shadcnblocks/quantity-input";
+import { StripePaymentForm } from "@/components/stripe-payment-form";
 import {
   Accordion,
   AccordionContent,
@@ -40,7 +49,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import accessoryData from "@/app/data.json";
+import buyData from "@/app/services/buy/data/buy_data.json";
 
 interface ProductPrice {
   regular: number;
@@ -224,11 +233,19 @@ const Checkout1 = ({
   onSuccess,
 }: Checkout1Props) => {
   const [activeAccordion, setActiveAccordion] = useState("item-1");
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [isCreatingPaymentIntent, setIsCreatingPaymentIntent] = useState(false);
   const defaultProducts = cartItems.map((item) => ({
     product_id: item.product_id,
     quantity: item.quantity,
     price: item.price.sale ?? item.price.regular,
   }));
+
+  // Calculate total amount
+  const totalAmount = useMemo(() => {
+    return defaultProducts.reduce((sum, p) => sum + p.price * p.quantity, 0);
+  }, [defaultProducts]);
 
   const form = useForm({
     resolver: zodResolver(checkoutFormSchema),
@@ -240,38 +257,105 @@ const Checkout1 = ({
     },
   });
 
-  const onSubmit = (data: CheckoutFormType) => {
-    console.log(data);
+  // Create payment intent when payment accordion is opened
+  useEffect(() => {
+    const createPaymentIntent = async () => {
+      if (
+        activeAccordion === "item-4" &&
+        !clientSecret &&
+        totalAmount > 0 &&
+        stripePromise
+      ) {
+        setIsCreatingPaymentIntent(true);
+        setPaymentError(null);
+        try {
+          const response = await fetch("/api/create-payment-intent", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              amount: totalAmount,
+              currency: "usd",
+            }),
+          });
+
+          const data = await response.json();
+          if (data.error) {
+            setPaymentError(data.error);
+          } else if (data.clientSecret) {
+            setClientSecret(data.clientSecret);
+          } else {
+            setPaymentError("Failed to receive payment client secret");
+          }
+        } catch (error: unknown) {
+          if (error instanceof Error) {
+            setPaymentError(error.message);
+          } else {
+            setPaymentError("Failed to initialize payment");
+          }
+        } finally {
+          setIsCreatingPaymentIntent(false);
+        }
+      }
+    };
+
+    createPaymentIntent();
+  }, [activeAccordion, clientSecret, totalAmount]);
+
+  // Reset client secret when total amount changes (e.g., cart items updated)
+  useEffect(() => {
+    if (clientSecret && activeAccordion === "item-4") {
+      // Reset client secret when amount changes to create a new payment intent
+      setClientSecret(null);
+    }
+  }, [totalAmount]);
+
+  const handlePaymentSuccess = () => {
+    const formData = form.getValues();
+    console.log("Payment successful:", formData);
     if (onSuccess) {
       onSuccess();
     }
   };
 
+  const handlePaymentError = (error: string) => {
+    setPaymentError(error);
+  };
+
   const onContinue = (value: string) => {
     setActiveAccordion(value);
+    setPaymentError(null);
   };
 
   const handleOnValueChange = (value: string) => {
     setActiveAccordion(value);
+    setPaymentError(null);
+    // Reset client secret when navigating away from payment section
+    if (value !== "item-4") {
+      setClientSecret(null);
+    }
   };
 
   return (
-    <section className={cn("py-16 md:py-24", className)}>
+    <section className={cn("py-16 md:py-24 p-10", className)}>
       <div className="container max-w-7xl mx-auto">
         <div className="flex flex-col gap-6 pb-8 md:flex-row md:items-center md:justify-between md:gap-8">
           <div className="flex flex-col gap-4">
-            <a href="/" className="flex items-center gap-2 mb-2">
+            <Link href="/" className="flex items-center gap-2 mb-2">
               <Image
                 src="/logo.png"
                 alt="Universal AI Services"
                 width={32}
                 height={32}
                 className="dark:invert"
+                unoptimized
+                priority
               />
               <span className="text-lg font-semibold zalando-sans-expanded">
                 Universal AI Services
               </span>
-            </a>
+            </Link>
             <div className="flex flex-col gap-2">
               <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
                 Checkout
@@ -281,9 +365,18 @@ const Checkout1 = ({
               </p>
             </div>
           </div>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/services/buy"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors border border-border rounded-lg hover:bg-muted/50"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Marketplace
+            </Link>
+          </div>
         </div>
         <FormProvider {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <div>
             <div className="grid grid-cols-1 gap-0 lg:grid-cols-2 lg:gap-8">
               <div>
                 <Accordion
@@ -361,10 +454,71 @@ const Checkout1 = ({
                     </AccordionTrigger>
                     <AccordionContent className="px-1 pb-7">
                       <div className="space-y-7">
-                        <PaymentFields />
-                        <Button type="submit" className="w-full">
-                          Checkout
-                        </Button>
+                        {paymentError && (
+                          <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+                            <p className="text-sm text-destructive">
+                              {paymentError}
+                            </p>
+                          </div>
+                        )}
+                        {stripePromise ? (
+                          clientSecret ? (
+                            <Elements
+                              stripe={stripePromise}
+                              options={{
+                                clientSecret,
+                                appearance: {
+                                  theme: "stripe",
+                                },
+                              }}
+                            >
+                              <StripePaymentForm
+                                amount={totalAmount}
+                                clientSecret={clientSecret}
+                                onSuccess={handlePaymentSuccess}
+                                onError={handlePaymentError}
+                              />
+                            </Elements>
+                          ) : isCreatingPaymentIntent ? (
+                            <div className="flex items-center justify-center py-12">
+                              <div className="flex items-center gap-2">
+                                <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                                <span className="text-sm text-muted-foreground">
+                                  Initializing payment...
+                                </span>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="p-6 border border-muted rounded-lg bg-muted/50">
+                              <p className="text-sm text-muted-foreground">
+                                Please complete the previous steps to proceed
+                                with payment.
+                              </p>
+                            </div>
+                          )
+                        ) : (
+                          <div className="p-6 border border-destructive/20 rounded-lg bg-destructive/5">
+                            <p className="text-sm font-medium text-destructive mb-2">
+                              Stripe Payment Not Configured
+                            </p>
+                            <p className="text-xs text-muted-foreground mb-4">
+                              Please add your Stripe publishable key to the
+                              environment variables to enable payment
+                              processing.
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Add{" "}
+                              <code className="px-1.5 py-0.5 bg-muted rounded text-xs">
+                                NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+                              </code>{" "}
+                              to your{" "}
+                              <code className="px-1.5 py-0.5 bg-muted rounded text-xs">
+                                .env.local
+                              </code>{" "}
+                              file.
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </AccordionContent>
                   </AccordionItem>
@@ -374,7 +528,7 @@ const Checkout1 = ({
                 <Cart form={form} cartItems={cartItems} />
               </div>
             </div>
-          </form>
+          </div>
         </FormProvider>
       </div>
     </section>
@@ -924,12 +1078,146 @@ const DateInput = () => {
   );
 };
 
+// Helper function to extract file ID from Google Drive URL
+const extractFileId = (url: string): string | null => {
+  const fileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (fileMatch) return fileMatch[1];
+  return null;
+};
+
+// Helper function to convert Google Drive URL to direct view URL
+const convertGoogleDriveUrl = (url: string): string => {
+  if (!url || typeof url !== "string") {
+    return "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
+  }
+
+  if (
+    url.includes("uc?export=view") ||
+    url.includes("uc?export=download") ||
+    url.includes("/preview")
+  ) {
+    return url;
+  }
+
+  if (url.includes("drive.google.com")) {
+    const fileId = extractFileId(url);
+    if (fileId) {
+      return `https://drive.google.com/uc?export=view&id=${fileId}`;
+    }
+  }
+
+  if (url.startsWith("http")) {
+    return url;
+  }
+
+  return "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
+};
+
+// Helper function to check if URL is a video
+const isVideoUrl = (url: string): boolean => {
+  if (typeof url !== "string") return false;
+  const videoExtensions = [".mp4", ".webm", ".mov", ".avi", ".mkv", ".m4v"];
+  return videoExtensions.some((ext) => url.toLowerCase().includes(ext));
+};
+
+// Helper function to get product image from buy data
+const getBuyProductImage = (item: {
+  Images?: string | string[];
+  "Location ID"?: string | string[];
+  [key: string]: unknown;
+}): string => {
+  // If Images field exists and has URLs, use the first one
+  if (item.Images && Array.isArray(item.Images) && item.Images.length > 0) {
+    const firstImage = item.Images[0];
+    // Skip if it's a video
+    if (typeof firstImage === "string" && !isVideoUrl(firstImage)) {
+      return firstImage;
+    }
+  }
+  if (
+    item.Images &&
+    typeof item.Images === "string" &&
+    !isVideoUrl(item.Images)
+  ) {
+    return item.Images;
+  }
+
+  // Check if Location ID is an array of Google Drive links
+  const locationId = item["Location ID"];
+  if (Array.isArray(locationId) && locationId.length > 0) {
+    // Find first non-video item
+    for (const link of locationId) {
+      if (typeof link === "string") {
+        // Skip videos
+        if (isVideoUrl(link)) continue;
+
+        if (link.includes("drive.google.com")) {
+          const fileId = extractFileId(link);
+          if (fileId) {
+            return `https://drive.google.com/uc?export=view&id=${fileId}`;
+          }
+        } else if (link.startsWith("http")) {
+          // Direct image URL
+          return link;
+        }
+      }
+    }
+  }
+
+  // Try to extract from single Google Drive link (string)
+  if (
+    typeof locationId === "string" &&
+    locationId.includes("drive.google.com") &&
+    !isVideoUrl(locationId)
+  ) {
+    const fileId = extractFileId(locationId);
+    if (fileId) {
+      return `https://drive.google.com/uc?export=view&id=${fileId}`;
+    }
+  }
+
+  // Fallback to placeholder
+  return "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
+};
+
+// Transform buy data to recommended products
+const getRecommendedProducts = () => {
+  return buyData.slice(0, 6).map((item, index) => {
+    const msrp = parseFloat(
+      item.MSRP?.toString().replace(/[^0-9.]/g, "") || "0"
+    );
+    const price =
+      msrp > 0 ? `From $${msrp.toLocaleString()}` : "Price on request";
+
+    const imageUrl = getBuyProductImage(item);
+    // getBuyProductImage already converts Google Drive URLs, so we just use it directly
+    // But ensure it's properly converted if it's still a view link
+    let finalImageUrl = imageUrl;
+    if (imageUrl.includes("drive.google.com/file/d/")) {
+      const fileId = extractFileId(imageUrl);
+      if (fileId) {
+        finalImageUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
+      }
+    }
+
+    return {
+      id: (index + 1).toString(),
+      name: item["Model Name"] || "Unnamed Product",
+      image: finalImageUrl,
+      originalImage: imageUrl,
+      price: price,
+      priceValue: msrp,
+    };
+  });
+};
+
 const Cart = ({ cartItems, form }: CartProps) => {
   const { fields, remove, update, append } = useFieldArray({
     control: form.control,
     name: "products",
   });
   const { addItem } = useCart();
+  const recommendedProducts = useMemo(() => getRecommendedProducts(), []);
 
   const formItems = form.watch("products");
 
@@ -951,194 +1239,128 @@ const Cart = ({ cartItems, form }: CartProps) => {
     [update, fields]
   );
 
-  // Helper function to extract file ID from Google Drive URL
-  const extractFileId = (url: string): string | null => {
-    const fileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-    if (fileMatch) return fileMatch[1];
-    return null;
-  };
-
-  // Helper function to convert Google Drive URL to direct view URL
-  const convertGoogleDriveUrl = (url: string): string => {
-    if (!url || typeof url !== "string") {
-      return "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
-    }
-    
-    if (url.includes("uc?export=view") || url.includes("uc?export=download") || url.includes("/preview")) {
-      return url;
-    }
-    
-    if (url.includes("drive.google.com")) {
-      const fileId = extractFileId(url);
-      if (fileId) {
-        return `https://drive.google.com/uc?export=view&id=${fileId}`;
-      }
-    }
-    
-    if (url.startsWith("http")) {
-      return url;
-    }
-    
-    return "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
-  };
-
-  // Transform accessories data for checkout display
-  const addOnProducts = useMemo(() => {
-    return accessoryData.accessories_addons.slice(0, 6).map((accessory) => {
-      // Extract price
-      let price = 0;
-      let priceStr = "Contact for pricing";
-      
-      if (accessory.MSRP && 
-          accessory.MSRP !== "Contact Micro-IP" && 
-          accessory.MSRP !== "N/A" &&
-          typeof accessory.MSRP === "string") {
-        const msrpValue = parseFloat(accessory.MSRP.replace(/[^0-9.]/g, ""));
-        if (msrpValue > 0 && !isNaN(msrpValue)) {
-          price = msrpValue;
-          priceStr = `$${msrpValue.toLocaleString()}`;
-        }
-      }
-      
-      if (accessory["UAIS Price"] && 
-          accessory["UAIS Price"] !== "N/A" && 
-          price === 0) {
-        const uaisPrice = accessory["UAIS Price"].toString();
-        if (uaisPrice.includes("$")) {
-          const extracted = parseFloat(uaisPrice.replace(/[^0-9.]/g, ""));
-          if (!isNaN(extracted) && extracted > 0) {
-            price = extracted;
-            priceStr = uaisPrice;
-          }
-        } else {
-          const uaisValue = parseFloat(uaisPrice.replace(/[^0-9.]/g, ""));
-          if (uaisValue > 0 && !isNaN(uaisValue)) {
-            price = uaisValue;
-            priceStr = `$${uaisValue.toLocaleString()}`;
-          }
-        }
-      }
-
-      // Get image
-      let imageUrl = "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
-      if (accessory.images && Array.isArray(accessory.images) && accessory.images.length > 0) {
-        imageUrl = convertGoogleDriveUrl(accessory.images[0]);
-      }
-
-      return {
-        id: accessory["Product ID"] || accessory.SKU || accessory.name || "",
-        name: accessory.name || "Accessory",
-        image: imageUrl,
-        price: price,
-        priceStr: priceStr,
-        description: accessory["Short Description"] || accessory.Description || "",
-      };
-    });
-  }, []);
-
-  const handleAddAddOn = (addOn: (typeof addOnProducts)[0]) => {
-    // Only add if price is available (not "Contact for pricing")
-    if (addOn.price === 0) {
-      // If price is 0 or "Contact for pricing", don't add directly - would need consultation
-      return;
-    }
-
-    const existingIndex = formItems.findIndex((p) => p.product_id === addOn.id);
-    if (existingIndex >= 0) {
-      update(existingIndex, {
-        ...formItems[existingIndex],
-        quantity: formItems[existingIndex].quantity + 1,
-      });
-    } else {
-      append({
-        product_id: addOn.id,
-        quantity: 1,
-        price: addOn.price,
-      });
-    }
-    // Also add to cart context
-    addItem({
-      id: addOn.id,
-      name: addOn.name,
-      image: addOn.image,
-      price: addOn.priceStr,
-    });
-  };
-
   return (
     <div>
       <div className="border-b py-7">
-        <h2 className="text-lg leading-relaxed font-semibold">Your Cart</h2>
-      </div>
-      <ul className="space-y-12 py-7">
-        {fields.map((field, index) => {
-          return (
-            <li key={field.id}>
-              <CartItem
-                {...(cartItems.find(
-                  (p) => p.product_id === field.product_id
-                ) as CartItem)}
-                onRemoveClick={() => handleRemove(index)()}
-                onQuantityChange={(newQty: number) =>
-                  handleQuantityChange(index)(newQty)
-                }
-                index={index}
-              />
-            </li>
-          );
-        })}
-      </ul>
-
-      {/* Add-ons Section */}
-      <div className="border-t py-7">
-        <h3 className="text-base font-semibold mb-6">Recommended Add-ons</h3>
-        <div className="space-y-6">
-          {addOnProducts.map((addOn) => {
-            const isAdded = formItems.some((p) => p.product_id === addOn.id);
-            return (
-              <div
-                key={addOn.id}
-                className="flex gap-4 items-center py-3 hover:bg-muted/50 rounded-lg transition-colors px-2 -mx-2"
-              >
-                <div className="w-16 h-16 shrink-0">
-                  <AspectRatio
-                    ratio={1}
-                    className="bg-muted rounded-lg overflow-hidden"
-                  >
-                    <Image
-                      src={addOn.image}
-                      alt={addOn.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </AspectRatio>
-                </div>
-                <div className="flex-1 flex items-center justify-between gap-4">
-                  <div className="flex-1">
-                    <h4 className="font-medium text-sm mb-1">{addOn.name}</h4>
-                    <p className="text-xs text-muted-foreground mb-1 line-clamp-2">
-                      {addOn.description}
-                    </p>
-                    <p className="text-sm font-semibold">
-                      {addOn.priceStr}
-                    </p>
-                  </div>
-                  <Button
-                    type="button"
-                    variant={isAdded ? "secondary" : "default"}
-                    size="sm"
-                    onClick={() => handleAddAddOn(addOn)}
-                    className="shrink-0"
-                    disabled={addOn.price === 0}
-                  >
-                    {isAdded ? "Added" : addOn.price === 0 ? "Contact" : "Add"}
-                  </Button>
-                </div>
-              </div>
-            );
-          })}
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg leading-relaxed font-semibold">Your Cart</h2>
+          <Link
+            href="/services/buy"
+            className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="h-3 w-3" />
+            Continue Shopping
+          </Link>
         </div>
       </div>
+      {fields.length === 0 ? (
+        <div className="py-16 text-center">
+          <ShoppingBag className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+          <h3 className="text-lg font-semibold mb-2">Your cart is empty</h3>
+          <p className="text-sm text-muted-foreground mb-6">
+            Start shopping to add items to your cart
+          </p>
+          <Link href="/services/buy">
+            <Button>
+              <ShoppingBag className="mr-2 h-4 w-4" />
+              Go to Marketplace
+            </Button>
+          </Link>
+        </div>
+      ) : (
+        <ul className="space-y-12 py-7">
+          {fields.map((field, index) => {
+            return (
+              <li key={field.id}>
+                <CartItem
+                  {...(cartItems.find(
+                    (p) => p.product_id === field.product_id
+                  ) as CartItem)}
+                  onRemoveClick={() => handleRemove(index)()}
+                  onQuantityChange={(newQty: number) =>
+                    handleQuantityChange(index)(newQty)
+                  }
+                  index={index}
+                />
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      {/* Recommended Products Section */}
+      {fields.length > 0 && (
+        <div className="border-t py-7">
+          <h3 className="text-base font-semibold mb-6">You May Also Like</h3>
+          <div className="overflow-x-auto pb-4 -mx-2 px-2">
+            <div className="flex gap-4 min-w-max">
+              {recommendedProducts.map((product) => {
+                const isAdded = formItems.some(
+                  (p) => p.product_id === product.id
+                );
+                const imageUrl = product.image;
+
+                return (
+                  <div
+                    key={product.id}
+                    className="w-48 shrink-0 flex flex-col gap-3 group"
+                  >
+                    <Link href={`/services/buy/${product.id}`}>
+                      <div className="relative aspect-3/4 w-full rounded-lg overflow-hidden bg-muted">
+                        <img
+                          src={imageUrl}
+                          alt={product.name}
+                          className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-105"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src =
+                              "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
+                          }}
+                          loading="lazy"
+                        />
+                      </div>
+                    </Link>
+                    <div className="flex flex-col gap-1">
+                      <Link href={`/services/buy/${product.id}`}>
+                        <h4 className="font-medium text-sm line-clamp-2 group-hover:text-primary transition-colors">
+                          {product.name}
+                        </h4>
+                      </Link>
+                      <p className="text-xs text-muted-foreground">
+                        {product.price}
+                      </p>
+                      <Button
+                        type="button"
+                        variant={isAdded ? "secondary" : "default"}
+                        size="sm"
+                        className="w-full mt-2"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (!isAdded) {
+                            addItem({
+                              id: product.id,
+                              name: product.name,
+                              image: product.image,
+                              price: product.price,
+                            });
+                            append({
+                              product_id: product.id.toString(),
+                              quantity: 1,
+                              price: product.priceValue,
+                            });
+                          }
+                        }}
+                      >
+                        {isAdded ? "Added" : "Add to Cart"}
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div>
         <div className="space-y-3.5 border-y py-7">
@@ -1189,17 +1411,43 @@ const CartItem = ({
   onRemoveClick,
 }: CartItemProps) => {
   const { regular, currency } = price;
+  const [imageLoading, setImageLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
+
+  const imageUrl = convertGoogleDriveUrl(image);
 
   return (
     <Card className="rounded-none border-none bg-background p-0 shadow-none">
       <div className="flex w-full gap-3.5 max-sm:flex-col">
         <div className="shrink-0 basis-25">
-          <AspectRatio ratio={1} className="overflow-hidden rounded-lg">
-            <img
-              src={image}
-              alt={name}
-              className="block size-full object-cover object-center"
-            />
+          <AspectRatio
+            ratio={1}
+            className="overflow-hidden rounded-lg bg-muted"
+          >
+            {imageLoading && (
+              <div className="absolute inset-0 bg-muted animate-pulse" />
+            )}
+            {!imageError ? (
+              <Image
+                src={imageUrl}
+                alt={name}
+                fill
+                sizes="(max-width: 640px) 100px, 100px"
+                className={cn(
+                  "object-cover transition-opacity duration-300",
+                  imageLoading ? "opacity-0" : "opacity-100"
+                )}
+                onLoad={() => setImageLoading(false)}
+                onError={() => {
+                  setImageError(true);
+                  setImageLoading(false);
+                }}
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground">
+                <p className="text-xs">Image unavailable</p>
+              </div>
+            )}
           </AspectRatio>
         </div>
         <div className="flex-1">
@@ -1226,8 +1474,13 @@ const CartItem = ({
                 index={index}
                 onQuantityChange={onQuantityChange}
               />
-              <Button size="icon" variant="ghost" onClick={onRemoveClick}>
-                <Trash />
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={onRemoveClick}
+                className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive transition-colors"
+              >
+                <X className="h-4 w-4" />
               </Button>
             </div>
           </div>

@@ -1,19 +1,19 @@
 "use client";
 
 import { motion } from "framer-motion";
+import * as React from "react";
+import Link from "next/link";
 import {
   Book,
   Calendar,
   Mail,
   Menu,
   ShoppingCart,
-  Truck,
-  Trees,
-  Zap,
   ToolCase,
   Gift,
   Receipt,
 } from "lucide-react";
+import { useContact } from "@/contexts/contact-context";
 
 import { cn } from "@/lib/utils";
 
@@ -35,6 +35,7 @@ import {
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -113,19 +114,13 @@ const Navbar = ({
           title: "Consultations",
           description: "Book a consultation with our experts",
           icon: <Calendar className="size-5 shrink-0" />,
-          url: "#",
+          url: "/services/consultation",
         },
         {
           title: "Contact Us",
           description: "We are here to help you with any questions you have",
           icon: <Mail className="size-5 shrink-0" />,
-          url: "#",
-        },
-        {
-          title: "Status",
-          description: "Check the status of your orders and rentals",
-          icon: <Truck className="size-5 shrink-0" />,
-          url: "#",
+          url: "#contact",
         },
         {
           title: "Terms of Service",
@@ -144,12 +139,10 @@ const Navbar = ({
       url: "#",
     },
   ],
-  auth = {
-    login: { title: "Login", url: "/login" },
-    signup: { title: "Sign up", url: "/signup" },
-  },
   className,
 }: Navbar1Props) => {
+  const { openContact } = useContact();
+
   return (
     <section
       className={cn(
@@ -207,21 +200,12 @@ const Navbar = ({
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <Button
-              asChild
-              variant="outline"
-              size="sm"
-              className="bg-black border-white/20 text-white hover:bg-white/10 hover:text-black"
+            <button
+              onClick={openContact}
+              className="px-4 py-2 rounded-lg bg-black text-white font-medium hover:bg-black/90 transition-colors text-sm"
             >
-              <a href={auth.login.url}>{auth.login.title}</a>
-            </Button>
-            <Button
-              asChild
-              size="sm"
-              className="bg-white text-black hover:bg-white/90"
-            >
-              <a href={auth.signup.url}>{auth.signup.title}</a>
-            </Button>
+              Contact
+            </button>
           </motion.div>
         </nav>
 
@@ -229,9 +213,9 @@ const Navbar = ({
         <div className="block lg:hidden">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <a href="/" className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2">
               <img src="/logo.png" className="max-h-8 dark:invert" alt="logo" />
-            </a>
+            </Link>
             <Sheet>
               <SheetTrigger asChild>
                 <Button
@@ -245,14 +229,17 @@ const Navbar = ({
               <SheetContent className="overflow-y-auto">
                 <SheetHeader>
                   <SheetTitle>
-                    <a href="/" className="flex items-center gap-2">
+                    <Link href="/" className="flex items-center gap-2">
                       <img
                         src="/logo.png"
                         className="max-h-8 dark:invert"
                         alt="logo"
                       />
-                    </a>
+                    </Link>
                   </SheetTitle>
+                  <SheetDescription className="sr-only">
+                    Navigation menu
+                  </SheetDescription>
                 </SheetHeader>
                 <div className="flex flex-col gap-6 p-4">
                   <Accordion
@@ -264,11 +251,11 @@ const Navbar = ({
                   </Accordion>
 
                   <div className="flex flex-col gap-3">
-                    <Button asChild variant="outline">
-                      <a href={auth.login.url}>{auth.login.title}</a>
-                    </Button>
-                    <Button asChild>
-                      <a href={auth.signup.url}>{auth.signup.title}</a>
+                    <Button
+                      onClick={openContact}
+                      className="bg-black text-white hover:bg-black/90"
+                    >
+                      Contact
                     </Button>
                   </div>
                 </div>
@@ -351,10 +338,20 @@ const renderMobileMenuItem = (item: MenuItem) => {
 };
 
 const SubMenuLink = ({ item }: { item: MenuItem }) => {
+  const { openContact } = useContact();
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (item.url === "#contact") {
+      e.preventDefault();
+      openContact();
+    }
+  };
+
   return (
     <a
       className="flex min-w-80 flex-row gap-4 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none hover:bg-muted hover:text-accent-foreground"
       href={item.url}
+      onClick={handleClick}
     >
       <div className="text-foreground">{item.icon}</div>
       <div>

@@ -22,11 +22,11 @@ const About = ({ className }: { className?: string }) => {
     description:
       "It has become the baseline for competitiveness, and companies that adopt it with speed and clarity will define the next decade.",
     buttonText: "Learn more",
-    buttonUrl: "/about",
+    buttonUrl: "#services",
   };
 
   return (
-    <section className={cn("py-32", className)}>
+    <section id="about" className={cn("py-32", className)}>
       <div className="container mx-auto max-w-7xl px-4">
         <div className="mb-14 grid gap-5 text-center md:grid-cols-2">
           <motion.h1

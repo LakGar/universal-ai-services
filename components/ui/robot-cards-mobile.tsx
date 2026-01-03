@@ -25,6 +25,24 @@ export function RobotCardsMobile({ robots, className }: RobotCardsMobileProps) {
     const [imageLoading, setImageLoading] = React.useState(true);
     const [imageError, setImageError] = React.useState(false);
 
+    // Timeout for images that don't load
+    React.useEffect(() => {
+      if (imageLoading && robot.image) {
+        const timeout = setTimeout(() => {
+          console.warn("Image loading timeout:", robot.image);
+          setImageError(true);
+          setImageLoading(false);
+        }, 8000); // 8 second timeout
+
+        return () => clearTimeout(timeout);
+      }
+      // If no image URL, show error immediately
+      if (!robot.image || robot.image === "") {
+        setImageError(true);
+        setImageLoading(false);
+      }
+    }, [imageLoading, robot.image]);
+
     return (
       <motion.div
         key={robot.id}
@@ -40,42 +58,28 @@ export function RobotCardsMobile({ robots, className }: RobotCardsMobileProps) {
               <Skeleton className="absolute inset-0 w-full h-full" />
             )}
             {!imageError && (
-              <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-110">
-                {robot.image.includes("drive.google.com") ? (
-                  <img
-                    src={robot.image}
-                    alt={robot.name}
-                    className={cn(
-                      "h-full w-full object-cover transition-opacity duration-300",
-                      imageLoading ? "opacity-0" : "opacity-100"
-                    )}
-                    onLoad={() => setImageLoading(false)}
-                    onError={() => {
-                      setImageError(true);
-                      setImageLoading(false);
-                    }}
-                  />
-                ) : (
-                  <Image
-                    src={robot.image}
-                    alt={robot.name}
-                    fill
-                    className={cn(
-                      "object-cover transition-opacity duration-300",
-                      imageLoading ? "opacity-0" : "opacity-100"
-                    )}
-                    onLoad={() => setImageLoading(false)}
-                    onError={() => {
-                      setImageError(true);
-                      setImageLoading(false);
-                    }}
-                  />
+              <Image
+                src={robot.image}
+                alt={robot.name}
+                fill
+                sizes="(max-width: 768px) 150px, 180px"
+                className={cn(
+                  "object-cover transition-opacity duration-300",
+                  imageLoading ? "opacity-0" : "opacity-100"
                 )}
-              </div>
+                onLoad={() => setImageLoading(false)}
+                onError={() => {
+                  setImageError(true);
+                  setImageLoading(false);
+                }}
+              />
             )}
             {imageError && (
-              <div className="absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground">
-                <p className="text-sm">Image not available</p>
+              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm">
+                <div className="text-center p-4">
+                  <p className="text-sm text-white/70 font-medium">{robot.name}</p>
+                  <p className="text-xs text-white/50 mt-1">Image unavailable</p>
+                </div>
               </div>
             )}
             {/* Gradient overlay */}

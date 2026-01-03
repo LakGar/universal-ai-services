@@ -83,7 +83,7 @@ function Feature() {
                 alt: "Repairs",
               },
               {
-                href: "/services/consultations",
+                href: "/services/consultation",
                 name: "Consultations",
                 description: "Book a consultation with our experts.",
                 image:

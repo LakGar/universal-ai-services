@@ -860,13 +860,7 @@
     {
       "Category": "Accessories+Add-ons",
       "images": [
-        "https://drive.google.com/file/d/1Y3XvLGxJTCoYB6UytyydPEUfzK27QhmZ/view?usp=drive_link",
-        "https://drive.google.com/file/d/1tDpgfQFM9g6diJlXSHOujoalgbgLFpG3/view?usp=drive_link",
-        "https://drive.google.com/file/d/11JWvo7TTuawLlgx_oFaIyr-IY57g1OqP/view?usp=drive_link",
-        "https://drive.google.com/file/d/1MmFjbXpD4X1y4ZDi5TI6Q0qZ1sxk4JrK/view?usp=drive_link",
-        "https://drive.google.com/file/d/1pF5nskNjzhYWR4evivKPoBuieAZtHaZc/view?usp=drive_link",
-        "https://drive.google.com/file/d/1ZkrFe_cIHsfx9gB9VOiAW3XGL97gKu0v/view?usp=drive_link",
-        "https://drive.google.com/file/d/1OtRixVVsMfiu0unZOOOEJtxwxBohpVpe/view?usp=drive_link"
+        "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&q=80"
       ],
       "name": "Virtual Fence",
       "Product ID": "MIP-EDGE-VIRTFENCE",
@@ -926,13 +920,7 @@
     {
       "Category": "Accessories+Add-ons",
       "images": [
-        "https://drive.google.com/file/d/1MmFjbXpD4X1y4ZDi5TI6Q0qZ1sxk4JrK/view?usp=drive_link",
-        "https://drive.google.com/file/d/1Y3XvLGxJTCoYB6UytyydPEUfzK27QhmZ/view?usp=drive_link",
-        "https://drive.google.com/file/d/1tDpgfQFM9g6diJlXSHOujoalgbgLFpG3/view?usp=drive_link",
-        "https://drive.google.com/file/d/11JWvo7TTuawLlgx_oFaIyr-IY57g1OqP/view?usp=drive_link",
-        "https://drive.google.com/file/d/1pF5nskNjzhYWR4evivKPoBuieAZtHaZc/view?usp=drive_link",
-        "https://drive.google.com/file/d/1ZkrFe_cIHsfx9gB9VOiAW3XGL97gKu0v/view?usp=drive_link",
-        "https://drive.google.com/file/d/1OtRixVVsMfiu0unZOOOEJtxwxBohpVpe/view?usp=drive_link"
+        "https://images.unsplash.com/photo-1611955874253-78c6c3959c41?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8ZmFsbGluZ3xlbnwwfHwwfHx8MA%3D%3D"
       ],
       "name": "Fall Detection",
       "Product ID": "MIP-EDGE-FALL",
@@ -992,13 +980,7 @@
     {
       "Category": "Accessories+Add-ons",
       "images": [
-        "https://drive.google.com/file/d/1pF5nskNjzhYWR4evivKPoBuieAZtHaZc/view?usp=drive_link",
-        "https://drive.google.com/file/d/1MmFjbXpD4X1y4ZDi5TI6Q0qZ1sxk4JrK/view?usp=drive_link",
-        "https://drive.google.com/file/d/1Y3XvLGxJTCoYB6UytyydPEUfzK27QhmZ/view?usp=drive_link",
-        "https://drive.google.com/file/d/1tDpgfQFM9g6diJlXSHOujoalgbgLFpG3/view?usp=drive_link",
-        "https://drive.google.com/file/d/11JWvo7TTuawLlgx_oFaIyr-IY57g1OqP/view?usp=drive_link",
-        "https://drive.google.com/file/d/1ZkrFe_cIHsfx9gB9VOiAW3XGL97gKu0v/view?usp=drive_link",
-        "https://drive.google.com/file/d/1OtRixVVsMfiu0unZOOOEJtxwxBohpVpe/view?usp=drive_link"
+        "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&q=80"
       ],
       "name": "People Flow Management",
       "Product ID": "MIP-EDGE-FLOW",
@@ -1058,13 +1040,7 @@
     {
       "Category": "Accessories+Add-ons",
       "images": [
-        "https://drive.google.com/file/d/1pF5nskNjzhYWR4evivKPoBuieAZtHaZc/view?usp=drive_link",
-        "https://drive.google.com/file/d/1MmFjbXpD4X1y4ZDi5TI6Q0qZ1sxk4JrK/view?usp=drive_link",
-        "https://drive.google.com/file/d/1Y3XvLGxJTCoYB6UytyydPEUfzK27QhmZ/view?usp=drive_link",
-        "https://drive.google.com/file/d/1tDpgfQFM9g6diJlXSHOujoalgbgLFpG3/view?usp=drive_link",
-        "https://drive.google.com/file/d/11JWvo7TTuawLlgx_oFaIyr-IY57g1OqP/view?usp=drive_link",
-        "https://drive.google.com/file/d/1ZkrFe_cIHsfx9gB9VOiAW3XGL97gKu0v/view?usp=drive_link",
-        "https://drive.google.com/file/d/1OtRixVVsMfiu0unZOOOEJtxwxBohpVpe/view?usp=drive_link"
+        "https://images.unsplash.com/photo-1502877338535-766e1452684a?w=800&q=80"
       ],
       "name": "License Plate Recognition (LPR)",
       "Product ID": "MIP-EDGE-LPR",

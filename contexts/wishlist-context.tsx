@@ -3,7 +3,7 @@
 import * as React from "react";
 
 interface WishlistItem {
-  id: number;
+  id: string | number;
   name: string;
   image: string;
   price: string;
@@ -13,19 +13,61 @@ interface WishlistItem {
 interface WishlistContextType {
   items: WishlistItem[];
   addItem: (item: WishlistItem) => void;
-  removeItem: (id: number) => void;
-  isInWishlist: (id: number) => boolean;
+  removeItem: (id: string | number) => void;
+  isInWishlist: (id: string | number) => boolean;
   itemCount: number;
 }
 
 const WishlistContext = React.createContext<WishlistContextType | undefined>(undefined);
 
+const STORAGE_KEY = "wishlist-items";
+
+// Load wishlist from localStorage
+const loadWishlistFromStorage = (): WishlistItem[] => {
+  if (typeof window === "undefined") return [];
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (error) {
+    console.error("Failed to load wishlist from localStorage:", error);
+  }
+  return [];
+};
+
+// Save wishlist to localStorage
+const saveWishlistToStorage = (items: WishlistItem[]) => {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  } catch (error) {
+    console.error("Failed to save wishlist to localStorage:", error);
+  }
+};
+
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = React.useState<WishlistItem[]>([]);
+  const [isInitialized, setIsInitialized] = React.useState(false);
+
+  // Load wishlist from localStorage on mount
+  React.useEffect(() => {
+    const loadedItems = loadWishlistFromStorage();
+    setItems(loadedItems);
+    setIsInitialized(true);
+  }, []);
+
+  // Save wishlist to localStorage whenever it changes
+  React.useEffect(() => {
+    if (isInitialized) {
+      saveWishlistToStorage(items);
+    }
+  }, [items, isInitialized]);
 
   const addItem = React.useCallback((item: WishlistItem) => {
     setItems((prev) => {
-      const existing = prev.find((i) => i.id === item.id);
+      // Use string comparison to handle both string and number IDs
+      const existing = prev.find((i) => String(i.id) === String(item.id));
       if (existing) {
         return prev; // Already in wishlist
       }
@@ -33,13 +75,13 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  const removeItem = React.useCallback((id: number) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
+  const removeItem = React.useCallback((id: string | number) => {
+    setItems((prev) => prev.filter((item) => String(item.id) !== String(id)));
   }, []);
 
   const isInWishlist = React.useCallback(
-    (id: number) => {
-      return items.some((item) => item.id === id);
+    (id: string | number) => {
+      return items.some((item) => String(item.id) === String(id));
     },
     [items]
   );

@@ -40,6 +40,9 @@ export function WishlistIcon() {
       </SheetTrigger>
       <SheetContent className="w-full sm:max-w-4xl overflow-y-auto p-6 pt-10">
         <SheetTitle className="sr-only">Wishlist</SheetTitle>
+        <SheetDescription className="sr-only">
+          View and manage items in your wishlist
+        </SheetDescription>
         <Wishlist1 />
       </SheetContent>
     </Sheet>

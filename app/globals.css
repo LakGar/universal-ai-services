@@ -171,12 +171,20 @@
 .calendly-inline-widget {
   width: 100% !important;
   height: 100% !important;
-  min-height: 1200px !important;
+  min-height: 600px !important;
+  border-radius: 0.5rem !important;
+  overflow: hidden !important;
 }
 
 .calendly-inline-widget iframe {
   width: 100% !important;
   height: 100% !important;
-  min-height: 1200px !important;
+  min-height: 600px !important;
   border: none !important;
+  border-radius: 0.5rem !important;
+}
+
+/* Make Calendly widget blend with dark modal */
+.calendly-inline-widget iframe {
+  background: transparent !important;
 }

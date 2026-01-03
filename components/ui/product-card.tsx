@@ -43,7 +43,7 @@ export function ProductCard({
     removeItem: removeFromWishlist,
     isInWishlist,
   } = useWishlist();
-  const inWishlist = isInWishlist(Number(id));
+  const inWishlist = isInWishlist(id);
   const [imageLoading, setImageLoading] = React.useState(true);
   const [imageError, setImageError] = React.useState(false);
   const isVideo = React.useMemo(() => {
@@ -53,9 +53,15 @@ export function ProductCard({
     return videoExtensions.some((ext) => image.toLowerCase().includes(ext));
   }, [image, isVideoProp]);
 
+  // Reset loading state when image changes
+  React.useEffect(() => {
+    setImageLoading(true);
+    setImageError(false);
+  }, [image]);
+
   const handleAddToCart = () => {
     addItem({
-      id: Number(id),
+      id,
       name,
       image,
       price,
@@ -64,10 +70,10 @@ export function ProductCard({
 
   const handleWishlistToggle = () => {
     if (inWishlist) {
-      removeFromWishlist(Number(id));
+      removeFromWishlist(id);
     } else {
       addToWishlist({
-        id: Number(id),
+        id,
         name,
         image,
         price,
@@ -93,7 +99,7 @@ export function ProductCard({
         </h3>
         <div className="relative aspect-3/4 w-full rounded-lg overflow-hidden bg-muted cursor-pointer">
           {imageLoading && (
-            <Skeleton className="absolute inset-0 w-full h-full" />
+            <Skeleton className="absolute inset-0 w-full h-full z-10" />
           )}
 
           {isVideo ? (
@@ -141,8 +147,9 @@ export function ProductCard({
                   src={image}
                   alt={alt}
                   fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className={cn(
-                    "object-cover transition-opacity duration-300",
+                    "object-cover transition-opacity duration-300 relative z-0",
                     imageLoading ? "opacity-0" : "opacity-100"
                   )}
                   onLoad={() => setImageLoading(false)}

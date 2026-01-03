@@ -1,20 +1,21 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Icons } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 import Image from "next/image";
+import { useContact } from "@/contexts/contact-context";
 
 function Footer() {
+  const { openContact } = useContact();
   const footerLinks = [
     { href: "#", label: "Home" },
-    { href: "#", label: "About" },
-    { href: "#", label: "Services" },
-    { href: "#", label: "Products" },
-    { href: "#", label: "Contact" },
+    { href: "#about", label: "About" },
+    { href: "#services", label: "Services" },
+    { href: "/services/buy", label: "Products" },
+    { href: "#contact", label: "Contact" },
   ];
 
   const socialLinks = [
@@ -44,25 +45,42 @@ function Footer() {
             />
           </motion.div>
           <motion.nav
-            className="mb-8 flex flex-wrap justify-center gap-6"
+            className="mb-8 flex flex-wrap justify-center gap-6 items-center"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            {footerLinks.map((link, index) => (
-              <motion.a
-                key={link.label}
-                href={link.href}
-                className="hover:text-primary"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: 0.2 + index * 0.05 }}
-              >
-                {link.label}
-              </motion.a>
-            ))}
+            {footerLinks.map((link, index) => {
+              if (link.href === "#contact") {
+                return (
+                  <motion.button
+                    key={link.label}
+                    onClick={openContact}
+                    className="hover:text-primary"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: 0.2 + index * 0.05 }}
+                  >
+                    {link.label}
+                  </motion.button>
+                );
+              }
+              return (
+                <motion.a
+                  key={link.label}
+                  href={link.href}
+                  className="hover:text-primary"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: 0.2 + index * 0.05 }}
+                >
+                  {link.label}
+                </motion.a>
+              );
+            })}
           </motion.nav>
           <motion.div
             className="mb-8 flex space-x-4"
@@ -101,7 +119,7 @@ function Footer() {
             transition={{ duration: 0.5, delay: 0.5 }}
           >
             <form className="flex space-x-2">
-              <div className="flex-grow">
+              <div className="grow">
                 <Label htmlFor="email" className="sr-only">
                   Email
                 </Label>

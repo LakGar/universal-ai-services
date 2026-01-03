@@ -563,12 +563,14 @@ export default function ProductDetailPage() {
                         src={currentMedia.url}
                         alt={product.name}
                         fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 60vw"
                         className={cn(
                           "object-cover transition-opacity duration-300",
                           mediaLoading ? "opacity-0" : "opacity-100"
                         )}
                         onLoad={() => setMediaLoading(false)}
                         onError={() => setMediaLoading(false)}
+                        priority={selectedMediaIndex === 0}
                       />
                     )}
                     {allMedia.length > 1 && (

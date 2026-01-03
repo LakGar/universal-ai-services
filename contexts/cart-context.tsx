@@ -9,7 +9,7 @@ export interface CartAddOn {
 }
 
 export interface CartItem {
-  id: number;
+  id: string | number;
   cartItemId: string; // Unique identifier for this specific cart item (product + config + add-ons)
   name: string;
   image: string;
@@ -38,7 +38,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems((prev) => {
       // Create a unique cart item ID based on product ID, config, and add-ons
       const addOnsKey = item.addOns?.map(a => a.id).sort().join(',') || '';
-      const cartItemId = `${item.id}-${item.selectedConfig || 'default'}-${addOnsKey}`;
+      const cartItemId = `${String(item.id)}-${item.selectedConfig || 'default'}-${addOnsKey}`;
       
       const existing = prev.find((i) => i.cartItemId === cartItemId);
       

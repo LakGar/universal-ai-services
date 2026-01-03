@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/landing/hero";
@@ -8,8 +10,12 @@ import { CapabilityGrid } from "@/components/landing/capability-grid";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { TrustSection } from "@/components/landing/trust-section";
 import { FramerCarousel } from "@/components/ui/framer-carousel";
+import { ContactModal } from "@/components/contact-modal";
+import { useContact } from "@/contexts/contact-context";
 
-const page = () => {
+function Page() {
+  const { isOpen, closeContact } = useContact();
+
   return (
     <div className="flex flex-col min-h-screen w-full">
       <Navbar />
@@ -21,8 +27,9 @@ const page = () => {
       <About />
       <Feature />
       <Footer />
+      <ContactModal isOpen={isOpen} onClose={closeContact} />
     </div>
   );
-};
+}
 
-export default page;
+export default Page;

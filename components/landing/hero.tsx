@@ -5,7 +5,7 @@ import { AuroraBackground } from "@/components/ui/aurora-background";
 import { useState, useEffect, useMemo } from "react";
 import { X, Check, BarChart3, Globe2 } from "lucide-react";
 import { MeshGradient } from "@paper-design/shaders-react";
-import { RobotCards, RobotCard } from "@/components/ui/robot-cards";
+import { RobotCards } from "@/components/ui/robot-cards";
 import { RobotCardsMobile } from "@/components/ui/robot-cards-mobile";
 import buyData from "@/app/services/buy/data/buy_data.json";
 
@@ -27,6 +27,7 @@ const extractFileId = (url: string): string | null => {
 
 // Helper function to get image from Google Drive or use provided images
 // Using the exact same logic as the buy page
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getProductImage = (item: any): string => {
   // If Images field exists and has URLs, use the first one
   if (item.Images && Array.isArray(item.Images) && item.Images.length > 0) {
@@ -97,17 +98,10 @@ const transformRobots = () => {
     );
     const detailPageId = fullIndex >= 0 ? fullIndex + 1 : index + 1;
 
-    const imageUrl = getProductImage(item);
-
-    // Debug: log the image URL to see what we're getting
-    if (typeof window !== "undefined" && index < 5) {
-      console.log(`Robot ${index + 1} (${item["Model Name"]}):`, imageUrl);
-    }
-
     return {
       id: index + 1,
       name: item["Model Name"] || "Robot",
-      image: imageUrl,
+      image: getProductImage(item),
       url: `/services/buy/${detailPageId}`,
     };
   });
@@ -213,9 +207,9 @@ export const Hero = () => {
             </AnimatePresence>
             <a
               className="bg-white dark:bg-black border border-black/10 dark:border-white rounded-full w-fit text-black dark:text-white px-4 py-2"
-              href="/signup"
+              href="#about"
             >
-              Sign up
+              Learn More
             </a>
           </div>
         </motion.div>
@@ -322,10 +316,10 @@ export const Hero = () => {
                   <div className="mt-auto pt-8 border-t border-white/20">
                     <figure>
                       <blockquote className="text-xl font-medium leading-relaxed mb-6">
-                        "Universal AI Services helped us deploy intelligent
-                        robotics solutions that transformed our manufacturing
-                        process. The expert integration support made all the
-                        difference."
+                        &ldquo;Universal AI Services helped us deploy
+                        intelligent robotics solutions that transformed our
+                        manufacturing process. The expert integration support
+                        made all the difference.&rdquo;
                       </blockquote>
                       <figcaption className="flex items-center gap-4">
                         <div className="h-12 w-12 rounded-full bg-gradient-to-tr from-orange-400 to-pink-500 flex items-center justify-center text-lg font-bold text-white">
@@ -377,7 +371,7 @@ export const Hero = () => {
                             Get a Consultation
                           </h3>
                           <p className="text-sm text-white/70">
-                            Fill out the form below and we'll contact you.
+                            Fill out the form below and we&apos;ll contact you.
                           </p>
                         </div>
 

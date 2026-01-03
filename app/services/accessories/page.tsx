@@ -100,8 +100,8 @@ const transformAccessories = () => {
       price = "Contact for pricing";
     }
 
-    // Set monthly price based on manufacturer or category
-    if (accessory.Manufacturer) {
+    // Set monthly price based on manufacturer or category (skip Micro-IP)
+    if (accessory.Manufacturer && accessory.Manufacturer !== "Micro-IP") {
       monthlyPrice = accessory.Manufacturer;
     } else if (accessory["Short Description"]) {
       monthlyPrice = accessory["Short Description"];

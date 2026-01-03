@@ -30,6 +30,24 @@ export function RobotCard({
   const [imageLoading, setImageLoading] = React.useState(true);
   const [imageError, setImageError] = React.useState(false);
 
+  // Timeout for images that don't load
+  React.useEffect(() => {
+    if (imageLoading && robot.image) {
+      const timeout = setTimeout(() => {
+        console.warn("Image loading timeout:", robot.image);
+        setImageError(true);
+        setImageLoading(false);
+      }, 8000); // 8 second timeout
+
+      return () => clearTimeout(timeout);
+    }
+    // If no image URL, show error immediately
+    if (!robot.image || robot.image === "") {
+      setImageError(true);
+      setImageLoading(false);
+    }
+  }, [imageLoading, robot.image]);
+
   // Calculate rotation and position for fan effect
   const centerIndex = Math.floor((totalCards - 1) / 1.51);
   const offset = index - centerIndex;
@@ -42,9 +60,9 @@ export function RobotCard({
   // First and last cards positioned higher, second and second-to-last positioned lower
   let yOffset = 0;
   if (index === 0 || index === totalCards - 1) {
-    yOffset = 70; // First and last cards higher
+    yOffset = 40; // First and last cards higher (reduced from 70)
   } else if (index === 1 || index === totalCards - 2) {
-    yOffset = 30; // Second and second-to-last cards lower
+    yOffset = 15; // Second and second-to-last cards lower (reduced from 30)
   }
 
   return (
@@ -57,13 +75,19 @@ export function RobotCard({
       }}
       animate={{
         opacity: 1,
-        y: isHovered ? -15 : yOffset,
-        scale: isHovered ? 1.05 : 1,
+        y: isHovered ? -8 : yOffset,
+        scale: isHovered ? 1.03 : 1,
         rotate: rotation, // Keep rotation static on hover
         x: `calc(-50% + ${xOffset}px)`, // Keep x position static on hover
         zIndex: isHovered ? 100 : zIndex, // Higher z-index on hover
       }}
-      transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
+      transition={{
+        duration: 0.5,
+        type: "spring",
+        stiffness: 100,
+        damping: 20,
+        bounce: 0.3,
+      }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
       className="group absolute aspect-square w-[180px] md:w-[200px] overflow-hidden rounded-2xl bg-slate-800/20 backdrop-blur-md cursor-pointer"
@@ -81,42 +105,28 @@ export function RobotCard({
           <Skeleton className="absolute inset-0 w-full h-full" />
         )}
         {!imageError && (
-          <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-110">
-            {robot.image.includes("drive.google.com") ? (
-              <img
-                src={robot.image}
-                alt={robot.name}
-                className={cn(
-                  "h-full w-full object-cover transition-opacity duration-300",
-                  imageLoading ? "opacity-0" : "opacity-100"
-                )}
-                onLoad={() => setImageLoading(false)}
-                onError={() => {
-                  setImageError(true);
-                  setImageLoading(false);
-                }}
-              />
-            ) : (
-              <Image
-                src={robot.image}
-                alt={robot.name}
-                fill
-                className={cn(
-                  "object-cover transition-opacity duration-300",
-                  imageLoading ? "opacity-0" : "opacity-100"
-                )}
-                onLoad={() => setImageLoading(false)}
-                onError={() => {
-                  setImageError(true);
-                  setImageLoading(false);
-                }}
-              />
+          <Image
+            src={robot.image}
+            alt={robot.name}
+            fill
+            sizes="(max-width: 768px) 180px, 200px"
+            className={cn(
+              "object-cover transition-opacity duration-300",
+              imageLoading ? "opacity-0" : "opacity-100"
             )}
-          </div>
+            onLoad={() => setImageLoading(false)}
+            onError={() => {
+              setImageError(true);
+              setImageLoading(false);
+            }}
+          />
         )}
         {imageError && (
-          <div className="absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground">
-            <p className="text-sm">Image not available</p>
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm">
+            <div className="text-center p-4">
+              <p className="text-sm text-white/70 font-medium">{robot.name}</p>
+              <p className="text-xs text-white/50 mt-1">Image unavailable</p>
+            </div>
           </div>
         )}
         {/* Gradient overlay */}
