@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import Script from "next/script";
 import { X, CheckCircle, BarChart3, Globe2, Calendar } from "lucide-react";
 import { MeshGradient } from "@paper-design/shaders-react";
+import { logger } from "@/lib/logger";
 
 interface ConsultationModalProps {
   isOpen: boolean;
@@ -44,7 +45,10 @@ export function ConsultationModal({ isOpen, onClose }: ConsultationModalProps) {
             parentElement: widgetRef.current,
           });
         } catch (error) {
-          console.error("Error initializing Calendly widget:", error);
+          logger.error(
+            "Error initializing Calendly widget",
+            error instanceof Error ? error : new Error(String(error))
+          );
         }
       }
     };
@@ -67,7 +71,10 @@ export function ConsultationModal({ isOpen, onClose }: ConsultationModalProps) {
           setTimeout(initWidget, 100);
         } else if (attempts >= maxAttempts) {
           clearInterval(checkInterval);
-          console.error("Calendly script loaded but failed to initialize");
+          logger.error(
+            "Calendly script loaded but failed to initialize",
+            new Error("Calendly initialization timeout")
+          );
         }
       }, 100);
 

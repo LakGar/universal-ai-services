@@ -342,11 +342,19 @@ export default function ProductDetailPage() {
   );
   const [isVideoPlaying, setIsVideoPlaying] = React.useState(false);
   const [mediaLoading, setMediaLoading] = React.useState(true);
+  const [thumbnailLoading, setThumbnailLoading] = React.useState<Set<number>>(new Set());
   const [showAllAddOns, setShowAllAddOns] = React.useState(false);
   const [showAllAccessories, setShowAllAccessories] = React.useState(false);
   const [selectedFilters, setSelectedFilters] = React.useState<Set<string>>(
     new Set()
   );
+
+  // Initialize thumbnail loading state when allMedia changes
+  React.useEffect(() => {
+    const loadingSet = new Set<number>();
+    allMedia.forEach((_, index) => loadingSet.add(index));
+    setThumbnailLoading(loadingSet);
+  }, [allMedia]);
 
   React.useEffect(() => {
     if (product) {
@@ -616,13 +624,26 @@ export default function ProductDetailPage() {
                           : "border-transparent hover:border-muted-foreground/50"
                       )}
                     >
+                      {thumbnailLoading.has(index) && (
+                        <Skeleton className="absolute inset-0 w-full h-full" />
+                      )}
                       {media.type === "video" ? (
                         <>
                           <video
                             src={media.url}
-                            className="w-full h-full object-cover"
+                            className={cn(
+                              "w-full h-full object-cover transition-opacity duration-300",
+                              thumbnailLoading.has(index) ? "opacity-0" : "opacity-100"
+                            )}
                             muted
                             playsInline
+                            onLoadedData={() => {
+                              setThumbnailLoading((prev) => {
+                                const next = new Set(prev);
+                                next.delete(index);
+                                return next;
+                              });
+                            }}
                           />
                           <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                             <Play
@@ -636,7 +657,24 @@ export default function ProductDetailPage() {
                           src={media.url}
                           alt={`${product.name} view ${index + 1}`}
                           fill
-                          className="object-cover"
+                          className={cn(
+                            "object-cover transition-opacity duration-300",
+                            thumbnailLoading.has(index) ? "opacity-0" : "opacity-100"
+                          )}
+                          onLoad={() => {
+                            setThumbnailLoading((prev) => {
+                              const next = new Set(prev);
+                              next.delete(index);
+                              return next;
+                            });
+                          }}
+                          onError={() => {
+                            setThumbnailLoading((prev) => {
+                              const next = new Set(prev);
+                              next.delete(index);
+                              return next;
+                            });
+                          }}
                         />
                       )}
                     </button>

@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import Script from "next/script";
 import { X, CheckCircle, Mail, Phone, MapPin, Calendar } from "lucide-react";
 import { MeshGradient } from "@paper-design/shaders-react";
+import { logger } from "@/lib/logger";
 
 interface ContactModalProps {
   isOpen: boolean;
@@ -53,7 +54,10 @@ export function ContactModal({
             parentElement: widgetRef.current,
           });
         } catch (error) {
-          console.error("Error initializing Calendly widget:", error);
+          logger.error(
+            "Error initializing Calendly widget",
+            error instanceof Error ? error : new Error(String(error))
+          );
         }
       }
     };
@@ -76,7 +80,10 @@ export function ContactModal({
           setTimeout(initWidget, 100);
         } else if (attempts >= maxAttempts) {
           clearInterval(checkInterval);
-          console.error("Calendly script loaded but failed to initialize");
+          logger.error(
+            "Calendly script loaded but failed to initialize",
+            new Error("Calendly initialization timeout")
+          );
         }
       }, 100);
 

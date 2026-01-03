@@ -19,12 +19,21 @@ import { WishlistIcon } from "@/components/wishlist-icon";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, Play, ChevronLeft, ChevronRight, Check, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  Heart,
+  Play,
+  ChevronLeft,
+  ChevronRight,
+  Check,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import { useCart } from "@/contexts/cart-context";
 import { useWishlist } from "@/contexts/wishlist-context";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 import rentalData from "@/app/data.json";
 import { addOns, getAllFilters } from "../../buy/data/addons";
 
@@ -38,14 +47,21 @@ const extractFileId = (url: string): string | null => {
 };
 
 // Helper function to convert Google Drive URL to direct view URL
-const convertGoogleDriveUrl = (url: string, isVideo: boolean = false): string => {
+const convertGoogleDriveUrl = (
+  url: string,
+  isVideo: boolean = false
+): string => {
   if (!url || typeof url !== "string") return url;
-  
+
   // If it's already a direct URL, return it
-  if (url.includes("uc?export=view") || url.includes("uc?export=download") || url.includes("/preview")) {
+  if (
+    url.includes("uc?export=view") ||
+    url.includes("uc?export=download") ||
+    url.includes("/preview")
+  ) {
     return url;
   }
-  
+
   // If it's a Google Drive share link, convert it
   if (url.includes("drive.google.com")) {
     const fileId = extractFileId(url);
@@ -59,7 +75,7 @@ const convertGoogleDriveUrl = (url: string, isVideo: boolean = false): string =>
       }
     }
   }
-  
+
   return url;
 };
 
@@ -74,10 +90,12 @@ const isVideoUrl = (url: string): boolean => {
 const getRentalById = (id: string) => {
   return rentalData.rentals.find((rental) => {
     // Check multiple possible ID fields
-    return rental.id === id || 
-           rental.SKU === id || 
-           rental["Product ID"] === id ||
-           rental["SKU"] === id;
+    return (
+      rental.id === id ||
+      rental.SKU === id ||
+      rental["Product ID"] === id ||
+      rental["SKU"] === id
+    );
   });
 };
 
@@ -85,7 +103,11 @@ export default function RentalDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { addItem } = useCart();
-  const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlist();
+  const {
+    addItem: addToWishlist,
+    removeItem: removeFromWishlist,
+    isInWishlist,
+  } = useWishlist();
 
   const rentalId = params.id as string;
   const rental = getRentalById(rentalId);
@@ -94,7 +116,7 @@ export default function RentalDetailPage() {
   const allMedia = React.useMemo(() => {
     if (!rental) return [];
     const media: Array<{ type: "image" | "video"; url: string }> = [];
-    
+
     if (rental.images && Array.isArray(rental.images)) {
       rental.images.forEach((url) => {
         if (typeof url === "string") {
@@ -102,7 +124,7 @@ export default function RentalDetailPage() {
         }
       });
     }
-    
+
     if (rental.videos && Array.isArray(rental.videos)) {
       rental.videos.forEach((url) => {
         if (typeof url === "string") {
@@ -110,13 +132,23 @@ export default function RentalDetailPage() {
         }
       });
     }
-    
+
     return media;
   }, [rental]);
 
   const [selectedMediaIndex, setSelectedMediaIndex] = React.useState(0);
   const [isVideoPlaying, setIsVideoPlaying] = React.useState(false);
   const [mediaLoading, setMediaLoading] = React.useState(true);
+  const [thumbnailLoading, setThumbnailLoading] = React.useState<Set<number>>(
+    new Set()
+  );
+
+  // Initialize thumbnail loading state when allMedia changes
+  React.useEffect(() => {
+    const loadingSet = new Set<number>();
+    allMedia.forEach((_, index) => loadingSet.add(index));
+    setThumbnailLoading(loadingSet);
+  }, [allMedia]);
   const [showAllAddOns, setShowAllAddOns] = React.useState(false);
   const [selectedFilters, setSelectedFilters] = React.useState<Set<string>>(
     new Set()
@@ -127,40 +159,67 @@ export default function RentalDetailPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Rental not found</h1>
-          <Button onClick={() => router.push("/services/rent")}>Back to Rentals</Button>
+          <Button onClick={() => router.push("/services/rent")}>
+            Back to Rentals
+          </Button>
         </div>
       </div>
     );
   }
 
   // Get pricing from various possible fields
-  const dailyPrice = rental.pricing?.daily_usd || 
-                     parseFloat((rental["Rental Price (Daily)"] || "").toString().replace(/[^0-9.]/g, "")) || 
-                     null;
-  const weeklyPrice = parseFloat((rental["Rental Price (Weekly)"] || "").toString().replace(/[^0-9.]/g, "")) || null;
-  const depositAmount = parseFloat((rental["Deposit Required"] || "").toString().replace(/[^0-9.]/g, "")) || null;
-  const depositPercent = rental.pricing?.deposit_percent || 
-                         (depositAmount && dailyPrice ? Math.round((depositAmount / (dailyPrice * 30)) * 100 * 10) / 10 : 0);
+  const dailyPrice =
+    rental.pricing?.daily_usd ||
+    parseFloat(
+      (rental["Rental Price (Daily)"] || "").toString().replace(/[^0-9.]/g, "")
+    ) ||
+    null;
+  const weeklyPrice =
+    parseFloat(
+      (rental["Rental Price (Weekly)"] || "").toString().replace(/[^0-9.]/g, "")
+    ) || null;
+  const depositAmount =
+    parseFloat(
+      (rental["Deposit Required"] || "").toString().replace(/[^0-9.]/g, "")
+    ) || null;
+  const depositPercent =
+    rental.pricing?.deposit_percent ||
+    (depositAmount && dailyPrice
+      ? Math.round((depositAmount / (dailyPrice * 30)) * 100 * 10) / 10
+      : 0);
   const monthlyEstimate = dailyPrice ? dailyPrice * 30 : 0;
-  
+
   // Get name from various fields
   const rentalData = rental as Record<string, unknown>;
-  const rentalName = rental.name || (rentalData["Model Name"] as string) || (rentalData["Short Description"] as string) || "Rental";
-  
+  const rentalName =
+    rental.name ||
+    (rentalData["Model Name"] as string) ||
+    (rentalData["Short Description"] as string) ||
+    "Rental";
+
   // Get description from various fields
-  const rentalDescription = rental.description || (rentalData["Description"] as string) || (rentalData["Short Description"] as string) || "";
-  
+  const rentalDescription =
+    rental.description ||
+    (rentalData["Description"] as string) ||
+    (rentalData["Short Description"] as string) ||
+    "";
+
   // Get year from various fields
-  const rentalYear = rental.year || parseInt(rental["Release Year"] || "0") || null;
+  const rentalYear =
+    rental.year || parseInt(rental["Release Year"] || "0") || null;
 
   // Get rental ID from various fields for cart/wishlist
   const itemId = rental.id || rental.SKU || rental["Product ID"] || "";
 
   const handleAddToCart = () => {
-    const price = dailyPrice 
+    const price = dailyPrice
       ? `From $${dailyPrice.toLocaleString()}/day`
-      : (rental.pricing && typeof rental.pricing === "object" && "model" in rental.pricing ? (rental.pricing.model as string) : null) || "Contact for pricing";
-    
+      : (rental.pricing &&
+        typeof rental.pricing === "object" &&
+        "model" in rental.pricing
+          ? (rental.pricing.model as string)
+          : null) || "Contact for pricing";
+
     // Rent always requires consultation - add to cart and redirect
     addItem({
       id: itemId,
@@ -172,10 +231,14 @@ export default function RentalDetailPage() {
   };
 
   const handleToggleWishlist = () => {
-    const price = dailyPrice 
+    const price = dailyPrice
       ? `From $${dailyPrice.toLocaleString()}/day`
-      : (rental.pricing && typeof rental.pricing === "object" && "model" in rental.pricing ? (rental.pricing.model as string) : null) || "Contact for pricing";
-    
+      : (rental.pricing &&
+        typeof rental.pricing === "object" &&
+        "model" in rental.pricing
+          ? (rental.pricing.model as string)
+          : null) || "Contact for pricing";
+
     if (isInWishlist(itemId)) {
       removeFromWishlist(itemId);
     } else {
@@ -184,9 +247,12 @@ export default function RentalDetailPage() {
         name: rentalName,
         image: allMedia[0]?.url || "",
         price,
-        monthlyPrice: monthlyEstimate > 0 
-          ? `~$${Math.round(monthlyEstimate).toLocaleString()}/mo • ${depositPercent}% deposit`
-          : undefined,
+        monthlyPrice:
+          monthlyEstimate > 0
+            ? `~$${Math.round(
+                monthlyEstimate
+              ).toLocaleString()}/mo • ${depositPercent}% deposit`
+            : undefined,
       });
     }
   };
@@ -201,7 +267,9 @@ export default function RentalDetailPage() {
   };
 
   const prevMedia = () => {
-    setSelectedMediaIndex((prev) => (prev - 1 + allMedia.length) % allMedia.length);
+    setSelectedMediaIndex(
+      (prev) => (prev - 1 + allMedia.length) % allMedia.length
+    );
     setIsVideoPlaying(false);
     setMediaLoading(true);
   };
@@ -209,9 +277,13 @@ export default function RentalDetailPage() {
   // Format specs for display
   const formatSpecs = () => {
     const formatted: Record<string, string> = {};
-    
+
     // If specs is an object, use it directly
-    if (rental.specs && typeof rental.specs === "object" && !Array.isArray(rental.specs)) {
+    if (
+      rental.specs &&
+      typeof rental.specs === "object" &&
+      !Array.isArray(rental.specs)
+    ) {
       Object.entries(rental.specs).forEach(([key, value]) => {
         if (typeof value === "object" && value !== null) {
           formatted[key.replace(/_/g, " ")] = JSON.stringify(value);
@@ -220,12 +292,12 @@ export default function RentalDetailPage() {
         }
       });
     }
-    
+
     // If Specs is a string, parse it
     if (rental.Specs && typeof rental.Specs === "string") {
       const specText = rental.Specs.replace(/<br>/g, " ").replace(/\*\*/g, "");
-      const lines = specText.split(/[•\n;]/).filter(l => l.trim());
-      lines.forEach(line => {
+      const lines = specText.split(/[•\n;]/).filter((l) => l.trim());
+      lines.forEach((line) => {
         const match = line.match(/([^:]+):\s*(.+)/);
         if (match) {
           const key = match[1].trim();
@@ -233,28 +305,43 @@ export default function RentalDetailPage() {
         }
       });
     }
-    
+
     // Add individual spec fields if they exist
     const specFields = [
-      "Unit Weight", "Shipping Weight", "Dimensions (Standing)", "Dimensions (Packed)",
-      "Payload (Typical)", "Payload (Max)", "Max Speed", "Max Climb Angle",
-      "Battery Type", "Battery Wh", "Removable Battery", "Runtime",
-      "IP Rating", "Certifications", "OS/Firmware", "SDK Available",
-      "API Access", "OTA Updates", "HS Code", "Lead Time (Days)"
+      "Unit Weight",
+      "Shipping Weight",
+      "Dimensions (Standing)",
+      "Dimensions (Packed)",
+      "Payload (Typical)",
+      "Payload (Max)",
+      "Max Speed",
+      "Max Climb Angle",
+      "Battery Type",
+      "Battery Wh",
+      "Removable Battery",
+      "Runtime",
+      "IP Rating",
+      "Certifications",
+      "OS/Firmware",
+      "SDK Available",
+      "API Access",
+      "OTA Updates",
+      "HS Code",
+      "Lead Time (Days)",
     ];
-    
-    specFields.forEach(field => {
+
+    specFields.forEach((field) => {
       const value = (rental as Record<string, unknown>)[field];
       if (value && value !== "Unknown" && value !== "N/A") {
         formatted[field] = String(value);
       }
     });
-    
+
     return formatted;
   };
 
   const specs = formatSpecs();
-  
+
   // Parse features if it's a string
   const parseFeatures = () => {
     if (Array.isArray(rental.features)) {
@@ -262,11 +349,10 @@ export default function RentalDetailPage() {
     }
     if (rental.Features && typeof rental.Features === "string") {
       // Replace HTML breaks with semicolons, then split on semicolons and bullet points
-      const normalized = rental.Features
-        .replace(/<br\s*\/?>/gi, ";")
+      const normalized = rental.Features.replace(/<br\s*\/?>/gi, ";")
         .split(/(?:;|•)/)
-        .map(f => f.trim())
-        .filter(f => f && f.length > 0);
+        .map((f) => f.trim())
+        .filter((f) => f && f.length > 0);
       return normalized;
     }
     // Also check lowercase features field as string
@@ -275,13 +361,13 @@ export default function RentalDetailPage() {
       const normalized = rentalData.features
         .replace(/<br\s*\/?>/gi, ";")
         .split(/(?:;|•)/)
-        .map(f => f.trim())
-        .filter(f => f && f.length > 0);
+        .map((f) => f.trim())
+        .filter((f) => f && f.length > 0);
       return normalized;
     }
     return [];
   };
-  
+
   const features = parseFeatures();
 
   return (
@@ -289,7 +375,10 @@ export default function RentalDetailPage() {
       <header className="fixed top-0 z-50 flex h-16 shrink-0 items-center justify-between gap-2 px-4 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 border-b w-[calc(100%-var(--sidebar-width))] md:w-[calc(100%-var(--sidebar-width)-1rem)]">
         <div className="flex items-center gap-2">
           <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
+          <Separator
+            orientation="vertical"
+            className="mr-2 data-[orientation=vertical]:h-4"
+          />
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
@@ -324,7 +413,8 @@ export default function RentalDetailPage() {
                   <Skeleton className="absolute inset-0 w-full h-full" />
                 )}
                 {isVideoPlaying && isCurrentVideo && currentMedia ? (
-                  currentMedia.url.includes("drive.google.com") && currentMedia.url.includes("/preview") ? (
+                  currentMedia.url.includes("drive.google.com") &&
+                  currentMedia.url.includes("/preview") ? (
                     <iframe
                       src={currentMedia.url}
                       className="w-full h-full border-0"
@@ -340,7 +430,10 @@ export default function RentalDetailPage() {
                       className="w-full h-full object-cover"
                       onLoadedData={() => setMediaLoading(false)}
                       onError={(e) => {
-                        console.error("Video load error:", e);
+                        logger.error(
+                          "Video load error",
+                          e instanceof Error ? e : new Error(String(e))
+                        );
                         setMediaLoading(false);
                       }}
                       onEnded={() => setIsVideoPlaying(false)}
@@ -351,7 +444,8 @@ export default function RentalDetailPage() {
                   <>
                     {currentMedia.type === "video" ? (
                       <div className="relative w-full h-full">
-                        {currentMedia.url.includes("drive.google.com") && currentMedia.url.includes("/preview") ? (
+                        {currentMedia.url.includes("drive.google.com") &&
+                        currentMedia.url.includes("/preview") ? (
                           <iframe
                             src={currentMedia.url}
                             className="w-full h-full border-0"
@@ -368,7 +462,10 @@ export default function RentalDetailPage() {
                               playsInline
                               onLoadedData={() => setMediaLoading(false)}
                               onError={(e) => {
-                                console.error("Video thumbnail error:", e);
+                                logger.error(
+                                  "Video thumbnail error",
+                                  e instanceof Error ? e : new Error(String(e))
+                                );
                                 setMediaLoading(false);
                               }}
                               crossOrigin="anonymous"
@@ -378,7 +475,10 @@ export default function RentalDetailPage() {
                               className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors"
                             >
                               <div className="bg-white/90 rounded-full p-4">
-                                <Play className="size-12 text-black ml-1" fill="currentColor" />
+                                <Play
+                                  className="size-12 text-black ml-1"
+                                  fill="currentColor"
+                                />
                               </div>
                             </button>
                           </>
@@ -439,14 +539,25 @@ export default function RentalDetailPage() {
                           : "border-transparent hover:border-muted-foreground/50"
                       )}
                     >
+                      {thumbnailLoading.has(index) && (
+                        <Skeleton className="absolute inset-0 w-full h-full" />
+                      )}
                       {media.type === "video" ? (
                         <>
-                          {media.url.includes("drive.google.com") && media.url.includes("/preview") ? (
+                          {media.url.includes("drive.google.com") &&
+                          media.url.includes("/preview") ? (
                             <iframe
                               src={media.url}
                               className="w-full h-full border-0 pointer-events-none"
                               allow="autoplay; encrypted-media"
                               allowFullScreen
+                              onLoad={() => {
+                                setThumbnailLoading((prev) => {
+                                  const next = new Set(prev);
+                                  next.delete(index);
+                                  return next;
+                                });
+                              }}
                             />
                           ) : (
                             <video
@@ -454,10 +565,20 @@ export default function RentalDetailPage() {
                               className="w-full h-full object-cover"
                               muted
                               playsInline
+                              onLoadedData={() => {
+                                setThumbnailLoading((prev) => {
+                                  const next = new Set(prev);
+                                  next.delete(index);
+                                  return next;
+                                });
+                              }}
                             />
                           )}
                           <div className="absolute inset-0 flex items-center justify-center bg-black/20 pointer-events-none">
-                            <Play className="size-6 text-white" fill="currentColor" />
+                            <Play
+                              className="size-6 text-white"
+                              fill="currentColor"
+                            />
                           </div>
                         </>
                       ) : (
@@ -465,7 +586,26 @@ export default function RentalDetailPage() {
                           src={media.url}
                           alt={`${rentalName} view ${index + 1}`}
                           fill
-                          className="object-cover"
+                          className={cn(
+                            "object-cover transition-opacity duration-300",
+                            thumbnailLoading.has(index)
+                              ? "opacity-0"
+                              : "opacity-100"
+                          )}
+                          onLoad={() => {
+                            setThumbnailLoading((prev) => {
+                              const next = new Set(prev);
+                              next.delete(index);
+                              return next;
+                            });
+                          }}
+                          onError={() => {
+                            setThumbnailLoading((prev) => {
+                              const next = new Set(prev);
+                              next.delete(index);
+                              return next;
+                            });
+                          }}
                         />
                       )}
                     </button>
@@ -483,7 +623,9 @@ export default function RentalDetailPage() {
                 )}
                 <h1 className="text-4xl font-bold mb-4">{rentalName}</h1>
                 {rentalDescription && (
-                  <p className="text-lg text-muted-foreground leading-relaxed">{rentalDescription}</p>
+                  <p className="text-lg text-muted-foreground leading-relaxed">
+                    {rentalDescription}
+                  </p>
                 )}
               </div>
 
@@ -492,8 +634,12 @@ export default function RentalDetailPage() {
                 {dailyPrice ? (
                   <>
                     <div className="flex items-baseline gap-2 mb-2">
-                      <span className="text-3xl font-bold">${dailyPrice.toLocaleString()}</span>
-                      <span className="text-lg text-muted-foreground">/day</span>
+                      <span className="text-3xl font-bold">
+                        ${dailyPrice.toLocaleString()}
+                      </span>
+                      <span className="text-lg text-muted-foreground">
+                        /day
+                      </span>
                     </div>
                     {weeklyPrice && (
                       <p className="text-muted-foreground mb-1">
@@ -502,7 +648,8 @@ export default function RentalDetailPage() {
                     )}
                     {monthlyEstimate > 0 && (
                       <p className="text-muted-foreground mb-1">
-                        ~${Math.round(monthlyEstimate).toLocaleString()}/mo (30 days)
+                        ~${Math.round(monthlyEstimate).toLocaleString()}/mo (30
+                        days)
                       </p>
                     )}
                     {depositAmount && (
@@ -521,14 +668,20 @@ export default function RentalDetailPage() {
                       </p>
                     )}
                   </>
-                ) : (rental.pricing && typeof rental.pricing === "object" && "model" in rental.pricing && rental.pricing.model) ? (
-                  <p className="text-2xl font-semibold">{String((rental.pricing as Record<string, unknown>).model)}</p>
+                ) : rental.pricing &&
+                  typeof rental.pricing === "object" &&
+                  "model" in rental.pricing &&
+                  rental.pricing.model ? (
+                  <p className="text-2xl font-semibold">
+                    {String((rental.pricing as Record<string, unknown>).model)}
+                  </p>
                 ) : (
                   <p className="text-2xl font-semibold">Contact for pricing</p>
                 )}
                 {(rental.availability || rental["Stock Status"]) && (
                   <p className="text-sm text-muted-foreground mt-2">
-                    Availability: {rental.availability || rental["Stock Status"]}
+                    Availability:{" "}
+                    {rental.availability || rental["Stock Status"]}
                   </p>
                 )}
               </div>
@@ -557,7 +710,9 @@ export default function RentalDetailPage() {
                       isInWishlist(itemId) && "fill-red-500 text-red-500"
                     )}
                   />
-                  {isInWishlist(itemId) ? "Remove from Wishlist" : "Add to Wishlist"}
+                  {isInWishlist(itemId)
+                    ? "Remove from Wishlist"
+                    : "Add to Wishlist"}
                 </Button>
               </div>
             </div>
@@ -574,7 +729,10 @@ export default function RentalDetailPage() {
                 <CardContent>
                   <dl className="space-y-3">
                     {Object.entries(specs).map(([key, value]) => (
-                      <div key={key} className="flex justify-between border-b pb-2">
+                      <div
+                        key={key}
+                        className="flex justify-between border-b pb-2"
+                      >
                         <dt className="font-medium capitalize">{key}</dt>
                         <dd className="text-muted-foreground">{value}</dd>
                       </div>
@@ -649,51 +807,68 @@ export default function RentalDetailPage() {
                   {rental.category && (
                     <div className="flex justify-between border-b pb-2">
                       <dt className="font-medium">Category</dt>
-                      <dd className="text-muted-foreground">{rental.category}</dd>
+                      <dd className="text-muted-foreground">
+                        {rental.category}
+                      </dd>
                     </div>
                   )}
                   {(rental.manufacturer || rental.Manufacturer) && (
                     <div className="flex justify-between border-b pb-2">
                       <dt className="font-medium">Manufacturer</dt>
-                      <dd className="text-muted-foreground">{rental.manufacturer || rental.Manufacturer}</dd>
+                      <dd className="text-muted-foreground">
+                        {rental.manufacturer || rental.Manufacturer}
+                      </dd>
                     </div>
                   )}
                   {(rentalYear || rental["Release Year"]) && (
                     <div className="flex justify-between border-b pb-2">
                       <dt className="font-medium">Year</dt>
-                      <dd className="text-muted-foreground">{rentalYear || rental["Release Year"]}</dd>
+                      <dd className="text-muted-foreground">
+                        {rentalYear || rental["Release Year"]}
+                      </dd>
                     </div>
                   )}
                   {(rental.origin || rental["Country of Origin"]) && (
                     <div className="flex justify-between border-b pb-2">
                       <dt className="font-medium">Origin</dt>
-                      <dd className="text-muted-foreground">{rental.origin || rental["Country of Origin"]}</dd>
+                      <dd className="text-muted-foreground">
+                        {rental.origin || rental["Country of Origin"]}
+                      </dd>
                     </div>
                   )}
                   {(rental.model || rental["Version/Revision"]) && (
                     <div className="flex justify-between border-b pb-2">
                       <dt className="font-medium">Model/Version</dt>
-                      <dd className="text-muted-foreground">{rental.model || rental["Version/Revision"]}</dd>
+                      <dd className="text-muted-foreground">
+                        {rental.model || rental["Version/Revision"]}
+                      </dd>
                     </div>
                   )}
                   {(rental.SKU || rental["Product ID"]) && (
                     <div className="flex justify-between border-b pb-2">
                       <dt className="font-medium">SKU/Product ID</dt>
-                      <dd className="text-muted-foreground">{rental.SKU || rental["Product ID"]}</dd>
+                      <dd className="text-muted-foreground">
+                        {rental.SKU || rental["Product ID"]}
+                      </dd>
                     </div>
                   )}
                   {rental["Vendor ID"] && (
                     <div className="flex justify-between border-b pb-2">
                       <dt className="font-medium">Vendor ID</dt>
-                      <dd className="text-muted-foreground">{rental["Vendor ID"]}</dd>
+                      <dd className="text-muted-foreground">
+                        {rental["Vendor ID"]}
+                      </dd>
                     </div>
                   )}
                 </dl>
               </CardContent>
             </Card>
-            
+
             {/* Pricing & Terms */}
-            {(rental.Shipping || rental.Tax || rental.Warranty || rental["Insurance Required"]) && (
+            {(rental.Shipping ||
+              rental.Tax ||
+              rental.Warranty ||
+              rental["Insurance Required"]) && (
               <Card>
                 <CardHeader>
                   <CardTitle>Pricing & Terms</CardTitle>
@@ -703,7 +878,9 @@ export default function RentalDetailPage() {
                     {rental.Shipping && rental.Shipping !== "N/A" && (
                       <div className="flex justify-between border-b pb-2">
                         <dt className="font-medium">Shipping</dt>
-                        <dd className="text-muted-foreground">{rental.Shipping}</dd>
+                        <dd className="text-muted-foreground">
+                          {rental.Shipping}
+                        </dd>
                       </div>
                     )}
                     {rental.Tax && rental.Tax !== "N/A" && (
@@ -715,28 +892,35 @@ export default function RentalDetailPage() {
                     {rental.Warranty && rental.Warranty !== "N/A" && (
                       <div className="flex justify-between border-b pb-2">
                         <dt className="font-medium">Warranty</dt>
-                        <dd className="text-muted-foreground">{rental.Warranty}</dd>
+                        <dd className="text-muted-foreground">
+                          {rental.Warranty}
+                        </dd>
                       </div>
                     )}
                     {rental["Insurance Required"] && (
                       <div className="flex justify-between border-b pb-2">
                         <dt className="font-medium">Insurance</dt>
-                        <dd className="text-muted-foreground">{rental["Insurance Required"]}</dd>
+                        <dd className="text-muted-foreground">
+                          {rental["Insurance Required"]}
+                        </dd>
                       </div>
                     )}
                     {rental["Commission %"] && (
                       <div className="flex justify-between border-b pb-2">
                         <dt className="font-medium">Commission</dt>
-                        <dd className="text-muted-foreground">{rental["Commission %"]}</dd>
+                        <dd className="text-muted-foreground">
+                          {rental["Commission %"]}
+                        </dd>
                       </div>
                     )}
                   </dl>
                 </CardContent>
               </Card>
             )}
-            
+
             {/* Disclaimers */}
-            {(rental["Intended Use Disclaimer"] || rental["Liability Disclaimer"]) && (
+            {(rental["Intended Use Disclaimer"] ||
+              rental["Liability Disclaimer"]) && (
               <Card>
                 <CardHeader>
                   <CardTitle>Important Information</CardTitle>
@@ -746,13 +930,17 @@ export default function RentalDetailPage() {
                     {rental["Intended Use Disclaimer"] && (
                       <div>
                         <h4 className="font-semibold mb-2">Intended Use</h4>
-                        <p className="text-sm text-muted-foreground">{rental["Intended Use Disclaimer"]}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {rental["Intended Use Disclaimer"]}
+                        </p>
                       </div>
                     )}
                     {rental["Liability Disclaimer"] && (
                       <div>
                         <h4 className="font-semibold mb-2">Liability</h4>
-                        <p className="text-sm text-muted-foreground">{rental["Liability Disclaimer"]}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {rental["Liability Disclaimer"]}
+                        </p>
                       </div>
                     )}
                   </div>
@@ -834,7 +1022,9 @@ export default function RentalDetailPage() {
                   let filtered = addOns;
                   if (selectedFilters.size > 0) {
                     filtered = addOns.filter((addOn) =>
-                      addOn.filters.some((filter) => selectedFilters.has(filter))
+                      addOn.filters.some((filter) =>
+                        selectedFilters.has(filter)
+                      )
                     );
                   }
                   const displayed = showAllAddOns
@@ -860,17 +1050,22 @@ export default function RentalDetailPage() {
                                   {addOn.description}
                                 </p>
                                 <div className="flex flex-wrap gap-1 mb-2">
-                                  {addOn.industries.slice(0, 3).map((industry) => (
+                                  {addOn.industries
+                                    .slice(0, 3)
+                                    .map((industry) => (
+                                      <Badge
+                                        key={industry}
+                                        variant="outline"
+                                        className="text-xs"
+                                      >
+                                        {industry}
+                                      </Badge>
+                                    ))}
+                                  {addOn.industries.length > 3 && (
                                     <Badge
-                                      key={industry}
                                       variant="outline"
                                       className="text-xs"
                                     >
-                                      {industry}
-                                    </Badge>
-                                  ))}
-                                  {addOn.industries.length > 3 && (
-                                    <Badge variant="outline" className="text-xs">
                                       +{addOn.industries.length - 3}
                                     </Badge>
                                   )}
@@ -886,7 +1081,10 @@ export default function RentalDetailPage() {
                                     </Badge>
                                   ))}
                                   {addOn.filters.length > 2 && (
-                                    <Badge variant="secondary" className="text-xs">
+                                    <Badge
+                                      variant="secondary"
+                                      className="text-xs"
+                                    >
                                       +{addOn.filters.length - 2}
                                     </Badge>
                                   )}
@@ -928,4 +1126,3 @@ export default function RentalDetailPage() {
     </>
   );
 }
-

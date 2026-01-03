@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { logger } from "@/lib/logger";
 
 // Get Stripe secret key - check both possible variable names
 // Note: STRIPE_SECRET_KEY should NOT have NEXT_PUBLIC_ prefix for security
@@ -8,7 +9,7 @@ const stripeSecretKey =
   process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY;
 
 if (!stripeSecretKey) {
-  console.error("STRIPE_SECRET_KEY is not set in environment variables");
+  logger.error("STRIPE_SECRET_KEY is not set in environment variables", new Error("Missing Stripe secret key"));
 }
 
 // Initialize Stripe only if key is available
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest) {
       clientSecret: paymentIntent.client_secret,
     });
   } catch (error: unknown) {
-    console.error("Error creating payment intent:", error);
+    logger.error("Error creating payment intent", error instanceof Error ? error : new Error(String(error)));
     
     if (error instanceof Stripe.errors.StripeError) {
       const statusCode = error.statusCode || 500;

@@ -107,6 +107,14 @@ export default function RepairDetailPage() {
 
   const [selectedMediaIndex, setSelectedMediaIndex] = React.useState(0);
   const [mediaLoading, setMediaLoading] = React.useState(true);
+  const [thumbnailLoading, setThumbnailLoading] = React.useState<Set<number>>(new Set());
+
+  // Initialize thumbnail loading state when allMedia changes
+  React.useEffect(() => {
+    const loadingSet = new Set<number>();
+    allMedia.forEach((_, index) => loadingSet.add(index));
+    setThumbnailLoading(loadingSet);
+  }, [allMedia]);
 
   if (!service) {
     return (
@@ -330,11 +338,31 @@ export default function RepairDetailPage() {
                           : "border-transparent hover:border-muted-foreground/50"
                       )}
                     >
+                      {thumbnailLoading.has(index) && (
+                        <Skeleton className="absolute inset-0 w-full h-full" />
+                      )}
                       <Image
                         src={media.url}
                         alt={`${serviceName} view ${index + 1}`}
                         fill
-                        className="object-cover"
+                        className={cn(
+                          "object-cover transition-opacity duration-300",
+                          thumbnailLoading.has(index) ? "opacity-0" : "opacity-100"
+                        )}
+                        onLoad={() => {
+                          setThumbnailLoading((prev) => {
+                            const next = new Set(prev);
+                            next.delete(index);
+                            return next;
+                          });
+                        }}
+                        onError={() => {
+                          setThumbnailLoading((prev) => {
+                            const next = new Set(prev);
+                            next.delete(index);
+                            return next;
+                          });
+                        }}
                       />
                     </button>
                   ))}

@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { motion, useMotionValue, animate } from "motion/react";
+import { logger } from "@/lib/logger";
 
 export const items = [
   {
@@ -69,15 +70,18 @@ export function FramerCarousel() {
         const playPromise = currentVideo.play();
         if (playPromise !== undefined) {
           playPromise.catch((error) => {
-            console.log(`Autoplay prevented for video ${index + 1}:`, error);
+            logger.debug(`Autoplay prevented for video ${index + 1}`, {
+              error,
+            });
           });
         }
       };
 
       const handleError = (e: Event) => {
-        console.error(
-          `Video ${index + 1} (${items[index].url}) failed to load:`,
-          e
+        logger.error(
+          `Video ${index + 1} (${items[index].url}) failed to load`,
+          e instanceof Error ? e : new Error(String(e)),
+          { videoIndex: index + 1, url: items[index].url }
         );
         // Skip to next video if current one fails after a delay
         setTimeout(() => {
@@ -98,7 +102,9 @@ export function FramerCarousel() {
         const playPromise = currentVideo.play();
         if (playPromise !== undefined) {
           playPromise.catch((error) => {
-            console.log(`Autoplay prevented for video ${index + 1}:`, error);
+            logger.debug(`Autoplay prevented for video ${index + 1}`, {
+              error,
+            });
           });
         }
       }
@@ -141,22 +147,18 @@ export function FramerCarousel() {
                   preload={i === index ? "auto" : "metadata"}
                   onError={(e) => {
                     const target = e.target as HTMLVideoElement;
-                    console.error(
-                      `Error loading video ${i + 1} (${item.url}):`,
+                    logger.error(
+                      `Error loading video ${i + 1} (${item.url})`,
+                      target.error
+                        ? new Error(target.error.message)
+                        : new Error("Unknown video error"),
                       {
-                        error: target.error,
+                        videoIndex: i + 1,
+                        url: item.url,
                         code: target.error?.code,
                         message: target.error?.message,
                       }
                     );
-                  }}
-                  onLoadedData={() => {
-                    console.log(
-                      `Video ${i + 1} (${item.url}) loaded successfully`
-                    );
-                  }}
-                  onLoadStart={() => {
-                    console.log(`Video ${i + 1} (${item.url}) started loading`);
                   }}
                 />
               </div>

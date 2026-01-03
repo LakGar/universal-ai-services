@@ -12,17 +12,13 @@ import {
   Video,
   Megaphone,
   HelpCircle,
-  Search,
-  Settings,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
-import { NavSecondary } from "@/components/nav-secondary";
-import { NavUser } from "@/components/nav-user";
+import { ConsultationModal } from "@/components/consultation-modal";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -81,27 +77,12 @@ const servicesItems = [
   },
 ];
 
-const navSecondary = [
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
-  },
-  {
-    title: "Get Help",
-    url: "#",
-    icon: HelpCircle,
-  },
-  {
-    title: "Search",
-    url: "#",
-    icon: Search,
-  },
-];
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const [isConsultationModalOpen, setIsConsultationModalOpen] = React.useState(false);
+
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <>
+      <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -164,17 +145,27 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <NavSecondary items={navSecondary} className="mt-auto" />
+        <SidebarGroup className="mt-auto">
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  tooltip="Get Help"
+                  onClick={() => setIsConsultationModalOpen(true)}
+                >
+                  <HelpCircle />
+                  <span>Get Help</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
-        <NavUser
-          user={{
-            name: "Guest",
-            email: "guest@example.com",
-            avatar: "/logo.png",
-          }}
-        />
-      </SidebarFooter>
     </Sidebar>
+    <ConsultationModal
+      isOpen={isConsultationModalOpen}
+      onClose={() => setIsConsultationModalOpen(false)}
+    />
+    </>
   );
 }

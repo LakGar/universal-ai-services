@@ -73,10 +73,10 @@ interface Navbar1Props {
 
 const Navbar = ({
   menu = [
-    { title: "Home", url: "#" },
+    { title: "Home", url: "/" },
     {
       title: "Marketplace",
-      url: "#",
+      url: "/services/buy",
       items: [
         {
           title: "Buy",
@@ -120,23 +120,19 @@ const Navbar = ({
           title: "Contact Us",
           description: "We are here to help you with any questions you have",
           icon: <Mail className="size-5 shrink-0" />,
-          url: "#contact",
+          url: "/#contact",
         },
         {
           title: "Terms of Service",
           description: "Our terms and conditions for using our services",
           icon: <Book className="size-5 shrink-0" />,
-          url: "#",
+          url: "/terms",
         },
       ],
     },
     {
       title: "Services",
-      url: "#services",
-    },
-    {
-      title: "Blog",
-      url: "#",
+      url: "/services/consultation",
     },
   ],
   className,

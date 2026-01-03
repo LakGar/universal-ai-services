@@ -15,6 +15,7 @@ import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { ProductCard } from "@/components/ui/product-card";
 import { CartIcon } from "@/components/cart-icon";
 import { WishlistIcon } from "@/components/wishlist-icon";
+import { cn } from "@/lib/utils";
 import rentalData from "@/app/data.json";
 
 // Helper function to extract file ID from Google Drive URL
@@ -118,6 +119,9 @@ const transformRentals = () => {
     // Get year from various possible fields
     const year = rental.year || parseInt(rental["Release Year"] || "0") || null;
 
+    // Get manufacturer from various possible fields
+    const manufacturer = rental.manufacturer || (rentalData["Manufacturer"] as string) || "";
+
     return {
       id,
       name,
@@ -127,14 +131,57 @@ const transformRentals = () => {
       monthlyPrice,
       isNew: year === 2025 || year === 2024,
       isVideo: imageIsVideo,
+      manufacturer,
     };
   });
 };
 
 const rentalProducts = transformRentals();
 
+// Manufacturer filter options
+const manufacturers = [
+  { id: "all", label: "All", value: "all" },
+  { id: "unitree", label: "Unitree", value: "unitree" },
+  { id: "nova-kuka", label: "Nova KUKA", value: "nova kuka" },
+  { id: "opendroid", label: "OpenDroid", value: "opendroid" },
+];
+
+// Helper function to normalize manufacturer name for matching
+const normalizeManufacturer = (manufacturer: string, productName: string = ""): string => {
+  const nameLower = productName.toLowerCase();
+  
+  // Check product names first (Robo Bar, Robo Cam, etc. → Nova KUKA)
+  const roboProducts = ["robo bar", "robo cam", "robo lights", "robots", "robo shows"];
+  if (roboProducts.some(robo => nameLower.includes(robo))) {
+    return "nova kuka";
+  }
+  
+  // Check manufacturer field
+  if (!manufacturer) return "opendroid"; // Default non-Unitree to OpenDroid
+  const normalized = manufacturer.toLowerCase();
+  
+  if (normalized.includes("unitree")) return "unitree";
+  if (normalized.includes("nova") && normalized.includes("kuka")) return "nova kuka";
+  if (normalized.includes("opendroid")) return "opendroid";
+  
+  // Everything else that's not Unitree → OpenDroid
+  return "opendroid";
+};
+
 export default function RentPage() {
   const { state, isMobile } = useSidebar();
+  const [selectedManufacturer, setSelectedManufacturer] = React.useState("all");
+
+  // Filter products by manufacturer
+  const filteredProducts = React.useMemo(() => {
+    if (selectedManufacturer === "all") {
+      return rentalProducts;
+    }
+    return rentalProducts.filter((product) => {
+      const normalized = normalizeManufacturer(product.manufacturer || "", product.name || "");
+      return normalized === selectedManufacturer;
+    });
+  }, [selectedManufacturer]);
 
   // Calculate header left position based on sidebar state
   const getHeaderLeft = () => {
@@ -192,22 +239,53 @@ export default function RentPage() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch">
-            {rentalProducts.map((product, index) => (
-              <ProductCard
-                key={product.id || `rental-${index}`}
-                id={product.id || `rental-${index}`}
-                name={product.name}
-                image={product.image}
-                alt={product.alt}
-                price={product.price}
-                monthlyPrice={product.monthlyPrice}
-                isNew={product.isNew}
-                isVideo={product.isVideo}
-                linkPath={`/services/rent/${product.id || `rental-${index}`}`}
-              />
-            ))}
+          {/* Manufacturer Filter Slider */}
+          <div
+            className="mb-8 overflow-x-auto"
+            style={{ scrollbarWidth: "thin" }}
+          >
+            <div className="flex gap-4 min-w-max pb-4">
+              {manufacturers.map((manufacturer) => (
+                <button
+                  key={manufacturer.id}
+                  onClick={() => setSelectedManufacturer(manufacturer.value)}
+                  className={cn(
+                    "px-6 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap rounded-t-lg",
+                    selectedManufacturer === manufacturer.value
+                      ? "border-blue-600 text-blue-600 bg-blue-50 dark:bg-blue-950/20"
+                      : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  )}
+                >
+                  {manufacturer.label}
+                </button>
+              ))}
+            </div>
           </div>
+
+          {filteredProducts.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch">
+              {filteredProducts.map((product, index) => (
+                <ProductCard
+                  key={product.id || `rental-${index}`}
+                  id={product.id || `rental-${index}`}
+                  name={product.name}
+                  image={product.image}
+                  alt={product.alt}
+                  price={product.price}
+                  monthlyPrice={product.monthlyPrice}
+                  isNew={product.isNew}
+                  isVideo={product.isVideo}
+                  linkPath={`/services/rent/${product.id || `rental-${index}`}`}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">
+                No rentals found for this manufacturer.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </>

@@ -3,6 +3,7 @@
 import { Download } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 
 import {
   ContextMenu,
@@ -58,7 +59,7 @@ const LogoBrandDownload = ({
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error("Failed to download file:", error);
+      logger.error("Failed to download file", error instanceof Error ? error : new Error(String(error)));
     }
   };
 

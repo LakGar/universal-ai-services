@@ -7,6 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 
 interface RobotCardsMobileProps {
   robots: Array<{
@@ -29,7 +30,7 @@ export function RobotCardsMobile({ robots, className }: RobotCardsMobileProps) {
     React.useEffect(() => {
       if (imageLoading && robot.image) {
         const timeout = setTimeout(() => {
-          console.warn("Image loading timeout:", robot.image);
+          logger.warn("Image loading timeout", { image: robot.image });
           setImageError(true);
           setImageLoading(false);
         }, 8000); // 8 second timeout

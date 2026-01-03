@@ -145,33 +145,57 @@ const transformProducts = (): ProductData[] => {
 
 const allProducts = transformProducts();
 
-// Extract unique categories from data
-const getCategories = (): string[] => {
-  const cats = new Set<string>();
-  cats.add("All Models");
-  buyData.forEach((item) => {
-    if (item.Category) {
-      cats.add(item.Category);
-    }
-  });
-  return Array.from(cats).sort();
-};
+// Model filter options
+const models = [
+  { id: "all", label: "All", value: "all" },
+  { id: "g02", label: "G02", value: "g02" },
+  { id: "g1", label: "G1", value: "g1" },
+  { id: "r1", label: "R1", value: "r1" },
+  { id: "h1", label: "H1", value: "h1" },
+];
 
-const categories = getCategories();
+// Helper function to extract model from product name
+const extractModel = (productName: string): string => {
+  if (!productName) return "";
+  const nameLower = productName.toLowerCase();
+  
+  // Check for G02/Go2 variations (check first to avoid matching G1)
+  if (nameLower.includes("go2") || nameLower.includes("g02")) {
+    return "g02";
+  }
+  
+  // Check for H1 (check before G1 to avoid matching H1-2 as G1)
+  if (nameLower.includes("h1")) {
+    return "h1";
+  }
+  
+  // Check for R1
+  if (nameLower.includes("r1")) {
+    return "r1";
+  }
+  
+  // Check for G1 (must be separate from G02, check after H1 to avoid H1 matching)
+  if (nameLower.includes("g1")) {
+    return "g1";
+  }
+  
+  return "";
+};
 
 export default function BuyPage() {
   const { state, isMobile } = useSidebar();
-  const [selectedCategory, setSelectedCategory] = React.useState("All Models");
+  const [selectedModel, setSelectedModel] = React.useState("all");
 
-  // Filter products by category
+  // Filter products by model
   const filteredProducts = React.useMemo(() => {
-    if (selectedCategory === "All Models") {
+    if (selectedModel === "all") {
       return allProducts;
     }
-    return allProducts.filter(
-      (product: ProductData) => product.category === selectedCategory
-    );
-  }, [selectedCategory]);
+    return allProducts.filter((product: ProductData) => {
+      const model = extractModel(product.name);
+      return model === selectedModel;
+    });
+  }, [selectedModel]);
 
   // Calculate header left position based on sidebar state
   const getHeaderLeft = () => {
@@ -229,23 +253,24 @@ export default function BuyPage() {
             </p>
           </motion.div>
 
+          {/* Model Filter Slider */}
           <div
             className="mb-8 overflow-x-auto"
             style={{ scrollbarWidth: "thin" }}
           >
             <div className="flex gap-4 min-w-max pb-4">
-              {categories.map((category) => (
+              {models.map((model) => (
                 <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
+                  key={model.id}
+                  onClick={() => setSelectedModel(model.value)}
                   className={cn(
-                    "px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap",
-                    selectedCategory === category
-                      ? "border-blue-600 text-blue-600"
-                      : "border-transparent text-muted-foreground hover:text-foreground"
+                    "px-6 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap rounded-t-lg",
+                    selectedModel === model.value
+                      ? "border-blue-600 text-blue-600 bg-blue-50 dark:bg-blue-950/20"
+                      : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   )}
                 >
-                  {category}
+                  {model.label}
                 </button>
               ))}
             </div>

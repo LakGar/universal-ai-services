@@ -24,6 +24,7 @@ const stripePromise = stripePublishableKey
 
 import { cn } from "@/lib/utils";
 import { useCart } from "@/contexts/cart-context";
+import { logger } from "@/lib/logger";
 
 import Image from "next/image";
 import { Price, PriceValue } from "@/components/shadcnblocks/price";
@@ -323,7 +324,7 @@ const Checkout1 = ({
 
   const handlePaymentSuccess = () => {
     const formData = form.getValues();
-    console.log("Payment successful:", formData);
+    // Payment success is handled by onSuccess callback
     if (onSuccess) {
       onSuccess();
     }
@@ -1559,7 +1560,7 @@ const Cart = ({ cartItems: initialCartItems, form }: CartProps) => {
                     !cartItem.price ||
                     typeof cartItem.price !== "object"
                   ) {
-                    console.warn(
+                    logger.warn(
                       `CartItem not found or invalid for product_id: ${field.product_id}`,
                       {
                         normalizedFieldId,
@@ -1798,7 +1799,7 @@ const CartItem = ({
 }: CartItemProps) => {
   // Safety check: ensure price exists and has required properties
   if (!price || typeof price !== "object") {
-    console.error("CartItem: Invalid price structure", { price, name });
+    logger.error("CartItem: Invalid price structure", new Error("Invalid price structure"), { price, name });
     return null;
   }
 

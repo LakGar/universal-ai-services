@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useContact } from "@/contexts/contact-context";
 
 interface OrderItem {
   id: string;
@@ -124,10 +125,12 @@ interface OrderSummary1Props {
   className?: string;
 }
 
-const OrderSummary1 = ({
+function OrderSummary1({
   order = DEFAULT_ORDER,
   className,
-}: OrderSummary1Props) => {
+}: OrderSummary1Props) {
+  const { openContact } = useContact();
+  
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -421,8 +424,8 @@ const OrderSummary1 = ({
             Have a question about your order?
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            <Button variant="outline" asChild>
-              <a href="#">Contact Support</a>
+            <Button variant="outline" onClick={openContact}>
+              Contact Support
             </Button>
             <Button asChild>
               <a href="/services/buy">Continue Shopping</a>

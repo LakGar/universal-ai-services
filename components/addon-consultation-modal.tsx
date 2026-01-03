@@ -7,6 +7,7 @@ import { X, CheckCircle, Calendar } from "lucide-react";
 import { MeshGradient } from "@paper-design/shaders-react";
 import Image from "next/image";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { logger } from "@/lib/logger";
 
 interface AddOnConsultationModalProps {
   isOpen: boolean;
@@ -59,7 +60,10 @@ export function AddOnConsultationModal({
             parentElement: widgetRef.current,
           });
         } catch (error) {
-          console.error("Error initializing Calendly widget:", error);
+          logger.error(
+            "Error initializing Calendly widget",
+            error instanceof Error ? error : new Error(String(error))
+          );
         }
       }
     };
@@ -82,7 +86,10 @@ export function AddOnConsultationModal({
           setTimeout(initWidget, 100);
         } else if (attempts >= maxAttempts) {
           clearInterval(checkInterval);
-          console.error("Calendly script loaded but failed to initialize");
+          logger.error(
+            "Calendly script loaded but failed to initialize",
+            new Error("Calendly initialization timeout")
+          );
         }
       }, 100);
 

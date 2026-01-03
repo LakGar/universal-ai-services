@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { logger } from "@/lib/logger";
 
 interface WishlistItem {
   id: string | number;
@@ -31,7 +32,7 @@ const loadWishlistFromStorage = (): WishlistItem[] => {
       return JSON.parse(stored);
     }
   } catch (error) {
-    console.error("Failed to load wishlist from localStorage:", error);
+    logger.error("Failed to load wishlist from localStorage", error instanceof Error ? error : new Error(String(error)));
   }
   return [];
 };
@@ -42,7 +43,7 @@ const saveWishlistToStorage = (items: WishlistItem[]) => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   } catch (error) {
-    console.error("Failed to save wishlist to localStorage:", error);
+    logger.error("Failed to save wishlist to localStorage", error instanceof Error ? error : new Error(String(error)));
   }
 };
 
