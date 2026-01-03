@@ -571,6 +571,7 @@ export default function ProductDetailPage() {
                         onLoad={() => setMediaLoading(false)}
                         onError={() => setMediaLoading(false)}
                         priority={selectedMediaIndex === 0}
+                        loading={selectedMediaIndex === 0 ? "eager" : "lazy"}
                       />
                     )}
                     {allMedia.length > 1 && (

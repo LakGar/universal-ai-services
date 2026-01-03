@@ -81,7 +81,9 @@ export function CartModal() {
                     src={item.image}
                     alt={item.name}
                     fill
+                    sizes="(max-width: 640px) 50vw, 33vw"
                     className="object-cover"
+                    loading="lazy"
                   />
                 </AspectRatio>
                 {/* Remove Button */}

@@ -162,7 +162,7 @@ export default function AccessoryDetailPage() {
   
   // Get year from various fields
   const releaseYear = parseInt(accessory["Release Year"] || "0") || null;
-  const isNew = releaseYear >= 2024;
+  const isNew = releaseYear !== null && releaseYear >= 2024;
 
   // Get item ID for cart/wishlist
   const itemId = accessory["Product ID"] || accessory.SKU || accessory.name || "";
@@ -240,8 +240,9 @@ export default function AccessoryDetailPage() {
     ];
     
     specFields.forEach(field => {
-      if (accessory[field] && accessory[field] !== "Unknown" && accessory[field] !== "N/A") {
-        formatted[field] = String(accessory[field]);
+      const value = (accessory as Record<string, unknown>)[field];
+      if (value && value !== "Unknown" && value !== "N/A") {
+        formatted[field] = String(value);
       }
     });
     
@@ -310,12 +311,15 @@ export default function AccessoryDetailPage() {
                       src={currentMedia.url}
                       alt={accessoryName}
                       fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 50vw"
                       className={cn(
                         "object-cover transition-opacity duration-300",
                         mediaLoading ? "opacity-0" : "opacity-100"
                       )}
                       onLoad={() => setMediaLoading(false)}
                       onError={() => setMediaLoading(false)}
+                      loading={selectedMediaIndex === 0 ? "eager" : "lazy"}
+                      priority={selectedMediaIndex === 0}
                     />
                     {allMedia.length > 1 && (
                       <>

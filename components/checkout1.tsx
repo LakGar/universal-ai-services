@@ -58,6 +58,7 @@ interface ProductPrice {
   regular: number;
   sale?: number;
   currency: string;
+  consultationRequired?: boolean;
 }
 
 type CartItem = {
@@ -65,7 +66,7 @@ type CartItem = {
   link: string;
   name: string;
   image: string;
-  price: ProductPrice;
+  price: ProductPrice & { consultationRequired?: boolean };
   quantity: number;
   details: {
     label: string;
@@ -244,11 +245,16 @@ const Checkout1 = ({
     product_id: item.product_id,
     quantity: item.quantity,
     price: item.price.sale ?? item.price.regular,
+    consultationRequired: item.price.consultationRequired || false,
   }));
 
-  // Calculate total amount
+  // Calculate total amount (exclude consultation-required items)
   const totalAmount = useMemo(() => {
-    return defaultProducts.reduce((sum, p) => sum + p.price * p.quantity, 0);
+    return defaultProducts.reduce((sum, p) => {
+      // Don't include consultation-required items in total
+      if (p.consultationRequired) return sum;
+      return sum + p.price * p.quantity;
+    }, 0);
   }, [defaultProducts]);
 
   const form = useForm({
@@ -1260,20 +1266,84 @@ const getRecommendedAddOns = () => {
     });
 };
 
-const Cart = ({ cartItems, form }: CartProps) => {
+const Cart = ({ cartItems: initialCartItems, form }: CartProps) => {
   const { fields, remove, update, append } = useFieldArray({
     control: form.control,
     name: "products",
   });
-  const { addItem } = useCart();
+  const { addItem, items: cartContextItems } = useCart();
+
+  // Convert cart context items to checkout format and merge with initial cartItems
+  const cartItems = useMemo(() => {
+    // Convert cart context items to checkout format
+    const contextItemsAsCheckout = cartContextItems.map((item) => {
+      const priceValue = parseFloat(item.price.replace(/[^0-9.]/g, "")) || 0;
+      const isConsultationRequired =
+        priceValue === 0 ||
+        item.price.toLowerCase().includes("consultation") ||
+        item.price.toLowerCase().includes("request");
+
+      return {
+        product_id: String(item.id), // Convert to string to match CartItem type
+        link: "#",
+        name: item.name,
+        image: item.image,
+        price: {
+          regular: priceValue,
+          currency: "USD",
+          consultationRequired: isConsultationRequired,
+        },
+        quantity: item.quantity,
+        details: [],
+      };
+    });
+
+    // Merge with initial cartItems, avoiding duplicates
+    // Normalize product_id format: remove "product-" prefix for matching
+    const normalizeProductId = (id: string | number) => {
+      const idStr = String(id);
+      return idStr.replace(/^product-/, "");
+    };
+
+    const mergedItems = [...initialCartItems];
+    contextItemsAsCheckout.forEach((contextItem) => {
+      const normalizedContextId = normalizeProductId(contextItem.product_id);
+      const existingItem = mergedItems.find(
+        (item) => normalizeProductId(item.product_id) === normalizedContextId
+      );
+
+      if (!existingItem) {
+        // New item: use the format from contextItem (matches form's product_id format)
+        mergedItems.push(contextItem);
+      } else {
+        // Update existing item with latest data from context
+        const existingIndex = mergedItems.findIndex(
+          (item) => normalizeProductId(item.product_id) === normalizedContextId
+        );
+        if (existingIndex !== -1) {
+          mergedItems[existingIndex] = {
+            ...mergedItems[existingIndex],
+            ...contextItem,
+            // Preserve the original product_id format from initialCartItems
+            product_id: mergedItems[existingIndex].product_id,
+            // But update quantity if it changed
+            quantity: contextItem.quantity,
+          };
+        }
+      }
+    });
+
+    return mergedItems;
+  }, [cartContextItems, initialCartItems]);
   const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
-  const [selectedAddOnForConsultation, setSelectedAddOnForConsultation] = useState<{
-    id: string;
-    name: string;
-    image: string;
-    priceStr: string;
-    description: string;
-  } | null>(null);
+  const [selectedAddOnForConsultation, setSelectedAddOnForConsultation] =
+    useState<{
+      id: string;
+      name: string;
+      image: string;
+      priceStr: string;
+      description: string;
+    } | null>(null);
   const recommendedProducts = useMemo(() => getRecommendedProducts(), []);
   const recommendedAddOns = useMemo(() => getRecommendedAddOns(), []);
 
@@ -1298,10 +1368,53 @@ const Cart = ({ cartItems, form }: CartProps) => {
   );
 
   const handleAddProductToCart = useCallback(
-    (product: { id: string; name: string; image: string; price: string }) => {
+    (product: {
+      id: string;
+      name: string;
+      image: string;
+      price: string;
+      description?: string;
+    }) => {
+      // Check if product has a valid price (not "Price on request" or empty)
       const priceValue = parseFloat(product.price.replace(/[^0-9.]/g, "")) || 0;
+      const hasValidPrice =
+        priceValue > 0 && !product.price.toLowerCase().includes("request");
 
-      // Add to cart context (silently, no consultation prompt)
+      // Check if consultation has already been scheduled
+      const consultationScheduled =
+        sessionStorage.getItem("consultationScheduled") === "true";
+
+      // If no valid price and consultation not scheduled, open consultation modal
+      if (!hasValidPrice && !consultationScheduled) {
+        setSelectedAddOnForConsultation({
+          id: product.id,
+          name: product.name,
+          image: product.image,
+          priceStr: product.price || "Consultation Required",
+          description: product.description || "",
+        });
+        setIsConsultationModalOpen(true);
+        return;
+      }
+
+      // If no valid price but consultation already scheduled, add silently
+      if (!hasValidPrice && consultationScheduled) {
+        addItem({
+          id: product.id,
+          name: product.name,
+          image: product.image,
+          price: product.price || "Consultation Required",
+        });
+
+        append({
+          product_id: product.id,
+          quantity: 1,
+          price: 0, // Price is 0 for consultation items until finalized
+        });
+        return;
+      }
+
+      // Normal flow: product has a valid price
       addItem({
         id: product.id,
         name: product.name,
@@ -1309,7 +1422,6 @@ const Cart = ({ cartItems, form }: CartProps) => {
         price: product.price,
       });
 
-      // Add to form's products array
       append({
         product_id: product.id,
         quantity: 1,
@@ -1342,8 +1454,13 @@ const Cart = ({ cartItems, form }: CartProps) => {
 
   const handleConsultationScheduled = useCallback(
     (addOnId: string) => {
-      // Find the add-on that was scheduled
+      // Mark consultation as scheduled in sessionStorage
+      sessionStorage.setItem("consultationScheduled", "true");
+
+      // Find the add-on or product that was scheduled
       const addOn = recommendedAddOns.find((a) => a.id === addOnId);
+      const product = recommendedProducts.find((p) => p.id === addOnId);
+
       if (addOn) {
         // Add add-on to cart context as a consultation-required item
         addItem({
@@ -1366,9 +1483,25 @@ const Cart = ({ cartItems, form }: CartProps) => {
           quantity: 1,
           price: 0,
         });
+      } else if (product) {
+        // Add product from "You May Also Like" to cart context as a consultation-required item
+        addItem({
+          id: product.id,
+          name: product.name,
+          image: product.image,
+          price: product.price || "Consultation Required",
+        });
+
+        // Add to form's products array with price 0 (consultation required)
+        append({
+          product_id: product.id,
+          quantity: 1,
+          price: 0,
+        });
       }
+      setIsConsultationModalOpen(false); // Close modal after scheduling
     },
-    [recommendedAddOns, addItem, append]
+    [recommendedAddOns, recommendedProducts, addItem, append]
   );
 
   return (
@@ -1404,16 +1537,51 @@ const Cart = ({ cartItems, form }: CartProps) => {
           {fields.map((field, index) => {
             return (
               <li key={field.id}>
-                <CartItem
-                  {...(cartItems.find(
-                    (p) => p.product_id === field.product_id
-                  ) as CartItem)}
-                  onRemoveClick={() => handleRemove(index)()}
-                  onQuantityChange={(newQty: number) =>
-                    handleQuantityChange(index)(newQty)
+                {(() => {
+                  // Normalize product_id for matching (handle both "GO2-PRO-0001" and "product-GO2-PRO-0001" formats)
+                  const normalizeProductId = (id: string | number) => {
+                    const idStr = String(id);
+                    return idStr.replace(/^product-/, "");
+                  };
+                  const normalizedFieldId = normalizeProductId(
+                    field.product_id
+                  );
+
+                  // Try to find cartItem by normalized product_id
+                  const cartItem = cartItems.find(
+                    (p) =>
+                      normalizeProductId(p.product_id) === normalizedFieldId
+                  );
+
+                  // Safety check: ensure cartItem exists and has valid price structure
+                  if (
+                    !cartItem ||
+                    !cartItem.price ||
+                    typeof cartItem.price !== "object"
+                  ) {
+                    console.warn(
+                      `CartItem not found or invalid for product_id: ${field.product_id}`,
+                      {
+                        normalizedFieldId,
+                        availableProductIds: cartItems.map((c) => ({
+                          original: c.product_id,
+                          normalized: normalizeProductId(c.product_id),
+                        })),
+                      }
+                    );
+                    return null; // Skip rendering if item not found or price is invalid
                   }
-                  index={index}
-                />
+                  return (
+                    <CartItem
+                      {...cartItem}
+                      onRemoveClick={() => handleRemove(index)()}
+                      onQuantityChange={(newQty: number) =>
+                        handleQuantityChange(index)(newQty)
+                      }
+                      index={index}
+                    />
+                  );
+                })()}
               </li>
             );
           })}
@@ -1535,9 +1703,30 @@ const Cart = ({ cartItems, form }: CartProps) => {
                         variant="outline"
                         size="sm"
                         className="w-full mt-2"
-                        onClick={() => handleAddProductToCart(product)}
+                        onClick={() =>
+                          handleAddProductToCart({
+                            ...product,
+                            description: product.description,
+                          })
+                        }
                       >
-                        Add to Cart
+                        {(() => {
+                          const priceValue =
+                            parseFloat(product.price.replace(/[^0-9.]/g, "")) ||
+                            0;
+                          const hasValidPrice =
+                            priceValue > 0 &&
+                            !product.price.toLowerCase().includes("request");
+                          const consultationScheduled =
+                            typeof window !== "undefined" &&
+                            sessionStorage.getItem("consultationScheduled") ===
+                              "true";
+
+                          if (!hasValidPrice && !consultationScheduled) {
+                            return "Consultation Required";
+                          }
+                          return "Add to Cart";
+                        })()}
                       </Button>
                     </div>
                   </div>
@@ -1566,7 +1755,7 @@ const Cart = ({ cartItems, form }: CartProps) => {
             <Price className="text-sm font-normal">
               <PriceValue
                 price={totalPrice}
-                currency={cartItems[0].price.currency}
+                currency={cartItems[0]?.price?.currency || "USD"}
                 variant="regular"
               />
             </Price>
@@ -1586,7 +1775,7 @@ const Cart = ({ cartItems, form }: CartProps) => {
             <Price className="text-xl font-medium">
               <PriceValue
                 price={totalPrice}
-                currency={cartItems[0].price.currency}
+                currency={cartItems[0]?.price?.currency || "USD"}
                 variant="regular"
               />
             </Price>
@@ -1607,7 +1796,13 @@ const CartItem = ({
   onQuantityChange,
   onRemoveClick,
 }: CartItemProps) => {
-  const { regular, currency } = price;
+  // Safety check: ensure price exists and has required properties
+  if (!price || typeof price !== "object") {
+    console.error("CartItem: Invalid price structure", { price, name });
+    return null;
+  }
+
+  const { regular = 0, currency = "USD", consultationRequired = false } = price;
   const [imageLoading, setImageLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
 
@@ -1657,13 +1852,23 @@ const CartItem = ({
                 <ProductDetails details={details} />
               </div>
               <div>
-                <Price className="text-sm font-semibold">
-                  <PriceValue
-                    price={regular}
-                    currency={currency}
-                    variant="regular"
-                  />
-                </Price>
+                {consultationRequired ? (
+                  <div className="flex items-center gap-1 text-sm font-semibold">
+                    <span>$0</span>
+                    <span className="text-xs text-muted-foreground">*</span>
+                    <span className="text-xs text-muted-foreground">
+                      Price to be decided
+                    </span>
+                  </div>
+                ) : (
+                  <Price className="text-sm font-semibold">
+                    <PriceValue
+                      price={regular}
+                      currency={currency}
+                      variant="regular"
+                    />
+                  </Price>
+                )}
               </div>
             </div>
             <div className="flex w-full justify-between gap-3">

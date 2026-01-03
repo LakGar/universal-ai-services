@@ -89,7 +89,8 @@ const transformRentals = () => {
     const id = rental.id || rental.SKU || rental["Product ID"] || `rental-${index}`;
     
     // Get name from various possible fields
-    const name = rental.name || rental["Model Name"] || rental["Short Description"] || "Unnamed Rental";
+    const rentalData = rental as Record<string, unknown>;
+    const name = rental.name || (rentalData["Model Name"] as string) || (rentalData["Short Description"] as string) || "Unnamed Rental";
     
     // Get pricing from various possible fields (same logic as detail page)
     const dailyPrice = rental.pricing?.daily_usd || 
@@ -108,8 +109,8 @@ const transformRentals = () => {
       monthlyPrice = monthlyEstimate > 0 
         ? `~$${Math.round(monthlyEstimate).toLocaleString()}/mo • ${depositPercent}% deposit`
         : rental.availability || "";
-    } else if (rental.pricing?.model) {
-      price = rental.pricing.model;
+    } else if (rental.pricing && typeof rental.pricing === "object" && "model" in rental.pricing && rental.pricing.model) {
+      price = String((rental.pricing as Record<string, unknown>).model);
     }
 
     const { url: imageUrl, isVideo: imageIsVideo } = getProductImage(rental);

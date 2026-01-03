@@ -140,7 +140,7 @@ export default function RepairDetailPage() {
   
   // Get year from various fields
   const releaseYear = parseInt(service["Release Year"] || "0") || null;
-  const isNew = releaseYear >= 2024;
+  const isNew = releaseYear !== null && releaseYear >= 2024;
 
   // Get item ID for cart/wishlist
   const itemId = service["Product ID"] || service.SKU || service.name || "";
@@ -208,8 +208,9 @@ export default function RepairDetailPage() {
     ];
     
     specFields.forEach(field => {
-      if (service[field] && service[field] !== "Unknown" && service[field] !== "N/A") {
-        formatted[field] = String(service[field]);
+      const value = (service as Record<string, unknown>)[field];
+      if (value && value !== "Unknown" && value !== "N/A") {
+        formatted[field] = String(value);
       }
     });
     
@@ -278,12 +279,15 @@ export default function RepairDetailPage() {
                       src={currentMedia.url}
                       alt={serviceName}
                       fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 50vw"
                       className={cn(
                         "object-cover transition-opacity duration-300",
                         mediaLoading ? "opacity-0" : "opacity-100"
                       )}
                       onLoad={() => setMediaLoading(false)}
                       onError={() => setMediaLoading(false)}
+                      loading={selectedMediaIndex === 0 ? "eager" : "lazy"}
+                      priority={selectedMediaIndex === 0}
                     />
                     {allMedia.length > 1 && (
                       <>

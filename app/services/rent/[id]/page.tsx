@@ -144,10 +144,11 @@ export default function RentalDetailPage() {
   const monthlyEstimate = dailyPrice ? dailyPrice * 30 : 0;
   
   // Get name from various fields
-  const rentalName = rental.name || rental["Model Name"] || rental["Short Description"] || "Rental";
+  const rentalData = rental as Record<string, unknown>;
+  const rentalName = rental.name || (rentalData["Model Name"] as string) || (rentalData["Short Description"] as string) || "Rental";
   
   // Get description from various fields
-  const rentalDescription = rental.description || rental.Description || rental["Short Description"] || "";
+  const rentalDescription = rental.description || (rentalData["Description"] as string) || (rentalData["Short Description"] as string) || "";
   
   // Get year from various fields
   const rentalYear = rental.year || parseInt(rental["Release Year"] || "0") || null;
@@ -158,7 +159,7 @@ export default function RentalDetailPage() {
   const handleAddToCart = () => {
     const price = dailyPrice 
       ? `From $${dailyPrice.toLocaleString()}/day`
-      : rental.pricing?.model || "Contact for pricing";
+      : (rental.pricing && typeof rental.pricing === "object" && "model" in rental.pricing ? (rental.pricing.model as string) : null) || "Contact for pricing";
     
     // Rent always requires consultation - add to cart and redirect
     addItem({
@@ -173,7 +174,7 @@ export default function RentalDetailPage() {
   const handleToggleWishlist = () => {
     const price = dailyPrice 
       ? `From $${dailyPrice.toLocaleString()}/day`
-      : rental.pricing?.model || "Contact for pricing";
+      : (rental.pricing && typeof rental.pricing === "object" && "model" in rental.pricing ? (rental.pricing.model as string) : null) || "Contact for pricing";
     
     if (isInWishlist(itemId)) {
       removeFromWishlist(itemId);
@@ -243,8 +244,9 @@ export default function RentalDetailPage() {
     ];
     
     specFields.forEach(field => {
-      if (rental[field] && rental[field] !== "Unknown" && rental[field] !== "N/A") {
-        formatted[field] = String(rental[field]);
+      const value = (rental as Record<string, unknown>)[field];
+      if (value && value !== "Unknown" && value !== "N/A") {
+        formatted[field] = String(value);
       }
     });
     
@@ -268,8 +270,9 @@ export default function RentalDetailPage() {
       return normalized;
     }
     // Also check lowercase features field as string
-    if (rental.features && typeof rental.features === "string") {
-      const normalized = rental.features
+    const rentalData = rental as Record<string, unknown>;
+    if (rentalData.features && typeof rentalData.features === "string") {
+      const normalized = rentalData.features
         .replace(/<br\s*\/?>/gi, ";")
         .split(/(?:;|•)/)
         .map(f => f.trim())
@@ -518,8 +521,8 @@ export default function RentalDetailPage() {
                       </p>
                     )}
                   </>
-                ) : rental.pricing?.model ? (
-                  <p className="text-2xl font-semibold">{rental.pricing.model}</p>
+                ) : (rental.pricing && typeof rental.pricing === "object" && "model" in rental.pricing && rental.pricing.model) ? (
+                  <p className="text-2xl font-semibold">{String((rental.pricing as Record<string, unknown>).model)}</p>
                 ) : (
                   <p className="text-2xl font-semibold">Contact for pricing</p>
                 )}
