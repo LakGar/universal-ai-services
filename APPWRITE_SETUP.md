@@ -127,3 +127,4 @@ const getRobots = async () => {
   return await databases.listDocuments(DATABASE_ID, COLLECTIONS.ROBOTS);
 };
 ```
+

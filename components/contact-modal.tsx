@@ -199,7 +199,7 @@ export function ContactModal({
                     <div>
                       <h3 className="font-semibold text-lg">Email Us</h3>
                       <p className="text-white/70 text-sm leading-relaxed mt-1">
-                        info@universalaiservices.com
+                        contact@universalaiservices.com
                       </p>
                     </div>
                   </div>
@@ -210,7 +210,7 @@ export function ContactModal({
                     <div>
                       <h3 className="font-semibold text-lg">Call Us</h3>
                       <p className="text-white/70 text-sm leading-relaxed mt-1">
-                        +1 (555) 123-4567
+                        (650) 260-4147
                       </p>
                     </div>
                   </div>
@@ -221,9 +221,9 @@ export function ContactModal({
                     <div>
                       <h3 className="font-semibold text-lg">Visit Us</h3>
                       <p className="text-white/70 text-sm leading-relaxed mt-1">
-                        123 Innovation Drive
+                        450 Townsend St
                         <br />
-                        San Francisco, CA 94105
+                        San Francisco, CA
                       </p>
                     </div>
                   </div>

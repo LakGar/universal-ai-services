@@ -19,6 +19,23 @@ export const metadata: Metadata = {
   title: "Universal AI Services - Robotics & AI Solutions",
   description: "Universal AI Services is an AI & robotics consultancy that guides leaders through every stage of adoption with proven playbooks. Buy, rent, or consult on cutting-edge robotics solutions.",
   keywords: ["robotics", "AI", "artificial intelligence", "robots", "automation", "consulting"],
+  authors: [{ name: "Universal AI Services" }],
+  creator: "Universal AI Services",
+  publisher: "Universal AI Services",
+  metadataBase: new URL("https://universalaiservices.com"),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://universalaiservices.com",
+    siteName: "Universal AI Services",
+    title: "Universal AI Services - Robotics & AI Solutions",
+    description: "Universal AI Services is an AI & robotics consultancy that guides leaders through every stage of adoption with proven playbooks.",
+  },
+  other: {
+    "contact:email": "contact@universalaiservices.com",
+    "contact:phone": "(650) 260-4147",
+    "contact:address": "450 Townsend St, San Francisco, CA",
+  },
 };
 
 export default function RootLayout({

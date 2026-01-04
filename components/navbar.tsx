@@ -131,6 +131,10 @@ const Navbar = ({
       ],
     },
     {
+      title: "About",
+      url: "/about",
+    },
+    {
       title: "Services",
       url: "/services/consultation",
     },
@@ -158,7 +162,12 @@ const Navbar = ({
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <img src="/logo.png" className="max-h-8 dark:invert" alt="logo" />
+              <img src="/logo.png" className="max-h-8 dark:hidden" alt="logo" />
+              <img
+                src="/logo-white.png"
+                className="max-h-8 hidden dark:block"
+                alt="logo"
+              />
               <span className="text-lg font-semibold tracking-tighter text-black dark:text-white zalando-sans-expanded">
                 Universal AI Services
               </span>
@@ -210,7 +219,12 @@ const Navbar = ({
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2">
-              <img src="/logo.png" className="max-h-8 dark:invert" alt="logo" />
+              <img src="/logo.png" className="max-h-8 dark:hidden" alt="logo" />
+              <img
+                src="/logo-white.png"
+                className="max-h-8 hidden dark:block"
+                alt="logo"
+              />
             </Link>
             <Sheet>
               <SheetTrigger asChild>
@@ -228,7 +242,12 @@ const Navbar = ({
                     <Link href="/" className="flex items-center gap-2">
                       <img
                         src="/logo.png"
-                        className="max-h-8 dark:invert"
+                        className="max-h-8 dark:hidden"
+                        alt="logo"
+                      />
+                      <img
+                        src="/logo-white.png"
+                        className="max-h-8 hidden dark:block"
                         alt="logo"
                       />
                     </Link>

@@ -4,15 +4,23 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
+import {
+  Facebook,
+  Instagram,
+  Linkedin,
+  Twitter,
+  Mail,
+  Phone,
+  MapPin,
+} from "lucide-react";
 import Image from "next/image";
 import { useContact } from "@/contexts/contact-context";
 
 function Footer() {
   const { openContact } = useContact();
   const footerLinks = [
-    { href: "#", label: "Home" },
-    { href: "#about", label: "About" },
+    { href: "/", label: "Home" },
+    { href: "/about", label: "About" },
     { href: "#services", label: "Services" },
     { href: "/services/buy", label: "Products" },
     { href: "#contact", label: "Contact" },
@@ -136,14 +144,45 @@ function Footer() {
             </form>
           </motion.div>
           <motion.div
-            className="text-center"
+            className="text-center space-y-4"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.6 }}
           >
+            <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
+              <a
+                href="mailto:contact@universalaiservices.com"
+                className="flex items-center gap-2 hover:text-primary transition-colors"
+              >
+                <Mail className="h-4 w-4" />
+                <span>contact@universalaiservices.com</span>
+              </a>
+              <a
+                href="tel:+16502604147"
+                className="flex items-center gap-2 hover:text-primary transition-colors"
+              >
+                <Phone className="h-4 w-4" />
+                <span>(650) 260-4147</span>
+              </a>
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                <span>450 Townsend St, San Francisco, CA</span>
+              </div>
+            </div>
             <p className="text-sm text-muted-foreground">
-              © 2024 Your Company. All rights reserved.
+              © 2026 Universal AI Services. All rights reserved.
+            </p>
+            <p className="text-xs text-muted-foreground/60 mt-3">
+              Website by{" "}
+              <a
+                href="https://www.theempowerweb.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Empower
+              </a>
             </p>
           </motion.div>
         </div>

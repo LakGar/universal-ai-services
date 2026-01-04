@@ -32,6 +32,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "www.opendroids.com",
       },
+      {
+        protocol: "https",
+        hostname: "images.squarespace-cdn.com",
+      },
     ],
   },
 };
