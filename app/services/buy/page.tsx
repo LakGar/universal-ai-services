@@ -241,10 +241,7 @@ export default function BuyPage() {
 
     if (activeTab === "all") {
       // For "all" tab, get diverse images from all categories
-      const categories = [
-        "Quadruped Robots",
-        "Humanoid Robots",
-      ];
+      const categories = ["Quadruped Robots", "Humanoid Robots"];
       categories.forEach((cat) => {
         const product = allProducts.find((p) => {
           const categories = categorizeProduct(p.description || p.alt);
@@ -312,10 +309,7 @@ export default function BuyPage() {
       const categories = categorizeProduct(product.description || product.alt);
       categories.forEach((cat) => {
         // Only include robot type categories for tabs
-        if (
-          cat === "Quadruped Robots" ||
-          cat === "Humanoid Robots"
-        ) {
+        if (cat === "Quadruped Robots" || cat === "Humanoid Robots") {
           categorySet.add(cat);
         }
       });
@@ -331,13 +325,18 @@ export default function BuyPage() {
     return state === "collapsed" ? "4rem" : "19rem";
   };
 
+  const getHeaderWidth = () => {
+    if (isMobile) return "100vw";
+    return state === "collapsed" ? "calc(100% - 4rem)" : "calc(100% - 19rem)";
+  };
+
   return (
     <>
       <header
-        className="fixed top-0 z-50 flex h-16 shrink-0 items-center justify-between gap-2 px-4 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 border-b transition-[left] duration-200 ease-linear max-w-full overflow-x-hidden"
+        className="fixed top-0 z-50 w-full flex h-16 shrink-0 items-center justify-between gap-2 px-4 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 border-b transition-[left,width] duration-200 ease-linear"
         style={{
           left: getHeaderLeft(),
-          right: 0,
+          width: getHeaderWidth(),
         }}
       >
         <div className="flex items-center gap-2">

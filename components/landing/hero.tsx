@@ -47,7 +47,7 @@ const HERO_ROBOT_CONFIG: HeroRobotConfig[] = [
       "https://images.squarespace-cdn.com/content/v1/5e76e0c52a318c0c1a850442/1693706482840-464SIORTG1VDG0KPM3DO/picture+of+GO2-13.jpg?format=1500w",
   },
   {
-    productId: "GO2-EDU-0001-CONSTRUCTION",
+    productId: "GO2-PRO-0001-CONSTRUCTION",
     name: "Go2 Construction",
     type: "buy",
     image:

@@ -66,7 +66,7 @@ export function RobotCard({
     yOffset = 15; // Second and second-to-last cards lower (reduced from 30)
   }
 
-  return (
+  const cardContent = (
     <motion.div
       initial={{
         opacity: 0,
@@ -78,9 +78,9 @@ export function RobotCard({
         opacity: 1,
         y: isHovered ? -8 : yOffset,
         scale: isHovered ? 1.03 : 1,
-        rotate: rotation, // Keep rotation static on hover
-        x: `calc(-50% + ${xOffset}px)`, // Keep x position static on hover
-        zIndex: isHovered ? 100 : zIndex, // Higher z-index on hover
+        rotate: rotation,
+        x: `calc(-50% + ${xOffset}px)`,
+        zIndex: isHovered ? 100 : zIndex,
       }}
       transition={{
         duration: 0.5,
@@ -153,24 +153,24 @@ export function RobotCard({
           }}
           transition={{ duration: 0.3, delay: 0.1 }}
         >
-          {robot.url ? (
-            <Link
-              href={robot.url}
-              className="flex items-center gap-1.5 px-4 py-2 bg-transparent text-white rounded-full text-xs font-medium hover:text-blue-500 transition-colors w-full text-right"
-            >
-              Learn more
-              <ArrowRight className="w-2 h-2" />
-            </Link>
-          ) : (
-            <button className="flex items-center gap-1.5 px-4 py-2 bg-transparent text-white rounded-full text-xs font-medium hover:text-blue-500 transition-colors w-full text-right">
-              Learn more
-              <ArrowRight className="w-2 h-2" />
-            </button>
-          )}
+          <div className="flex items-center gap-1.5 px-4 py-2 bg-transparent text-white rounded-full text-xs font-medium hover:text-blue-500 transition-colors w-full text-right pointer-events-none">
+            Learn more
+            <ArrowRight className="w-2 h-2" />
+          </div>
         </motion.div>
       </motion.div>
     </motion.div>
   );
+
+  if (robot.url) {
+    return (
+      <Link href={robot.url} className="absolute w-[180px] md:w-[200px] aspect-square" style={{ left: "50%", pointerEvents: "auto" }}>
+        {cardContent}
+      </Link>
+    );
+  }
+
+  return cardContent;
 }
 
 interface RobotCardsProps {
