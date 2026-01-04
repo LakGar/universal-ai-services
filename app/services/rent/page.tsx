@@ -369,7 +369,7 @@ export default function RentPage() {
   return (
     <>
       <header
-        className="fixed top-0 z-50 flex h-16 shrink-0 items-center justify-between gap-2 px-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b transition-[left] duration-200 ease-linear"
+        className="fixed top-0 z-50 flex h-16 shrink-0 items-center justify-between gap-2 px-4 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 border-b transition-[left] duration-200 ease-linear max-w-full overflow-x-hidden"
         style={{
           left: getHeaderLeft(),
           right: 0,
@@ -400,7 +400,7 @@ export default function RentPage() {
       </header>
       {/* Hero Slider Section - Positioned below header */}
       <div
-        className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden"
+        className="relative w-full max-w-full h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden"
         style={{
           marginTop: "4rem", // Height of header
         }}
@@ -437,7 +437,7 @@ export default function RentPage() {
                 sizes="100vw"
               />
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/30" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/50 to-black/30" />
           </motion.div>
         </AnimatePresence>
 
@@ -507,25 +507,27 @@ export default function RentPage() {
       </div>
 
       {/* Content Section */}
-      <div className="flex flex-1 flex-col gap-4 p-4 md:p-8 min-w-0 pt-8">
-        <div className="w-full min-w-0">
+      <div className="flex flex-1 flex-col gap-4 p-4 md:p-8 min-w-0 pt-8 max-w-full overflow-x-hidden">
+        <div className="w-full min-w-0 max-w-full">
           {/* Tabs */}
           <Tabs
             value={activeTab}
             onValueChange={setActiveTab}
-            className="w-full"
+            className="w-full max-w-full"
           >
-            <TabsList className="w-full justify-start mb-8 h-auto p-1 bg-muted/50">
-              {tabCategories.map((tab) => (
-                <TabsTrigger
-                  key={tab}
-                  value={tab}
-                  className="px-6 py-2 text-sm md:text-base data-[state=active]:bg-background"
-                >
-                  {tab === "all" ? "All Products" : tab}
-                </TabsTrigger>
-              ))}
-            </TabsList>
+            <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
+              <TabsList className="w-full md:w-auto justify-start h-auto p-1 bg-muted/50 inline-flex min-w-max">
+                {tabCategories.map((tab) => (
+                  <TabsTrigger
+                    key={tab}
+                    value={tab}
+                    className="px-4 md:px-6 py-2 text-sm md:text-base data-[state=active]:bg-background whitespace-nowrap shrink-0"
+                  >
+                    {tab === "all" ? "All Products" : tab}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </div>
 
             {/* Tab Contents */}
             {tabCategories.map((tab) => {
@@ -553,7 +555,7 @@ export default function RentPage() {
                   </div>
 
                   {tabProducts.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch w-full max-w-full">
                       {tabProducts.map((product, index) => (
                         <ProductCard
                           key={product.id || `rental-${index}`}
