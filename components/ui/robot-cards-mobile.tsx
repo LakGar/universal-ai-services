@@ -22,7 +22,13 @@ interface RobotCardsMobileProps {
 export function RobotCardsMobile({ robots, className }: RobotCardsMobileProps) {
   if (!robots || robots.length === 0) return null;
 
-  const RobotCardMobile = ({ robot, index }: { robot: typeof robots[0]; index: number }) => {
+  const RobotCardMobile = ({
+    robot,
+    index,
+  }: {
+    robot: (typeof robots)[0];
+    index: number;
+  }) => {
     const [imageLoading, setImageLoading] = React.useState(true);
     const [imageError, setImageError] = React.useState(false);
 
@@ -78,17 +84,21 @@ export function RobotCardsMobile({ robots, className }: RobotCardsMobileProps) {
             {imageError && (
               <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm">
                 <div className="text-center p-4">
-                  <p className="text-sm text-white/70 font-medium">{robot.name}</p>
-                  <p className="text-xs text-white/50 mt-1">Image unavailable</p>
+                  <p className="text-sm text-white/70 font-medium">
+                    {robot.name}
+                  </p>
+                  <p className="text-xs text-white/50 mt-1">
+                    Image unavailable
+                  </p>
                 </div>
               </div>
             )}
-            {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            {/* Gradient overlay - always visible on mobile */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-100" />
           </div>
 
-          {/* Content overlay - appears on hover */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          {/* Content overlay - always visible on mobile */}
+          <div className="absolute bottom-0 left-0 right-0 p-4 opacity-100">
             <h3 className="text-sm font-semibold text-white mb-2 whitespace-nowrap overflow-hidden text-ellipsis">
               {robot.name}
             </h3>

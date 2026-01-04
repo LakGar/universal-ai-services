@@ -262,6 +262,35 @@ const transformProductDetail = (item: any, index: number) => {
   // Accessories as add-ons
   const standardAddOns = transformAccessoriesToAddOns();
 
+  // Get add-ons from "Add ons" field in buy_data.json and match with addons.ts
+  const productAddOnNames = item["Add ons"] || [];
+  const matchedAddOns: Array<{ id: string; name: string; price: number; description: string }> = [];
+  const preSelectedAddOnIds: string[] = [];
+
+  if (Array.isArray(productAddOnNames) && productAddOnNames.length > 0) {
+    productAddOnNames.forEach((addOnName: string) => {
+      // Try to find matching add-on by name (case-insensitive, partial match)
+      const matchedAddOn = addOns.find(
+        (a) => a.name.toLowerCase() === addOnName.toLowerCase() ||
+               a.name.toLowerCase().includes(addOnName.toLowerCase()) ||
+               addOnName.toLowerCase().includes(a.name.toLowerCase())
+      );
+      
+      if (matchedAddOn) {
+        matchedAddOns.push({
+          id: matchedAddOn.id,
+          name: matchedAddOn.name,
+          price: 0, // Add-ons from addons.ts don't have prices
+          description: matchedAddOn.description,
+        });
+        preSelectedAddOnIds.push(matchedAddOn.id);
+      }
+    });
+  }
+
+  // Combine accessories and matched add-ons
+  const allAddOns = [...standardAddOns, ...matchedAddOns];
+
   // Extract configurations from version/revision if available
   const configurations = [
     { id: "standard", name: "Standard Configuration", price: 0 },
@@ -293,7 +322,8 @@ const transformProductDetail = (item: any, index: number) => {
     options: {
       configurations,
     },
-    addOns: standardAddOns,
+    addOns: allAddOns,
+    preSelectedAddOnIds, // Store IDs of add-ons that should be pre-selected
     specs: parseSpecs(item.Specs || ""),
     features: parseFeatures(item.Features || ""),
     manufacturer: item.Manufacturer || "",
@@ -337,8 +367,9 @@ export default function ProductDetailPage() {
   const [selectedConfig, setSelectedConfig] = React.useState(
     product?.options.configurations[0].id || ""
   );
+  // Initialize selectedAddOns with pre-selected add-ons from product
   const [selectedAddOns, setSelectedAddOns] = React.useState<Set<string>>(
-    new Set()
+    () => new Set(product?.preSelectedAddOnIds || [])
   );
   const [isVideoPlaying, setIsVideoPlaying] = React.useState(false);
   const [mediaLoading, setMediaLoading] = React.useState(true);
@@ -359,6 +390,10 @@ export default function ProductDetailPage() {
   React.useEffect(() => {
     if (product) {
       setSelectedConfig(product.options.configurations[0].id);
+      // Initialize selected add-ons with pre-selected ones
+      if (product.preSelectedAddOnIds && product.preSelectedAddOnIds.length > 0) {
+        setSelectedAddOns(new Set(product.preSelectedAddOnIds));
+      }
     }
   }, [product]);
 
@@ -719,6 +754,41 @@ export default function ProductDetailPage() {
                   </p>
                 )}
               </div>
+
+              {/* Selected Add-ons */}
+              {selectedAddOns.size > 0 && (
+                <div className="border-t pt-6">
+                  <h3 className="font-semibold mb-3">Selected Add-ons</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {Array.from(selectedAddOns).map((addOnId) => {
+                      // Try to find in product.addOns first (accessories)
+                      const addOn = product.addOns.find((a) => a.id === addOnId);
+                      // If not found, try in comprehensive addOns from addons.ts
+                      const comprehensiveAddOn = !addOn ? addOns.find((a) => a.id === addOnId) : null;
+                      const displayAddOn = addOn || comprehensiveAddOn;
+                      
+                      if (!displayAddOn) return null;
+
+                      return (
+                        <div
+                          key={addOnId}
+                          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-muted/50 text-sm"
+                        >
+                          <Check className="size-3.5 text-primary shrink-0" />
+                          <span className="font-medium whitespace-nowrap">
+                            {displayAddOn.name}
+                          </span>
+                          {addOn && addOn.price > 0 && (
+                            <span className="text-xs text-muted-foreground whitespace-nowrap">
+                              (+${addOn.price.toLocaleString()})
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               {/* Configuration Options */}
               {product.options.configurations.length > 1 && (

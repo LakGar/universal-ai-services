@@ -6,7 +6,7 @@ import { logger } from "@/lib/logger";
 export const items = [
   {
     id: 1,
-    url: "/carousel/video7.mp4",
+    url: "/carousel/video-ces.mp4",
   },
   {
     id: 2,
@@ -14,7 +14,7 @@ export const items = [
   },
   {
     id: 3,
-    url: "/carousel/video3.mp4",
+    url: "/carousel/video4.mp4",
   },
   {
     id: 4,
@@ -23,10 +23,6 @@ export const items = [
   {
     id: 5,
     url: "/carousel/video2.mp4",
-  },
-  {
-    id: 6,
-    url: "/carousel/video5.mp4",
   },
 ];
 
@@ -130,13 +126,16 @@ export function FramerCarousel() {
   return (
     <div className="lg:p-10 sm:p-4 p-2 max-w-7xl mx-auto">
       <div className="flex flex-col gap-3">
-        <div 
+        <div
           className="relative overflow-hidden rounded-lg w-full aspect-video max-h-[700px] sm:max-h-[700px]"
           ref={containerRef}
         >
           <motion.div className="flex h-full" style={{ x }}>
             {items.map((item, i) => (
-              <div key={item.id} className="shrink-0 w-full h-full relative flex items-center justify-center bg-black">
+              <div
+                key={item.id}
+                className="shrink-0 w-full h-full relative flex items-center justify-center bg-black"
+              >
                 <video
                   ref={(el) => {
                     videoRefs.current[i] = el;
@@ -226,7 +225,9 @@ export function FramerCarousel() {
                 key={i}
                 onClick={() => setIndex(i)}
                 className={`h-1.5 sm:h-2 rounded-full transition-all ${
-                  i === index ? "w-6 sm:w-8 bg-white" : "w-1.5 sm:w-2 bg-white/50"
+                  i === index
+                    ? "w-6 sm:w-8 bg-white"
+                    : "w-1.5 sm:w-2 bg-white/50"
                 }`}
               />
             ))}

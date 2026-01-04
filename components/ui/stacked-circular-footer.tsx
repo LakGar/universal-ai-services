@@ -27,10 +27,11 @@ function Footer() {
   ];
 
   const socialLinks = [
-    { icon: Facebook, label: "Facebook" },
-    { icon: Twitter, label: "Twitter" },
-    { icon: Instagram, label: "Instagram" },
-    { icon: Linkedin, label: "LinkedIn" },
+    {
+      icon: Linkedin,
+      label: "LinkedIn",
+      href: "https://www.linkedin.com/company/universalaiservices/",
+    },
   ];
 
   return (
@@ -107,14 +108,20 @@ function Footer() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.3, delay: 0.4 + index * 0.1 }}
                 >
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="rounded-full"
+                  <a
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
-                    <Icon className="h-4 w-4" />
-                    <span className="sr-only">{social.label}</span>
-                  </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="rounded-full"
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span className="sr-only">{social.label}</span>
+                    </Button>
+                  </a>
                 </motion.div>
               );
             })}

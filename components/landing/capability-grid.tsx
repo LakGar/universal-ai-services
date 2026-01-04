@@ -43,8 +43,7 @@ const capabilities = [
       "Seamless connections between robotics, software, and existing enterprise systems",
     hoverText:
       "API integrations, middleware solutions, and custom connectors for unified operations",
-    image:
-      "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&auto=format&fit=crop&q=80",
+    image: "/system.jpg",
   },
   {
     icon: Settings,
@@ -65,8 +64,7 @@ const capabilities = [
       "Dedicated technical support, firmware updates, and system optimization",
     hoverText:
       "24/7 monitoring, remote diagnostics, and proactive maintenance to ensure peak performance",
-    image:
-      "https://images.unsplash.com/photo-1555255707-c07966088b7b?w=800&auto=format&fit=crop&q=80",
+    image: "/support.jpg",
   },
 ];
 

@@ -10,6 +10,85 @@ import { logger } from "@/lib/logger";
 import { RobotCards } from "@/components/ui/robot-cards";
 import { RobotCardsMobile } from "@/components/ui/robot-cards-mobile";
 import buyData from "@/app/services/buy/data/buy_data.json";
+import rentalData from "@/app/data.json";
+
+// ============================================================================
+// HERO ROBOT CARDS CONFIGURATION
+// ============================================================================
+// Configure the 7 robots you want to display in the hero section
+// Leave empty array [] to use the first 7 "Buy" category items (default behavior)
+//
+// Configuration format:
+// {
+//   productId: string,        // Product ID from buy_data.json or data.json rentals
+//   type: "buy" | "rent",     // Whether it's from buy or rent data
+//   image?: string            // Optional: Custom image URL (overrides product image)
+// }
+//
+// Example:
+// [
+//   { productId: "GO2-PRO-0001", type: "buy" },
+//   { productId: "UNITREE-GO2-PRO-RENT", type: "rent", image: "/custom-image.jpg" },
+//   ...
+// ]
+interface HeroRobotConfig {
+  productId: string;
+  type: "buy" | "rent";
+  image?: string; // Optional custom image URL
+  name?: string; // Optional custom name (overrides product name)
+}
+
+const HERO_ROBOT_CONFIG: HeroRobotConfig[] = [
+  // Add your 7 robot configurations here:
+  {
+    productId: "GO2-PRO-0001",
+    type: "buy",
+    image:
+      "https://images.squarespace-cdn.com/content/v1/5e76e0c52a318c0c1a850442/1693706482840-464SIORTG1VDG0KPM3DO/picture+of+GO2-13.jpg?format=1500w",
+  },
+  {
+    productId: "GO2-EDU-0001-CONSTRUCTION",
+    name: "Go2 Construction",
+    type: "buy",
+    image:
+      "https://d2cdo4blch85n8.cloudfront.net/wp-content/uploads/2023/12/Unitree-B2-Industrial-Quadruped-Robot-1-1024x683.jpg",
+  },
+  {
+    productId: "ROBO-BAR-RENT-0001",
+    type: "rent",
+    image:
+      "https://globetrender.com/wp-content/uploads/2021/11/9Makr-Shakr-Amsterdam_Riccardo-De-Vecchi-Credits-scaled.jpg",
+  },
+  {
+    productId: "UAIS-AIRPORT-ROBOT-0001",
+    name: "Airport Robot",
+    type: "rent",
+    image: "https://www.opendroids.com/assets/images/service/airport-1.webp",
+  },
+  {
+    productId: "ROBO-LIGHTS-RENT-0001",
+    type: "rent",
+    image:
+      "https://static.designboom.com/wp-content/dbsub/381292/2021-07-26/when-robots-compose-poetry-tetro-presents-the-new-kinetic-sculpture-created-by-collectif-scale-1-60feb7b88cf2c.jpg",
+  },
+
+  {
+    productId: "UAIS-RETAIL-ROBOT-0001",
+    name: "Retail Robot",
+    type: "rent",
+    image: "https://www.opendroids.com/assets/images/service/retail-1.webp",
+  },
+  {
+    productId: "UAIS-WAREHOUSE-ROBOT-0001",
+    name: "Warehouse Robot",
+    type: "rent",
+    image: "https://www.opendroids.com/assets/images/service/warehouse-1.webp",
+  },
+  // { productId: "GO2-PRO-0001", type: "buy" },
+  // { productId: "UNITREE-GO2-PRO-RENT", type: "rent" },
+  // { productId: "H1-EDU-0001", type: "buy", image: "/custom-hero-image.jpg" },
+];
+// ============================================================================
 
 // Helper function to check if URL is a video
 const isVideoUrl = (url: string): boolean => {
@@ -85,9 +164,120 @@ const getProductImage = (item: any): string => {
   return "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
 };
 
-// Transform buy data to robot cards format
+// Helper function to get rental image (similar to rent page logic)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const getRentalImage = (rental: any): string => {
+  // Check if images array exists and has items
+  if (
+    rental.images &&
+    Array.isArray(rental.images) &&
+    rental.images.length > 0
+  ) {
+    // Find first non-video image
+    for (const img of rental.images) {
+      if (typeof img === "string" && !isVideoUrl(img)) {
+        // Convert Google Drive URL if needed
+        if (img.includes("drive.google.com")) {
+          const fileId = extractFileId(img);
+          if (fileId) {
+            return `https://drive.google.com/uc?export=view&id=${fileId}`;
+          }
+        }
+        return img;
+      }
+    }
+  }
+
+  // Check if images field exists as string
+  if (
+    rental.images &&
+    typeof rental.images === "string" &&
+    !isVideoUrl(rental.images)
+  ) {
+    if (rental.images.includes("drive.google.com")) {
+      const fileId = extractFileId(rental.images);
+      if (fileId) {
+        return `https://drive.google.com/uc?export=view&id=${fileId}`;
+      }
+    }
+    return rental.images;
+  }
+
+  // Fallback to placeholder
+  return "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80";
+};
+
+// Transform buy/rent data to robot cards format
 const transformRobots = () => {
-  // Filter to only "Buy" category items and limit to 7 for hero
+  // If HERO_ROBOT_CONFIG is configured, use those specific products
+  if (HERO_ROBOT_CONFIG.length > 0) {
+    return HERO_ROBOT_CONFIG.slice(0, 7).map((config, index) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let item: any = null;
+      let name = "Robot";
+      let image = "";
+      let url = "";
+
+      if (config.type === "buy") {
+        // Find in buy data
+        item = buyData.find(
+          (i) => i.Category === "Buy" && i["Product ID"] === config.productId
+        );
+        if (item) {
+          name = config.name || item["Model Name"] || "Robot";
+          image = config.image || getProductImage(item);
+          // Find the index in the full buyData array for the detail page
+          const fullIndex = buyData.findIndex(
+            (p) => p["Product ID"] === item["Product ID"]
+          );
+          const detailPageId = fullIndex >= 0 ? fullIndex + 1 : index + 1;
+          url = `/services/buy/${detailPageId}`;
+        }
+      } else if (config.type === "rent") {
+        // Find in rental data
+        item = rentalData.rentals.find(
+          (r) =>
+            r.id === config.productId ||
+            r.SKU === config.productId ||
+            r["Product ID"] === config.productId
+        );
+        if (item) {
+          name =
+            config.name ||
+            item.name ||
+            (item as Record<string, unknown>)["Model Name"] ||
+            (item as Record<string, unknown>)["Short Description"] ||
+            "Robot";
+          image = config.image || getRentalImage(item);
+          // Use the rental ID for the detail page
+          const rentalId =
+            item.id || item.SKU || item["Product ID"] || config.productId;
+          url = `/services/rent/${rentalId}`;
+        }
+      }
+
+      // If item not found, return placeholder
+      if (!item) {
+        return {
+          id: index + 1,
+          name: config.name || `Robot ${index + 1}`,
+          image:
+            config.image ||
+            "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80",
+          url: "#",
+        };
+      }
+
+      return {
+        id: index + 1,
+        name,
+        image,
+        url,
+      };
+    });
+  }
+
+  // Default: Filter to only "Buy" category items and limit to 7 for hero
   const buyItems = buyData
     .filter((item) => item.Category === "Buy")
     .slice(0, 7);
@@ -281,7 +471,7 @@ export const Hero = () => {
             </AnimatePresence>
             <a
               className="bg-white dark:bg-black border border-black/10 dark:border-white rounded-full w-fit text-black dark:text-white px-4 py-2"
-              href="#about"
+              href="/about"
             >
               Learn More
             </a>

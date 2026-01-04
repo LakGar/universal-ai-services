@@ -166,8 +166,6 @@ const heroImagesConfig: Record<string, string[]> = {
     "https://www.unitree.com/images/efca9764a6de42108d6e2effc75944aa_3840x2160.jpg",
     "https://www.unitree.com/images/7504897529034b05890225e149d3af28.mp4",
     "https://www.unitree.com/images/fadc6f0bc26747d6b4110fd5e5657857.mp4",
-  ],
-  "Hardware & Components": [
     "https://www.unitree.com/images/a81cbcb21ad7498eaf11f5c15c31d07e_1920x1080.jpg?x-oss-process=image/format,webp",
     "https://oss-global-cdn.unitree.com/static/615cd786abe14f5ebe64482b963cb092.mp4",
     "https://www.unitree.com/images/52688de58de044358e4792a5b7c1593d_2740x1720.jpg",
@@ -187,16 +185,15 @@ const categorizeProduct = (shortDesc: string): string[] => {
     desc.includes("tracked")
   ) {
     categories.push("Quadruped Robots");
-  } else if (desc.includes("humanoid")) {
-    categories.push("Humanoid Robots");
   } else if (
+    desc.includes("humanoid") ||
     desc.includes("hand") ||
     desc.includes("manipulator") ||
     desc.includes("hardware") ||
     desc.includes("module") ||
     desc.includes("autonomy")
   ) {
-    categories.push("Hardware & Components");
+    categories.push("Humanoid Robots");
   }
 
   // Use Case Categories (Secondary)
@@ -247,7 +244,6 @@ export default function BuyPage() {
       const categories = [
         "Quadruped Robots",
         "Humanoid Robots",
-        "Hardware & Components",
       ];
       categories.forEach((cat) => {
         const product = allProducts.find((p) => {
@@ -318,8 +314,7 @@ export default function BuyPage() {
         // Only include robot type categories for tabs
         if (
           cat === "Quadruped Robots" ||
-          cat === "Humanoid Robots" ||
-          cat === "Hardware & Components"
+          cat === "Humanoid Robots"
         ) {
           categorySet.add(cat);
         }

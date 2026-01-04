@@ -92,6 +92,18 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "i0.wp.com",
       },
+      {
+        protocol: "https",
+        hostname: "roboworks.net",
+      },
+      {
+        protocol: "https",
+        hostname: "static.designboom.com",
+      },
+      {
+        protocol: "https",
+        hostname: "d2cdo4blch85n8.cloudfront.net",
+      },
     ],
   },
 };

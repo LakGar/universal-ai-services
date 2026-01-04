@@ -78,7 +78,7 @@ export default function AboutPage() {
     description:
       "It has become the baseline for competitiveness, and companies that adopt it with speed and clarity will define the next decade.",
     buttonText: "Learn more",
-    buttonUrl: "#services",
+    buttonUrl: "/services",
   };
 
   return (
@@ -141,7 +141,7 @@ export default function AboutPage() {
               className="bg-black dark:bg-white text-white dark:text-black border border-black/10 dark:border-white rounded-full w-fit px-6 py-3 font-medium hover:opacity-90 transition-opacity"
               href="#who-we-are"
             >
-              Learn More About Us
+              Learn More
             </a>
             <a
               className="bg-white dark:bg-black border border-black/10 dark:border-white rounded-full w-fit text-black dark:text-white px-6 py-3 font-medium hover:opacity-90 transition-opacity"
