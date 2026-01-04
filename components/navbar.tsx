@@ -116,12 +116,7 @@ const Navbar = ({
           icon: <Calendar className="size-5 shrink-0" />,
           url: "/services/consultation",
         },
-        {
-          title: "Contact Us",
-          description: "We are here to help you with any questions you have",
-          icon: <Mail className="size-5 shrink-0" />,
-          url: "/#contact",
-        },
+
         {
           title: "Terms of Service",
           description: "Our terms and conditions for using our services",

@@ -251,12 +251,12 @@ export default function AboutPage() {
                     className="bg-background rounded-xl overflow-hidden shadow-sm border border-border"
                   >
                     {leader.image && (
-                      <div className="relative w-full h-64 overflow-hidden">
+                      <div className="relative w-full aspect-[4/5] overflow-hidden bg-muted">
                         <Image
                           src={leader.image}
                           alt={leader.name}
                           fill
-                          className="object-cover"
+                          className="object-cover object-center"
                           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         />
                       </div>

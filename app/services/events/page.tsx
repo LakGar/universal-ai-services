@@ -215,10 +215,10 @@ function EventCard({ event, featured = false }: EventCardProps) {
         {/* Content */}
         <div className="p-6 space-y-4 bg-card">
           <div>
-            <h3 className="font-bold text-xl mb-2 line-clamp-2 group-hover:text-white transition-colors duration-300">
+            <h3 className="font-bold text-xl mb-2 line-clamp-2 text-foreground">
               {event.title}
             </h3>
-            <p className="text-sm text-muted-foreground line-clamp-2 group-hover:text-foreground/80 transition-colors">
+            <p className="text-sm text-muted-foreground line-clamp-2">
               {event.description}
             </p>
           </div>

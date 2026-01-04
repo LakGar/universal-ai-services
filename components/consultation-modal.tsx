@@ -7,6 +7,21 @@ import { X, CheckCircle, BarChart3, Globe2, Calendar } from "lucide-react";
 import { MeshGradient } from "@paper-design/shaders-react";
 import { logger } from "@/lib/logger";
 
+interface CalendlyInitOptions {
+  url: string;
+  parentElement: HTMLElement;
+}
+
+interface Calendly {
+  initInlineWidget: (options: CalendlyInitOptions) => void;
+}
+
+declare global {
+  interface Window {
+    Calendly?: Calendly;
+  }
+}
+
 interface ConsultationModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -38,9 +53,9 @@ export function ConsultationModal({ isOpen, onClose }: ConsultationModalProps) {
       widgetRef.current.innerHTML = "";
 
       // Initialize the widget if Calendly is available
-      if ((window as any).Calendly?.initInlineWidget) {
+      if (window.Calendly?.initInlineWidget) {
         try {
-          (window as any).Calendly.initInlineWidget({
+          window.Calendly.initInlineWidget({
             url: calendlyUrl,
             parentElement: widgetRef.current,
           });
@@ -54,7 +69,7 @@ export function ConsultationModal({ isOpen, onClose }: ConsultationModalProps) {
     };
 
     // Check if Calendly is already available
-    if ((window as any).Calendly?.initInlineWidget) {
+    if (window.Calendly?.initInlineWidget) {
       // Small delay to ensure DOM is ready
       setTimeout(initWidget, 100);
       return;
@@ -66,7 +81,7 @@ export function ConsultationModal({ isOpen, onClose }: ConsultationModalProps) {
       const maxAttempts = 50; // 5 seconds
       const checkInterval = setInterval(() => {
         attempts++;
-        if ((window as any).Calendly?.initInlineWidget) {
+        if (window.Calendly?.initInlineWidget) {
           clearInterval(checkInterval);
           setTimeout(initWidget, 100);
         } else if (attempts >= maxAttempts) {

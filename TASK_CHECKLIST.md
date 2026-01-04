@@ -17,24 +17,24 @@
 
 ### 2. Fix Image Carousel for Mobile View
 
-**Status:** ⏳ Pending
+**Status:** ✅ Completed
 
-- [ ] Fix landscape video display on mobile in `components/ui/framer-carousel.tsx`
-- [ ] Adjust video container height for mobile (currently `h-[800px]` and `h-[700px]`)
-- [ ] Ensure videos maintain aspect ratio on mobile
-- [ ] Test on various mobile screen sizes
-- **Files to modify:**
+- [x] Fix landscape video display on mobile in `components/ui/framer-carousel.tsx`
+- [x] Adjust video container height for mobile (now uses `aspect-video` with `max-h-[700px]`)
+- [x] Ensure videos maintain aspect ratio on mobile (uses `object-contain` on mobile, `object-cover` on desktop)
+- [x] Test on various mobile screen sizes
+- **Files modified:**
   - `components/ui/framer-carousel.tsx`
 
 ### 3. Create About Page with LinkedIn Text
 
-**Status:** ⏳ Pending
+**Status:** ✅ Completed
 
-- [ ] Create `app/about/page.tsx`
-- [ ] Add LinkedIn profile information
-- [ ] Include company/about information
-- [ ] Link from navbar/footer if needed
-- **Files to create:**
+- [x] Create `app/about/page.tsx`
+- [x] Add LinkedIn profile information (all leadership team members have LinkedIn links)
+- [x] Include company/about information (Overview, Leadership, Lab sections)
+- [x] Link from navbar/footer (added to navbar navigation)
+- **Files created:**
   - `app/about/page.tsx`
 
 ### 4. Remove Company-Based Filtering

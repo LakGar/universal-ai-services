@@ -128,18 +128,21 @@ export function FramerCarousel() {
   }, [index]);
 
   return (
-    <div className="lg:p-10 sm:p-4 p-2 max-w-7xl mx-auto  h-[800px]">
+    <div className="lg:p-10 sm:p-4 p-2 max-w-7xl mx-auto">
       <div className="flex flex-col gap-3">
-        <div className="relative overflow-hidden rounded-lg" ref={containerRef}>
-          <motion.div className="flex" style={{ x }}>
+        <div 
+          className="relative overflow-hidden rounded-lg w-full aspect-video max-h-[700px] sm:max-h-[700px]"
+          ref={containerRef}
+        >
+          <motion.div className="flex h-full" style={{ x }}>
             {items.map((item, i) => (
-              <div key={item.id} className="shrink-0 w-full h-[700px] relative">
+              <div key={item.id} className="shrink-0 w-full h-full relative flex items-center justify-center bg-black">
                 <video
                   ref={(el) => {
                     videoRefs.current[i] = el;
                   }}
                   src={item.url}
-                  className="w-full h-full object-cover rounded-lg select-none pointer-events-none"
+                  className="w-full h-full object-contain sm:object-cover rounded-lg select-none pointer-events-none"
                   draggable={false}
                   autoPlay={i === index}
                   muted
@@ -169,15 +172,15 @@ export function FramerCarousel() {
           <motion.button
             disabled={index === 0}
             onClick={() => setIndex((i) => Math.max(0, i - 1))}
-            className={`absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-transform z-10
+            className={`absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-lg transition-transform z-10
               ${
                 index === 0
                   ? "opacity-40 cursor-not-allowed"
-                  : "bg-white hover:scale-110 hover:opacity-100 opacity-70"
+                  : "bg-white/90 hover:scale-110 hover:opacity-100 opacity-70"
               }`}
           >
             <svg
-              className="w-6 h-6"
+              className="w-4 h-4 sm:w-6 sm:h-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -195,15 +198,15 @@ export function FramerCarousel() {
           <motion.button
             disabled={index === items.length - 1}
             onClick={() => setIndex((i) => Math.min(items.length - 1, i + 1))}
-            className={`absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-transform z-10
+            className={`absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-lg transition-transform z-10
               ${
                 index === items.length - 1
                   ? "opacity-40 cursor-not-allowed"
-                  : "bg-white hover:scale-110 hover:opacity-100 opacity-70"
+                  : "bg-white/90 hover:scale-110 hover:opacity-100 opacity-70"
               }`}
           >
             <svg
-              className="w-6 h-6"
+              className="w-4 h-4 sm:w-6 sm:h-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -217,13 +220,13 @@ export function FramerCarousel() {
             </svg>
           </motion.button>
           {/* Progress Indicator */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 p-2 bg-white/20 rounded-xl border border-white/30">
+          <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-black/40 sm:bg-white/20 backdrop-blur-sm rounded-xl border border-white/30">
             {items.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setIndex(i)}
-                className={`h-2 rounded-full transition-all ${
-                  i === index ? "w-8 bg-white" : "w-2 bg-white/50"
+                className={`h-1.5 sm:h-2 rounded-full transition-all ${
+                  i === index ? "w-6 sm:w-8 bg-white" : "w-1.5 sm:w-2 bg-white/50"
                 }`}
               />
             ))}

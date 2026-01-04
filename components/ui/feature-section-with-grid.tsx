@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 function Feature() {
   return (
     <section id="services" className="w-full  p-4">
-      <div className="container mx-auto">
+      <div className="container mx-auto my-20">
         <div className="flex flex-col gap-10">
           <motion.div
             className="flex gap-4 flex-col items-start"

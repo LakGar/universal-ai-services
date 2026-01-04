@@ -369,15 +369,6 @@ const Checkout1 = ({
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/services/buy"
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors border border-border rounded-lg hover:bg-muted/50"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Marketplace
-            </Link>
-          </div>
         </div>
         <FormProvider {...form}>
           <div>
@@ -1797,16 +1788,21 @@ const CartItem = ({
   onQuantityChange,
   onRemoveClick,
 }: CartItemProps) => {
+  // Hooks must be called before any early returns
+  const [imageLoading, setImageLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
+
   // Safety check: ensure price exists and has required properties
   if (!price || typeof price !== "object") {
-    logger.error("CartItem: Invalid price structure", new Error("Invalid price structure"), { price, name });
+    logger.error(
+      "CartItem: Invalid price structure",
+      new Error("Invalid price structure"),
+      { price, name }
+    );
     return null;
   }
 
   const { regular = 0, currency = "USD", consultationRequired = false } = price;
-  const [imageLoading, setImageLoading] = useState(true);
-  const [imageError, setImageError] = useState(false);
-
   const imageUrl = convertGoogleDriveUrl(image);
 
   return (

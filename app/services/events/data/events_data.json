@@ -1,48 +1,174 @@
 [
   {
-    "id": "robotics-summit-2025",
-    "title": "Robotics Innovation Summit 2025",
-    "description": "Join industry leaders, researchers, and innovators at the premier robotics conference of the year. Explore cutting-edge AI and robotics solutions, network with experts, and discover the future of autonomous systems.",
-    "longDescription": "The Robotics Innovation Summit 2025 brings together the brightest minds in robotics and AI. This three-day event features keynote presentations from industry leaders, hands-on workshops, product demonstrations, and networking opportunities. Learn about the latest developments in quadruped robots, humanoid systems, autonomous navigation, and AI integration. Whether you're a researcher, engineer, or business leader, this summit offers valuable insights into the future of robotics.",
-    "date": "2025-06-15",
-    "endDate": "2025-06-17",
-    "location": "San Francisco Convention Center, San Francisco, CA",
-    "venue": "Moscone Center",
-    "category": "Conference",
+    "id": "ces-2026-microip-partnership",
+    "title": "CES 2026: UAIS × MICROIP Partnership Announcement",
+    "description": "Today, we're preparing to unveil a new partnership with MICROIP at CES and share the first signal of what's next for UAIS. This is part of a broader effort we've been building toward for some time.",
+    "longDescription": "Today, we're preparing to unveil a new partnership with MICROIP at CES and share the first signal of what's next for UAIS.\n\nThis is part of a broader effort we've been building toward for some time. At the beginning of 2026, we'll reveal something significant that reflects where we're headed and the scale of what we're building.\n\nMore partnerships, more announcements, and more to share in the months ahead.\n\nCES® unites the brightest tech luminaries to pioneer the future and solve the world's biggest problems. This is where brands get business done, meet new partners and where the industry's sharpest minds take the stage to unveil their latest releases and boldest breakthroughs.\n\nThe world's most powerful tech event is your place to experience the innovations transforming how we live. This is where global brands get business done, meet new partners and where the industry's sharpest minds take the stage to unveil their latest releases and boldest breakthroughs.",
+    "date": "2026-01-06",
+    "endDate": "2026-01-09",
+    "location": "Las Vegas, NV",
+    "venue": "CES 2026",
+    "category": "Partnership",
     "status": "upcoming",
     "images": [
-      "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1200&q=80",
-      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80",
-      "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=1200&q=80"
+      "https://img.equipmentworld.com/files/base/randallreilly/all/image/2024/01/_2__CES2024_HD_Hyundai___Future_Xite_Zone.659ebc71ba11a.png?auto=format%2Ccompress&fit=max&q=70&w=1200"
+    ],
+    "hosts": [
+      {
+        "name": "CES",
+        "title": "Venue",
+        "image": "https://webfiles.experientevent.com/ShowCES261/landing-banner.png"
+      },
+      {
+        "name": "Benjamin Shlemis",
+        "title": "Host",
+        "image": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,anim=false,background=white,quality=75,width=112,height=112/avatars/iw/a62e6e02-1825-44b4-a119-83fe85e8a9e3.jpg"
+      },
+      {
+        "name": "Fernando Lorenzo",
+        "title": "Host",
+        "image": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,anim=false,background=white,quality=75,width=112,height=112/avatars/b5/b5aace91-54c8-47f4-aa07-0230472a7820"
+      },
+      {
+        "name": "MICROIP",
+        "title": "Partner",
+        "image": "https://media.licdn.com/dms/image/v2/C560BAQFNlOYEJxbOlw/company-logo_200_200/company-logo_200_200/0/1644888184364/microip_inc_logo?e=1769040000&v=beta&t=ibP_jMm3UUJR472R9RR9iQiXRoJZgnVK9oRYnRzPtHE"
+      }
+    ],
+    "speakers": [],
+    "agenda": [],
+    "registrationUrl": "https://registration.experientevent.com/showCES261/Wizard/Landing",
+    "price": "Registration Required",
+    "capacity": null,
+    "tags": [
+      "CES",
+      "Partnership",
+      "MICROIP",
+      "Technology",
+      "Innovation",
+      "Las Vegas"
+    ],
+    "highlights": [
+      "Partnership announcement with MICROIP",
+      "First signal of what's next for UAIS",
+      "Major reveal at the beginning of 2026",
+      "Part of CES 2026 - the world's most powerful tech event",
+      "Where global brands get business done and partnerships spark real growth"
+    ]
+  },
+  {
+    "id": "ai-healthcare-summit-2026",
+    "title": "AI x Healthcare - Silicon Valley Investing Summit",
+    "description": "Held during JP Morgan Healthcare Week, the Silicon Valley Investing Summit brings together select startups and accredited investors for curated dealflow and high-level networking.",
+    "longDescription": "Monday, January 12, 2026 | 10:00 AM – 6:00 PM\n\nHeld during JP Morgan Healthcare Week, the Silicon Valley Investing Summit brings together select startups and accredited investors for curated dealflow and high-level networking. Complimentary admission is available by written approval.\n\nBrought to you by SF Playground\nInstagram: https://www.instagram.com/Sfplayground/\nLinkedIn: https://www.linkedin.com/company/sfplayground/\n\nSponsored by UAIS (Universal AI Services)\nLinkedIn: https://www.linkedin.com/company/universalaiservices/?viewAsMember=true\n\nIn partnership with Angel Launch\nhttps://www.angellaunch.com/",
+    "date": "2026-01-12",
+    "endDate": "2026-01-12",
+    "location": "995 Market Street, San Francisco, CA",
+    "venue": "Frontier Tower @ Spaceship",
+    "category": "Summit",
+    "status": "upcoming",
+    "images": [
+      "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=1,background=white,quality=75,width=400,height=400/event-covers/lu/8a1b28bf-dc59-4196-a20f-4f56e4d1170d.png"
+    ],
+    "hosts": [
+      {
+        "name": "Frontier Tower",
+        "title": "Host",
+        "image": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,anim=false,background=white,quality=75,width=112,height=112/avatars/hm/b9771f51-8d9e-4430-8e64-c512bb701e0c.png"
+      },
+      {
+        "name": "Fernando",
+        "title": "Host",
+        "image": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,anim=false,background=white,quality=75,width=112,height=112/avatars/b5/b5aace91-54c8-47f4-aa07-0230472a7820"
+      },
+      {
+        "name": "Xenofon",
+        "title": "Host",
+        "image": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,anim=false,background=white,quality=75,width=112,height=112/avatars/kz/2470eeaa-ea94-4ecb-b446-e38ad63b7c1d"
+      },
+      {
+        "name": "FT Front Desk",
+        "title": "Host",
+        "image": "https://cdn.lu.ma/cdn-cgi/image/format=auto,fit=cover,dpr=2,anim=false,background=white,quality=75,width=112,height=112/avatars-default/avatar_5.png"
+      },
+      {
+        "name": "Benjamin Shlemis",
+        "title": "Host",
+        "image": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,anim=false,background=white,quality=75,width=112,height=112/avatars/iw/a62e6e02-1825-44b4-a119-83fe85e8a9e3.jpg"
+      }
     ],
     "speakers": [
       {
-        "name": "Dr. Sarah Chen",
-        "title": "Chief Robotics Officer, TechCorp",
-        "image": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80"
+        "name": "Gerald Wluka",
+        "title": "Angel",
+        "image": ""
       },
       {
-        "name": "Michael Rodriguez",
-        "title": "Founder, Autonomous Systems Inc.",
-        "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80"
+        "name": "Dr. R. Paul Singh",
+        "title": "Startup Strategies, Angel",
+        "image": ""
+      },
+      {
+        "name": "Monali Jain",
+        "title": "Autonomous Labs, VC Partner",
+        "image": ""
+      },
+      {
+        "name": "Joey Kong",
+        "title": "Langrenus Fund, Investor",
+        "image": ""
+      },
+      {
+        "name": "Dr. Shailesh Chavan",
+        "title": "Ingenious Global Venture Partners, Investor",
+        "image": ""
+      },
+      {
+        "name": "Abid Hussain",
+        "title": "Atlas Technology Ventures, Managing Director",
+        "image": ""
+      },
+      {
+        "name": "Keshia Theobald-van Gent",
+        "title": "BDVentures, Partner",
+        "image": ""
+      },
+      {
+        "name": "Han Ko",
+        "title": "USAKO Group, CEO",
+        "image": ""
+      },
+      {
+        "name": "Elyse Heob",
+        "title": "Angel Investor",
+        "image": ""
+      },
+      {
+        "name": "Christos Kolias",
+        "title": "Axcel Group, Investor",
+        "image": ""
+      },
+      {
+        "name": "Sunmeet Jolly",
+        "title": "Jolly VC, Managing Partner",
+        "image": ""
       }
     ],
     "agenda": [
       {
-        "time": "09:00",
-        "title": "Registration & Networking",
+        "time": "10:00",
+        "title": "Registration & Welcome",
         "type": "networking"
       },
       {
-        "time": "10:00",
-        "title": "Opening Keynote: The Future of Robotics",
-        "type": "keynote",
-        "speaker": "Dr. Sarah Chen"
+        "time": "10:30",
+        "title": "Opening Remarks",
+        "type": "keynote"
       },
       {
-        "time": "11:30",
-        "title": "Workshop: Building Autonomous Systems",
-        "type": "workshop"
+        "time": "11:00",
+        "title": "Startup Pitches & Investor Judging",
+        "type": "pitch"
       },
       {
         "time": "13:00",
@@ -51,177 +177,336 @@
       },
       {
         "time": "14:00",
-        "title": "Product Demonstrations",
-        "type": "demo"
-      }
-    ],
-    "registrationUrl": "https://calendly.com/lakgarg2002/advisory-meeting-1",
-    "price": "Early Bird: $299 | Regular: $399",
-    "capacity": 500,
-    "tags": ["Robotics", "AI", "Innovation", "Technology"]
-  },
-  {
-    "id": "ai-automation-expo-2025",
-    "title": "AI & Automation Expo 2025",
-    "description": "Discover the latest AI-powered automation solutions and robotics technologies. Connect with vendors, attend technical sessions, and see live demonstrations of cutting-edge systems.",
-    "longDescription": "The AI & Automation Expo is the largest gathering of automation professionals in North America. This two-day event showcases the latest innovations in artificial intelligence, machine learning, and robotic automation. Explore hundreds of exhibitor booths, attend technical presentations, and participate in hands-on training sessions. Perfect for manufacturing professionals, system integrators, and technology enthusiasts.",
-    "date": "2025-08-20",
-    "endDate": "2025-08-21",
-    "location": "Las Vegas Convention Center, Las Vegas, NV",
-    "venue": "South Hall",
-    "category": "Expo",
-    "status": "upcoming",
-    "images": [
-      "https://images.unsplash.com/photo-1555255707-c07966088b7b?w=1200&q=80",
-      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80",
-      "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=1200&q=80"
-    ],
-    "speakers": [
-      {
-        "name": "Dr. James Park",
-        "title": "Director of AI Research, Innovate Labs",
-        "image": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80"
-      }
-    ],
-    "agenda": [
-      {
-        "time": "08:00",
-        "title": "Expo Hall Opens",
-        "type": "expo"
+        "title": "Afternoon Sessions & Networking",
+        "type": "networking"
       },
       {
-        "time": "10:00",
-        "title": "Keynote: AI in Manufacturing",
-        "type": "keynote",
-        "speaker": "Dr. James Park"
-      },
-      {
-        "time": "14:00",
-        "title": "Live Demonstrations",
-        "type": "demo"
+        "time": "17:00",
+        "title": "Closing & Networking Reception",
+        "type": "networking"
       }
     ],
-    "registrationUrl": "https://calendly.com/lakgarg2002/advisory-meeting-1",
-    "price": "Free with Registration",
-    "capacity": 2000,
-    "tags": ["AI", "Automation", "Manufacturing", "Expo"]
+    "registrationUrl": "https://luma.com/ai-x-healthcare",
+    "price": "Complimentary (by written approval)",
+    "capacity": 217,
+    "tags": [
+      "Healthcare",
+      "AI",
+      "Investing",
+      "Startups",
+      "Networking",
+      "Summit"
+    ],
+    "highlights": []
   },
+
   {
-    "id": "robotics-workshop-2025",
-    "title": "Hands-On Robotics Workshop",
-    "description": "A practical workshop for engineers and developers interested in building and programming robots. Learn from experts and get hands-on experience with real hardware.",
-    "longDescription": "This intensive one-day workshop provides hands-on experience with robotics development. Participants will work with actual robot hardware, learn programming techniques, and understand system integration. Perfect for engineers, developers, and students looking to expand their robotics skills. Limited to 30 participants for personalized instruction.",
-    "date": "2025-09-10",
-    "endDate": "2025-09-10",
-    "location": "Universal AI Services HQ, San Francisco, CA",
-    "venue": "Training Lab",
-    "category": "Workshop",
-    "status": "upcoming",
+    "id": "ai-robotics-oct-2024",
+    "title": "AI x Robotics",
+    "description": "Join us at the heart of innovation for a night where founders, leaders, and investors connect to shape what is next in AI and Robotics.",
+    "longDescription": "Join us in the heart of San Francisco, where the global hub of innovation thrives, for an evening at the forefront of Artificial Intelligence and Robotics. Hosted by Universal AI Services, this event brings together industry leaders, fast-scaling startups, and top venture capital firms who are shaping the future of intelligent systems.\n\nExpect keynote talks from recognized experts, startup pitches reviewed by leading investors, and a networking dinner designed to connect you with the people driving real-world impact.\n\nThe community is intentionally designed to spark opportunities:\n\n• AI & Robotics leaders executives driving adoption in leading organizations\n• AI & Robotics founders fast-growing startups with real traction and bold ambitions\n• Investors and researchers venture capital firms and labs advancing the frontier\n\nThis is the room where ideas meet capital, where talent meets opportunity, and where the future of AI and Robotics comes into focus.",
+    "date": "2024-10-15",
+    "endDate": "2024-10-15",
+    "location": "995 Market St, San Francisco, CA",
+    "venue": "Frontier Tower",
+    "category": "Business",
+    "status": "past",
     "images": [
-      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80",
-      "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1200&q=80"
+      "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1136591713%2F2921119157241%2F1%2Foriginal.20250926-171140?crop=focalpoint&fit=crop&w=940&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.487&fp-y=0.028&s=5e5dab851cc1268d0e3cb6c649567abf"
     ],
     "speakers": [],
     "agenda": [
       {
-        "time": "09:00",
-        "title": "Introduction to Robotics Hardware",
-        "type": "workshop"
+        "time": "17:00",
+        "title": "Check-in & Network",
+        "type": "networking"
       },
       {
-        "time": "11:00",
-        "title": "Programming & Control Systems",
-        "type": "workshop"
+        "time": "17:30",
+        "title": "Program (keynote speakers + lightning round pitches from VC panels)",
+        "type": "keynote"
       },
       {
-        "time": "13:00",
-        "title": "Lunch Break",
-        "type": "break"
-      },
-      {
-        "time": "14:00",
-        "title": "Hands-On Project Session",
-        "type": "workshop"
-      },
-      {
-        "time": "16:00",
-        "title": "Q&A and Networking",
+        "time": "18:30",
+        "title": "Dinner & Networking",
         "type": "networking"
       }
     ],
-    "registrationUrl": "https://calendly.com/lakgarg2002/advisory-meeting-1",
-    "price": "$199",
-    "capacity": 30,
-    "tags": ["Workshop", "Hands-On", "Training", "Development"]
-  },
-  {
-    "id": "tech-showcase-2024",
-    "title": "Technology Showcase 2024",
-    "description": "Annual showcase of the latest robotics and AI technologies. Featured product launches, demonstrations, and networking opportunities.",
-    "longDescription": "Our annual Technology Showcase brought together industry professionals to explore the latest innovations in robotics and AI. The event featured product launches, live demonstrations, and expert presentations on emerging technologies.",
-    "date": "2024-11-15",
-    "endDate": "2024-11-15",
-    "location": "San Francisco, CA",
-    "venue": "Moscone Center",
-    "category": "Showcase",
-    "status": "past",
-    "images": [
-      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80",
-      "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=1200&q=80",
-      "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=1200&q=80"
-    ],
-    "speakers": [
-      {
-        "name": "Dr. Emily Watson",
-        "title": "VP of Engineering, RoboTech",
-        "image": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&q=80"
-      }
-    ],
-    "agenda": [],
     "registrationUrl": "",
-    "price": "Free",
-    "capacity": 300,
-    "tags": ["Showcase", "Product Launch", "Networking"],
+    "price": "Invitation Only",
+    "capacity": 0,
+    "tags": ["Business", "Startups", "AI", "Robotics", "Networking"],
     "highlights": [
-      "Launched 5 new robot models",
-      "500+ attendees",
-      "15 product demonstrations",
-      "Networking reception"
+      "Keynote talks from recognized experts",
+      "Startup pitches reviewed by leading investors",
+      "Networking dinner with industry leaders",
+      "Connecting founders, leaders, and investors"
     ]
   },
   {
-    "id": "autonomous-systems-forum-2024",
-    "title": "Autonomous Systems Forum 2024",
-    "description": "Deep dive into autonomous systems, navigation, and AI integration. Technical presentations and expert panels.",
-    "longDescription": "The Autonomous Systems Forum provided a comprehensive look at the state of autonomous robotics. Experts discussed navigation systems, AI integration, safety protocols, and real-world deployment challenges. The event included technical deep-dives, case studies, and panel discussions.",
-    "date": "2024-09-20",
-    "endDate": "2024-09-22",
-    "location": "Boston, MA",
-    "venue": "Hynes Convention Center",
-    "category": "Forum",
+    "id": "sf-robot-society-nov-2024",
+    "title": "SF Robot Society Social @ Modernist",
+    "description": "Modernist & SF Robot Society invites you to gather for a night dedicated to our future in SF among humanoids & robots.",
+    "longDescription": "🤖 Welcome to the Robot Society 🤖\n\nJoin us at The Modernist for Robot Society Night, a gathering where humans interested in humanoids mingle under one roof.\n\nThis is where visionaries, creators, and the robot-curious unite to explore how machines can enhance human life — from daily chores to dazzling performances.\n\nWhether you work in robotics, invest in the future, or simply love the thrill of innovation — SF Robot Society is your new playground.\n\n📍 Modernist, San Francisco\n🎟️ Invitation-only. Limited capacity.\n👗 Dress code: Futuristic chic — human or otherwise.",
+    "date": "2024-11-19",
+    "endDate": "2024-11-19",
+    "location": "Modernist, San Francisco, CA",
+    "venue": "The Modernist",
+    "category": "Social",
     "status": "past",
     "images": [
-      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80",
-      "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1200&q=80"
+      "https://partiful.imgix.net/external/user/Rg1XIwoopCgh2ak0mMIjRl6ADy02/735427f7-2fc8-4cd4-97?fit=clip&w=460&auto=format"
+    ],
+    "hosts": [
+      {
+        "name": "Kristopher Floyd",
+        "title": "Host",
+        "image": "https://partiful.imgix.net/profileImages/387e4ed1-fc31-49bd-b5_thumbnail?fit=clip&w=52&auto=format&dpr=1"
+      },
+      {
+        "name": "Robert Scoble",
+        "title": "Tech Futurist & Author",
+        "image": "https://partiful.imgix.net/profileImages/ETv9kPfEIOzbGkM_JeqLO_thumbnail?fit=clip&w=52&auto=format&dpr=1"
+      },
+      {
+        "name": "Anto Patrex",
+        "title": "CEO, CosmicBrain AI",
+        "image": "https://partiful.imgix.net/profileImages/1UwjyJpmxE1i14g34DdZ__thumbnail?fit=clip&w=52&auto=format&dpr=1"
+      },
+      {
+        "name": "Ben Holfeld",
+        "title": "Humanoid Demo",
+        "image": "https://partiful.imgix.net/profileImages/zJb1S09gm9q8R13d1yLs-_thumbnail?fit=clip&w=52&auto=format&dpr=1"
+      },
+      {
+        "name": "Ainur (Ann) Nygmet",
+        "title": "Humanoid Demo",
+        "image": "https://partiful.imgix.net/profileImages/2S_GSPjgf4Luia-7N2j0o_thumbnail?fit=clip&w=52&auto=format&dpr=1"
+      }
     ],
     "speakers": [
       {
-        "name": "Prof. David Kim",
-        "title": "MIT Robotics Lab",
-        "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&q=80"
+        "name": "Kristopher Floyd",
+        "title": "Speaker",
+        "image": "https://partiful.imgix.net/profileImages/387e4ed1-fc31-49bd-b5_thumbnail?fit=clip&w=52&auto=format&dpr=1"
+      },
+      {
+        "name": "Robert Scoble",
+        "title": "Tech Futurist & Author",
+        "image": "https://partiful.imgix.net/profileImages/ETv9kPfEIOzbGkM_JeqLO_thumbnail?fit=clip&w=52&auto=format&dpr=1"
+      },
+      {
+        "name": "Anto Patrex",
+        "title": "CEO, CosmicBrain AI",
+        "image": "https://partiful.imgix.net/profileImages/1UwjyJpmxE1i14g34DdZ__thumbnail?fit=clip&w=52&auto=format&dpr=1"
       }
     ],
-    "agenda": [],
+    "agenda": [
+      {
+        "time": "19:00",
+        "title": "Cocktails, snacks & networking",
+        "type": "networking"
+      },
+      {
+        "time": "20:15",
+        "title": "Fireside Chat: \"World Models and the Future of Robotics\"",
+        "type": "keynote",
+        "speaker": "Kristopher Floyd, Robert Scoble, Anto Patrex"
+      },
+      {
+        "time": "20:45",
+        "title": "Humanoid Demo with Ben Holfeld & Ainur (Ann) Nygmet",
+        "type": "demo"
+      },
+      {
+        "time": "21:00",
+        "title": "Drinks, music & networking with fellow builders, investors, and robot enthusiasts",
+        "type": "networking"
+      }
+    ],
     "registrationUrl": "",
-    "price": "Early Bird: $249 | Regular: $349",
-    "capacity": 400,
-    "tags": ["Autonomous Systems", "Navigation", "AI", "Technical"],
+    "price": "Invitation-only",
+    "capacity": 230,
+    "tags": ["Social", "Robotics", "Humanoids", "Networking", "San Francisco"],
     "highlights": [
-      "20+ technical presentations",
-      "400+ attendees",
-      "Expert panel discussions",
-      "Poster session"
+      "Fireside chat on World Models and the Future of Robotics",
+      "Humanoid robot demonstration",
+      "Networking with builders, investors, and robot enthusiasts",
+      "221 attendees on guest list"
+    ]
+  },
+  {
+    "id": "pitch-playoffs-physical-ai-2025",
+    "title": "Pitch Playoffs: Physical AI",
+    "description": "We're bringing together 10 early-stage startups across physical AI. Every attendee gets 3 voting tokens at check-in to \"invest\" in their favorite products during the booth showcase.",
+    "longDescription": "We're bringing together 10 early-stage startups across physical AI. Every attendee gets 3 voting tokens at check-in to \"invest\" in their favorite products during the booth showcase. Walk the room, meet founders, try products, and drop your tokens where you see the most potential.\n\nAt the end of the showcase, we'll tally the votes.\n\nThe top 3 startups earn a spot on stage for a Shark Tank–style pitch in front of a investor panel, with live feedback and a room full of builders watching.\n\nWho this is for:\n• Founders & startups looking for users, signal, and investor attention\n• Investors & angels looking for curated, pre-filtered dealflow\n• Operators, engineers, and tech folks who want to see what's being built next in SF",
+    "date": "2025-12-11",
+    "endDate": "2025-12-11",
+    "location": "995 Market St, San Francisco, CA 94103",
+    "venue": "Frontier Tower",
+    "category": "Business",
+    "status": "past",
+    "images": [
+      "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=1,background=white,quality=75,width=400,height=400/event-covers/h5/3a7fe764-5bdf-4253-9164-9ead4e914b51.jpg"
+    ],
+    "hosts": [
+      {
+        "name": "Fernando",
+        "title": "Host",
+        "image": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,anim=false,background=white,quality=75,width=112,height=112/avatars/b5/b5aace91-54c8-47f4-aa07-0230472a7820"
+      },
+      {
+        "name": "Benjamin Shlemis",
+        "title": "Host",
+        "image": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,anim=false,background=white,quality=75,width=112,height=112/avatars/kz/2470eeaa-ea94-4ecb-b446-e38ad63b7c1d"
+      },
+      {
+        "name": "Xenofon",
+        "title": "Host",
+        "image": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,anim=false,background=white,quality=75,width=112,height=112/avatars/hm/b9771f51-8d9e-4430-8e64-c512bb701e0c.png"
+      },
+      {
+        "name": "FT Front Desk",
+        "title": "Host",
+        "image": "https://cdn.lu.ma/cdn-cgi/image/format=auto,fit=cover,dpr=2,anim=false,background=white,quality=75,width=112,height=112/avatars-default/avatar_5.png"
+      },
+      {
+        "name": "SF Playground",
+        "title": "Host",
+        "image": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,anim=false,background=white,quality=75,width=112,height=112/avatars/im/b9fe6e91-c074-4ea3-a23c-5743481850c8.png"
+      },
+      {
+        "name": "Ben Holfeld",
+        "title": "Host",
+        "image": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,anim=false,background=white,quality=75,width=112,height=112/avatars/7b/bdc86132-0d87-4765-b16e-12e503d97601"
+      },
+      {
+        "name": "Aexodus Capital",
+        "title": "Host",
+        "image": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,anim=false,background=white,quality=75,width=112,height=112/avatars/ke/9c9937f6-1881-485d-8fc0-bbe90ad1f732.jpg"
+      },
+      {
+        "name": "Zahava Stroud",
+        "title": "Host",
+        "image": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,anim=false,background=white,quality=75,width=112,height=112/avatars/ug/f7a879e6-475f-48a5-a09b-a721860248a0.jpg"
+      },
+      {
+        "name": "Mark",
+        "title": "Host",
+        "image": "https://cdn.lu.ma/cdn-cgi/image/format=auto,fit=cover,dpr=2,anim=false,background=white,quality=75,width=112,height=112/avatars-default/avatar_42.png"
+      }
+    ],
+    "speakers": [],
+    "agenda": [
+      {
+        "time": "17:30",
+        "title": "Doors Open",
+        "type": "networking"
+      },
+      {
+        "time": "18:00",
+        "title": "Startup booths, voting, networking, & get refreshments (3 tokens per attendee)",
+        "type": "networking"
+      },
+      {
+        "time": "19:30",
+        "title": "$5,000 analytics platform presentation mapping trends across 100k+ research papers",
+        "type": "presentation"
+      },
+      {
+        "time": "20:00",
+        "title": "Intermission & finalist announcement",
+        "type": "break"
+      },
+      {
+        "time": "20:30",
+        "title": "Live pitches: 3 finalists × investor panel Q&A",
+        "type": "pitch"
+      }
+    ],
+    "registrationUrl": "https://luma.com/ai-x-healthcare",
+    "price": "Free (Investor) | $15 (Standard) | $250 (Booth Package)",
+    "capacity": 92,
+    "tags": [
+      "Physical AI",
+      "Startups",
+      "Pitch",
+      "Investing",
+      "Networking",
+      "San Francisco"
+    ],
+    "highlights": [
+      "10 early-stage startups showcasing physical AI products",
+      "Shark Tank–style pitch competition",
+      "Top 3 startups pitch to investor panel",
+      "92 attendees",
+      "Voting tokens system for audience engagement"
+    ]
+  },
+  {
+    "id": "ai-physical-world-mit-harvard-series-2025",
+    "title": "AI in the Physical World: An MIT × Harvard Three-Part Series",
+    "description": "Universal AI Services convenes a three-month evening series in collaboration with the Harvard Club of San Francisco and the MIT Club of Northern California examining how artificial intelligence is increasingly embedded in the physical world and the industries that operate within it.",
+    "longDescription": "Universal AI Services convenes a three-month evening series in collaboration with the Harvard Club of San Francisco and the MIT Club of Northern California examining how artificial intelligence is increasingly embedded in the physical world and the industries that operate within it. The series takes place in San Francisco from 6:00 to 9:00 PM, with doors opening at 5:30 PM. Each program brings together researchers, technologists, practitioners, and industry leaders to explore the evolving relationship between AI systems, physical environments, and real-world deployment.\n\n**February 17 - Entertainment, Music, and Media**\n\nThe opening event examines how AI is reshaping entertainment, music, and film across both digital and physical contexts. As AI tools influence creative production, performance, and distribution, and as embodied systems enter studios, stages, and public spaces, this program considers the implications of intelligent technologies for cultural expression and audience experience. Topics include AI-assisted music and film production, immersive and interactive media, humanoid performers, and robotics in live and experiential settings.\n\n**March 11 - Physical AI**\n\nThe second event focuses on the technical foundations of AI systems that perceive, move, and act in the physical world. Discussions address advances in robotics, sensing, foundation models, autonomy, and edge intelligence, with particular attention to real-world perception, safety, and deployment beyond simulation. The program emphasizes both the opportunities and the limitations of current approaches to embodied intelligence.\n\n**April 16 - Construction and Real Estate**\n\nThe final event turns to the built environment, examining how AI is influencing construction and real estate through a combination of robotics and software. Topics include robotic labor, autonomous site inspection, AI-supported planning and simulation, development intelligence, and property analytics. The discussion considers how these technologies are reshaping design, construction workflows, and long-term management of buildings and urban systems.\n\nThrough this series, Universal AI Services facilitates dialogue across academic, technical, and industry communities, creating a shared space for careful examination of how AI is moving from research settings into everyday environments.",
+    "date": "2025-02-17",
+    "endDate": "2025-04-16",
+    "location": "San Francisco, CA",
+    "venue": "Register to See Address",
+    "category": "Series",
+    "status": "upcoming",
+    "images": [
+      "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=1,background=white,quality=75,width=400,height=400/event-covers/yx/a871dcd2-3d1e-42d0-bf14-a5ca8c4ed1c4.png"
+    ],
+    "hosts": [
+      {
+        "name": "Benjamin Shlemis",
+        "title": "Host",
+        "image": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,anim=false,background=white,quality=75,width=112,height=112/avatars/iw/a62e6e02-1825-44b4-a119-83fe85e8a9e3.jpg"
+      },
+      {
+        "name": "Fernando Lorenzo",
+        "title": "Host",
+        "image": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,anim=false,background=white,quality=75,width=112,height=112/avatars/b5/b5aace91-54c8-47f4-aa07-0230472a7820"
+      }
+    ],
+    "speakers": [],
+    "agenda": [
+      {
+        "time": "17:30",
+        "title": "Doors Open",
+        "type": "networking"
+      },
+      {
+        "time": "18:00",
+        "title": "Program Begins",
+        "type": "keynote"
+      },
+      {
+        "time": "21:00",
+        "title": "Program Ends",
+        "type": "networking"
+      }
+    ],
+    "registrationUrl": "https://luma.com/cg0smmhy",
+    "price": "Private Event - Registration Required",
+    "capacity": null,
+    "tags": [
+      "AI",
+      "Physical AI",
+      "MIT",
+      "Harvard",
+      "Series",
+      "Research",
+      "Technology",
+      "San Francisco"
+    ],
+    "highlights": [
+      "Three-part series in collaboration with Harvard Club of San Francisco and MIT Club of Northern California",
+      "February 17: Entertainment, Music, and Media",
+      "March 11: Physical AI",
+      "April 16: Construction and Real Estate",
+      "Each session 6:00 PM - 9:00 PM (doors at 5:30 PM)",
+      "Brings together researchers, technologists, practitioners, and industry leaders"
     ]
   }
 ]
-

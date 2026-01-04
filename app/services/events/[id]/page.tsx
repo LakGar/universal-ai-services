@@ -3,8 +3,6 @@
 import * as React from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
-import { motion } from "framer-motion";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -19,18 +17,20 @@ import { CartIcon } from "@/components/cart-icon";
 import { WishlistIcon } from "@/components/wishlist-icon";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   Calendar,
   MapPin,
-  Clock,
   Users,
   ChevronLeft,
   ChevronRight,
   Check,
   ExternalLink,
 } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 import eventsData from "../data/events_data.json";
 
 // Helper function to extract file ID from Google Drive URL
@@ -95,6 +95,16 @@ const formatTime = (timeString: string): string => {
   return `${displayHour}:${minutes} ${ampm}`;
 };
 
+// Get initials from name
+const getInitials = (name: string): string => {
+  if (!name) return "?";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return name.substring(0, 2).toUpperCase();
+};
+
 export default function EventDetailPage() {
   const { state, isMobile } = useSidebar();
   const params = useParams();
@@ -108,9 +118,6 @@ export default function EventDetailPage() {
       ? eventsData[eventIndex + 1]
       : null;
   const prevEvent = eventIndex > 0 ? eventsData[eventIndex - 1] : null;
-
-  const [currentImageIndex, setCurrentImageIndex] = React.useState(0);
-  const [imageLoading, setImageLoading] = React.useState(true);
 
   // Calculate header left position based on sidebar state
   const getHeaderLeft = () => {
@@ -159,11 +166,11 @@ export default function EventDetailPage() {
             <CartIcon />
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-20 min-w-0">
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-20 min-w-0 mt-10">
           <div className="text-center py-12">
             <h1 className="text-2xl font-semibold mb-2">Event not found</h1>
             <p className="text-muted-foreground mb-4">
-              The event you're looking for doesn't exist.
+              The event you&apos;re looking for doesn&apos;t exist.
             </p>
             <Button onClick={() => router.push("/services/events")}>
               Back to Events
@@ -173,19 +180,6 @@ export default function EventDetailPage() {
       </>
     );
   }
-
-  const images = event.images || [];
-  const currentImage = images[currentImageIndex]
-    ? getImageUrl(images[currentImageIndex])
-    : "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1200&q=80";
-
-  const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % images.length);
-  };
-
-  const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
-  };
 
   return (
     <>
@@ -226,324 +220,253 @@ export default function EventDetailPage() {
         </div>
       </header>
       <div className="flex flex-1 flex-col min-w-0">
-        {/* Hero Section with Image */}
-        {images.length > 0 && (
-          <div className="relative w-full h-[60vh] min-h-[500px] max-h-[700px] overflow-hidden">
-            <div className="absolute inset-0">
-              {imageLoading && <Skeleton className="absolute inset-0" />}
-              <Image
-                src={currentImage}
-                alt={event.title}
-                fill
-                className="object-cover"
-                onLoad={() => setImageLoading(false)}
-                sizes="100vw"
-                priority
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-b from-background/40 to-transparent" />
-            </div>
-
-            {/* Navigation for images */}
-            {images.length > 1 && (
-              <>
-                <button
-                  onClick={prevImage}
-                  className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-background/90 backdrop-blur-md hover:bg-background border border-border text-foreground flex items-center justify-center transition-all shadow-lg hover:scale-110 z-10"
-                >
-                  <ChevronLeft className="w-6 h-6" />
-                </button>
-                <button
-                  onClick={nextImage}
-                  className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-background/90 backdrop-blur-md hover:bg-background border border-border text-foreground flex items-center justify-center transition-all shadow-lg hover:scale-110 z-10"
-                >
-                  <ChevronRight className="w-6 h-6" />
-                </button>
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 bg-background/80 backdrop-blur-md px-4 py-2 rounded-full border border-border">
-                  {images.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentImageIndex(index)}
-                      className={`h-2 rounded-full transition-all ${
-                        index === currentImageIndex
-                          ? "bg-primary w-8"
-                          : "bg-muted-foreground/50 w-2 hover:bg-muted-foreground/70"
-                      }`}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
-
-            {/* Title Overlay */}
-            <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12 lg:p-16">
-              <div className="max-w-7xl mx-auto">
-                <div className="flex items-center gap-3 mb-4">
-                  <Badge
-                    variant={
-                      event.status === "upcoming" ? "default" : "secondary"
-                    }
-                    className="text-sm px-3 py-1"
-                  >
-                    {event.status === "upcoming" ? "Upcoming" : "Past"}
-                  </Badge>
-                  <Badge
-                    variant="outline"
-                    className="bg-background/90 backdrop-blur-sm text-sm px-3 py-1"
-                  >
-                    {event.category}
-                  </Badge>
-                </div>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-foreground drop-shadow-lg">
-                  {event.title}
-                </h1>
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className="flex flex-1 flex-col gap-6 p-6 md:p-8 lg:p-12 max-w-7xl mx-auto w-full">
+        <div className="flex flex-1 flex-col gap-6 p-6 md:p-8 lg:p-12 max-w-7xl mx-auto w-full mt-10">
           {/* Back Button */}
           <Button
             variant="ghost"
             onClick={() => router.push("/services/events")}
             className="w-fit"
           >
-            <ChevronLeft className="w-4 h-4 mr-2" />
+            <ChevronLeft className="w-4 h-4 mr-2 " />
             Back to Events
           </Button>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Event Details - Only show if no hero image */}
-              {images.length === 0 && (
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center gap-2 mb-2">
-                      <Badge
-                        variant={
-                          event.status === "upcoming" ? "default" : "secondary"
-                        }
-                      >
-                        {event.status === "upcoming" ? "Upcoming" : "Past"}
-                      </Badge>
-                      <Badge variant="outline">{event.category}</Badge>
-                    </div>
-                    <CardTitle className="text-3xl mb-2">
-                      {event.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground leading-relaxed text-lg">
-                      {event.longDescription || event.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Description Card */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-2xl">About This Event</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground leading-relaxed text-base">
-                    {event.longDescription || event.description}
-                  </p>
-                </CardContent>
-              </Card>
+            <div className="lg:col-span-2 space-y-8">
+              {/* Event Details */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Badge
+                    variant={
+                      event.status === "upcoming" ? "default" : "secondary"
+                    }
+                  >
+                    {event.status === "upcoming" ? "Upcoming" : "Past"}
+                  </Badge>
+                  <Badge variant="outline">{event.category}</Badge>
+                </div>
+                <h1 className="text-4xl md:text-5xl font-bold">
+                  {event.title}
+                </h1>
+                <p className="text-muted-foreground leading-relaxed text-lg">
+                  {event.longDescription || event.description}
+                </p>
+              </div>
 
               {/* Event Information */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-2xl">Event Information</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                        <Calendar className="w-6 h-6 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-base mb-1">Date</p>
-                        <p className="text-muted-foreground">
-                          {event.endDate
-                            ? formatDateRange(event.date, event.endDate)
-                            : formatDate(event.date)}
-                        </p>
-                      </div>
+              <div className="space-y-6">
+                <h2 className="text-2xl font-semibold">Event Information</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                      <Calendar className="w-6 h-6 text-primary" />
                     </div>
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                        <MapPin className="w-6 h-6 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-base mb-1">Location</p>
-                        <p className="text-muted-foreground">
-                          {event.location}
-                        </p>
-                        {event.venue && (
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {event.venue}
-                          </p>
-                        )}
-                      </div>
+                    <div>
+                      <p className="font-semibold text-base mb-1">Date</p>
+                      <p className="text-muted-foreground">
+                        {event.endDate
+                          ? formatDateRange(event.date, event.endDate)
+                          : formatDate(event.date)}
+                      </p>
                     </div>
-                    {event.capacity && (
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                          <Users className="w-6 h-6 text-primary" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-base mb-1">
-                            Capacity
-                          </p>
-                          <p className="text-muted-foreground">
-                            {event.capacity} attendees
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                    {event.price && (
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                          <span className="text-2xl font-bold text-primary">
-                            $
-                          </span>
-                        </div>
-                        <div>
-                          <p className="font-semibold text-base mb-1">Price</p>
-                          <p className="text-muted-foreground">{event.price}</p>
-                        </div>
-                      </div>
-                    )}
                   </div>
-
-                  {/* Tags */}
-                  {event.tags && event.tags.length > 0 && (
-                    <div className="pt-6 mt-6 border-t">
-                      <p className="font-semibold text-base mb-3">Tags</p>
-                      <div className="flex flex-wrap gap-2">
-                        {event.tags.map((tag) => (
-                          <Badge
-                            key={tag}
-                            variant="outline"
-                            className="text-sm px-3 py-1"
-                          >
-                            {tag}
-                          </Badge>
-                        ))}
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                      <MapPin className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-base mb-1">Location</p>
+                      <p className="text-muted-foreground">{event.location}</p>
+                      {event.venue && (
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {event.venue}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  {event.capacity && (
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                        <Users className="w-6 h-6 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-base mb-1">Capacity</p>
+                        <p className="text-muted-foreground">
+                          {event.capacity} attendees
+                        </p>
                       </div>
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                  {event.price && (
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                        <span className="text-2xl font-bold text-primary">
+                          $
+                        </span>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-base mb-1">Price</p>
+                        <p className="text-muted-foreground">{event.price}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Tags */}
+                {event.tags && event.tags.length > 0 && (
+                  <div className="pt-6 mt-6 border-t">
+                    <p className="font-semibold text-base mb-3">Tags</p>
+                    <div className="flex flex-wrap gap-2">
+                      {event.tags.map((tag) => (
+                        <Badge
+                          key={tag}
+                          variant="outline"
+                          className="text-sm px-3 py-1"
+                        >
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {/* Agenda */}
               {event.agenda && event.agenda.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-2xl">Agenda</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-6">
-                      {event.agenda.map((item, index) => (
-                        <div
-                          key={index}
-                          className="flex gap-6 pb-6 border-b last:border-0 last:pb-0"
-                        >
-                          <div className="shrink-0 w-24">
-                            <div className="text-lg font-bold text-primary">
-                              {formatTime(item.time)}
-                            </div>
-                          </div>
-                          <div className="flex-1 space-y-2">
-                            <p className="font-semibold text-base">
-                              {item.title}
-                            </p>
-                            {item.speaker && (
-                              <p className="text-sm text-muted-foreground">
-                                Speaker:{" "}
-                                <span className="font-medium">
-                                  {item.speaker}
-                                </span>
-                              </p>
-                            )}
-                            {item.type && (
-                              <Badge variant="outline" className="mt-2">
-                                {item.type}
-                              </Badge>
-                            )}
+                <div className="space-y-6">
+                  <h2 className="text-2xl font-semibold">Agenda</h2>
+                  <div className="space-y-6">
+                    {event.agenda.map((item, index) => (
+                      <div
+                        key={index}
+                        className="flex gap-6 pb-6 border-b last:border-0 last:pb-0"
+                      >
+                        <div className="shrink-0 w-24">
+                          <div className="text-lg font-bold text-primary">
+                            {formatTime(item.time)}
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
+                        <div className="flex-1 space-y-2">
+                          <p className="font-semibold text-base">
+                            {item.title}
+                          </p>
+                          {"speaker" in item && item.speaker && (
+                            <p className="text-sm text-muted-foreground">
+                              Speaker:{" "}
+                              <span className="font-medium">
+                                {item.speaker}
+                              </span>
+                            </p>
+                          )}
+                          {item.type && (
+                            <Badge variant="outline" className="mt-2">
+                              {item.type}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Hosts */}
+              {event.hosts && event.hosts.length > 0 && (
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-semibold">Hosts</h2>
+                  <div className="flex -space-x-3">
+                    {event.hosts.map((host, index) => {
+                      const hasImage = host.image && host.image.trim() !== "";
+                      return (
+                        <Tooltip key={index}>
+                          <TooltipTrigger asChild>
+                            <div
+                              className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-background ring-2 ring-border hover:ring-primary/50 transition-all hover:scale-110 hover:z-10 cursor-pointer"
+                              style={{ zIndex: event.hosts.length - index }}
+                            >
+                              {hasImage ? (
+                                <Image
+                                  src={host.image}
+                                  alt={host.name || "Host"}
+                                  fill
+                                  className="object-cover"
+                                  sizes="48px"
+                                />
+                              ) : (
+                                <div className="w-full h-full bg-primary/60 flex items-center justify-center text-primary-foreground font-semibold text-xs">
+                                  {getInitials(host.name || "Host")}
+                                </div>
+                              )}
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>{host.name || "Host"}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    })}
+                  </div>
+                </div>
               )}
 
               {/* Speakers */}
               {event.speakers && event.speakers.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-2xl">Speakers</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {event.speakers.map((speaker, index) => (
-                        <div
-                          key={index}
-                          className="flex gap-4 p-4 rounded-lg border hover:bg-muted/50 transition-colors"
-                        >
-                          <div className="relative w-20 h-20 rounded-full overflow-hidden shrink-0 ring-2 ring-primary/20">
-                            <Image
-                              src={
-                                speaker.image ||
-                                "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80"
-                              }
-                              alt={speaker.name}
-                              fill
-                              className="object-cover"
-                              sizes="80px"
-                            />
-                          </div>
-                          <div className="flex-1">
-                            <p className="font-semibold text-base mb-1">
-                              {speaker.name}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              {speaker.title}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-semibold">Speakers</h2>
+                  <div className="flex -space-x-3">
+                    {event.speakers.map((speaker, index) => {
+                      const hasImage =
+                        speaker.image && speaker.image.trim() !== "";
+                      return (
+                        <Tooltip key={index}>
+                          <TooltipTrigger asChild>
+                            <div
+                              className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-background ring-2 ring-border hover:ring-primary/50 transition-all hover:scale-110 hover:z-10 cursor-pointer"
+                              style={{ zIndex: event.speakers.length - index }}
+                            >
+                              {hasImage ? (
+                                <Image
+                                  src={speaker.image}
+                                  alt={speaker.name || "Speaker"}
+                                  fill
+                                  className="object-cover"
+                                  sizes="48px"
+                                />
+                              ) : (
+                                <div className="w-full h-full bg-primary/60 flex items-center justify-center text-primary-foreground font-semibold text-xs">
+                                  {getInitials(speaker.name || "Speaker")}
+                                </div>
+                              )}
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>{speaker.name || "Speaker"}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    })}
+                  </div>
+                </div>
               )}
 
               {/* Highlights (for past events) */}
               {event.highlights && event.highlights.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-2xl">Event Highlights</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-4">
-                      {event.highlights.map((highlight, index) => (
-                        <li key={index} className="flex items-start gap-4">
-                          <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                            <Check className="w-4 h-4 text-primary" />
-                          </div>
-                          <span className="text-base leading-relaxed">
-                            {highlight}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-semibold">Event Highlights</h2>
+                  <ul className="space-y-4">
+                    {event.highlights.map((highlight, index) => (
+                      <li key={index} className="flex items-start gap-4">
+                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                          <Check className="w-4 h-4 text-primary" />
+                        </div>
+                        <span className="text-base leading-relaxed">
+                          {highlight}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               )}
 
               {/* Navigation */}
@@ -578,44 +501,38 @@ export default function EventDetailPage() {
             </div>
 
             {/* Sidebar */}
-            <div className="space-y-6">
-              {/* Registration/CTA Card */}
+            <div className="space-y-8">
+              {/* Registration/CTA */}
               {event.status === "upcoming" && event.registrationUrl && (
-                <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background">
-                  <CardHeader>
-                    <CardTitle className="text-xl">Register Now</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      Secure your spot at this event. Limited availability.
-                    </p>
-                    <Button asChild className="w-full" size="lg">
-                      <a
-                        href={event.registrationUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Register Now
-                        <ExternalLink className="w-4 h-4 ml-2" />
-                      </a>
-                    </Button>
-                    {event.price && (
-                      <div className="pt-2 border-t">
-                        <p className="text-sm font-semibold text-center text-foreground">
-                          {event.price}
-                        </p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+                <div className="space-y-4 p-6 rounded-lg border border-primary/20 bg-gradient-to-br from-primary/5 to-background">
+                  <h3 className="text-xl font-semibold">Register Now</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Secure your spot at this event. Limited availability.
+                  </p>
+                  <Button asChild className="w-full" size="lg">
+                    <a
+                      href={event.registrationUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Register Now
+                      <ExternalLink className="w-4 h-4 ml-2" />
+                    </a>
+                  </Button>
+                  {event.price && (
+                    <div className="pt-4 border-t">
+                      <p className="text-sm font-semibold text-center text-foreground">
+                        {event.price}
+                      </p>
+                    </div>
+                  )}
+                </div>
               )}
 
               {/* Quick Info */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-xl">Quick Info</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
+              <div className="space-y-6">
+                <h3 className="text-xl font-semibold">Quick Info</h3>
+                <div className="space-y-6">
                   <div>
                     <p className="text-sm font-semibold mb-2 text-muted-foreground">
                       Category
@@ -655,8 +572,8 @@ export default function EventDetailPage() {
                       {event.status === "upcoming" ? "Upcoming" : "Past"}
                     </Badge>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
           </div>
         </div>
