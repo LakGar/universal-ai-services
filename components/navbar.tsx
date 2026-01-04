@@ -224,27 +224,18 @@ const Navbar = ({
             <Sheet>
               <SheetTrigger asChild>
                 <Button
-                  variant="outline"
+                  variant="secondary"
                   size="icon"
-                  className="bg-transparent border-white/20 text-white hover:bg-white/10"
+                  className="bg-white border-white/20 text-black hover:bg-white/10"
                 >
                   <Menu className="size-4" />
                 </Button>
               </SheetTrigger>
-              <SheetContent className="overflow-y-auto">
+              <SheetContent className="overflow-y-auto bg-white text-black">
                 <SheetHeader>
-                  <SheetTitle>
+                  <SheetTitle className="text-black">
                     <Link href="/" className="flex items-center gap-2">
-                      <img
-                        src="/logo.png"
-                        className="max-h-8 dark:hidden"
-                        alt="logo"
-                      />
-                      <img
-                        src="/logo-white.png"
-                        className="max-h-8 hidden dark:block"
-                        alt="logo"
-                      />
+                      <img src="/logo.png" className="max-h-8" alt="logo" />
                     </Link>
                   </SheetTitle>
                   <SheetDescription className="sr-only">
@@ -328,7 +319,7 @@ const renderMobileMenuItem = (item: MenuItem) => {
   if (item.items) {
     return (
       <AccordionItem key={item.title} value={item.title} className="border-b-0">
-        <AccordionTrigger className="text-md py-0 font-semibold hover:no-underline">
+        <AccordionTrigger className="text-md py-0 font-semibold hover:no-underline text-black">
           {item.title}
         </AccordionTrigger>
         <AccordionContent className="mt-2">
@@ -341,7 +332,11 @@ const renderMobileMenuItem = (item: MenuItem) => {
   }
 
   return (
-    <a key={item.title} href={item.url} className="text-md font-semibold">
+    <a
+      key={item.title}
+      href={item.url}
+      className="text-md font-semibold text-black"
+    >
       {item.title}
     </a>
   );
@@ -359,15 +354,15 @@ const SubMenuLink = ({ item }: { item: MenuItem }) => {
 
   return (
     <a
-      className="flex min-w-80 flex-row gap-4 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none hover:bg-muted hover:text-accent-foreground"
+      className="flex min-w-80 flex-row gap-4 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none hover:bg-gray-100 text-black"
       href={item.url}
       onClick={handleClick}
     >
-      <div className="text-foreground">{item.icon}</div>
+      <div className="text-black">{item.icon}</div>
       <div>
-        <div className="text-sm font-semibold">{item.title}</div>
+        <div className="text-sm font-semibold text-black">{item.title}</div>
         {item.description && (
-          <p className="text-sm leading-snug text-muted-foreground">
+          <p className="text-sm leading-snug text-gray-600">
             {item.description}
           </p>
         )}
