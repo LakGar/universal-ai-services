@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, Minus, Plus, ArrowLeft, X, ShoppingBag } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useState, useMemo, useEffect } from "react";
+import { useCallback, useState, useMemo, useEffect, useRef } from "react";
 import {
   Controller,
   FormProvider,
@@ -25,6 +25,40 @@ const stripePromise = stripePublishableKey
 import { cn } from "@/lib/utils";
 import { useCart } from "@/contexts/cart-context";
 import { logger } from "@/lib/logger";
+import Script from "next/script";
+
+// Google Maps types
+declare global {
+  interface Window {
+    google?: {
+      maps: {
+        places: {
+          Autocomplete: new (
+            input: HTMLInputElement,
+            options?: {
+              componentRestrictions?: { country?: string[] };
+              fields?: string[];
+              types?: string[];
+            }
+          ) => {
+            getPlace: () => {
+              address_components?: Array<{
+                types: string[];
+                long_name: string;
+                short_name: string;
+              }>;
+              formatted_address?: string;
+            };
+            addListener: (event: string, callback: () => void) => void;
+          };
+        };
+        event: {
+          clearInstanceListeners: (instance: unknown) => void;
+        };
+      };
+    };
+  }
+}
 
 import Image from "next/image";
 import { Price, PriceValue } from "@/components/shadcnblocks/price";
@@ -578,154 +612,256 @@ const ContactFields = () => {
 
 const AddressFields = () => {
   const form = useFormContext();
+  const [isGoogleLoaded, setIsGoogleLoaded] = useState(false);
+  const addressInputRef = useRef<HTMLInputElement | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const autocompleteRef = useRef<any>(null);
+
+  // Initialize autocomplete when Google is loaded
+  useEffect(() => {
+    if (
+      !isGoogleLoaded ||
+      !addressInputRef.current ||
+      !window.google?.maps?.places
+    )
+      return;
+
+    const Autocomplete = window.google.maps.places.Autocomplete;
+    const autocomplete = new Autocomplete(addressInputRef.current, {
+      componentRestrictions: { country: [] }, // Allow all countries
+      fields: ["address_components", "formatted_address"],
+      types: ["address"],
+    });
+
+    autocompleteRef.current = autocomplete;
+
+    autocomplete.addListener("place_changed", () => {
+      const place = autocomplete.getPlace();
+      if (!place.address_components) return;
+
+      // Extract address components
+      let streetNumber = "";
+      let route = "";
+      let city = "";
+      let postalCode = "";
+      let country = "";
+
+      place.address_components.forEach(
+        (component: { types: string[]; long_name: string }) => {
+          const types = component.types;
+
+          if (types.includes("street_number")) {
+            streetNumber = component.long_name;
+          }
+          if (types.includes("route")) {
+            route = component.long_name;
+          }
+          if (types.includes("locality")) {
+            city = component.long_name;
+          }
+          if (types.includes("postal_code")) {
+            postalCode = component.long_name;
+          }
+          if (types.includes("country")) {
+            country = component.long_name;
+          }
+        }
+      );
+
+      // Set form values
+      const fullAddress =
+        place.formatted_address || `${streetNumber} ${route}`.trim();
+      form.setValue("address.address", fullAddress);
+      if (city) form.setValue("address.city", city);
+      if (postalCode) form.setValue("address.postalCode", postalCode);
+      if (country) form.setValue("address.country", country);
+    });
+
+    return () => {
+      if (autocompleteRef.current && window.google?.maps?.event) {
+        window.google.maps.event.clearInstanceListeners(
+          autocompleteRef.current
+        );
+      }
+    };
+  }, [isGoogleLoaded, form]);
 
   return (
-    <FieldGroup className="gap-3.5">
-      <Controller
-        name="address.country"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel
-              className="text-sm font-normal"
-              htmlFor="checkout-country"
-            >
-              Country
-            </FieldLabel>
-            <Input
-              {...field}
-              id="checkout-country"
-              aria-invalid={fieldState.invalid}
-            />
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
-        )}
+    <>
+      {/* Load Google Places API */}
+      <Script
+        src={`https://maps.googleapis.com/maps/api/js?key=${
+          process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY || ""
+        }&libraries=places`}
+        strategy="lazyOnload"
+        onLoad={() => {
+          if (typeof window !== "undefined" && window.google?.maps?.places) {
+            setIsGoogleLoaded(true);
+          }
+        }}
       />
-      <div className="flex gap-3.5 max-sm:flex-col">
+      <FieldGroup className="gap-3.5">
         <Controller
-          name="address.firstName"
+          name="address.country"
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel
                 className="text-sm font-normal"
-                htmlFor="checkout-firstName"
+                htmlFor="checkout-country"
               >
-                First Name
+                Country
               </FieldLabel>
               <Input
                 {...field}
-                id="checkout-firstName"
+                id="checkout-country"
                 aria-invalid={fieldState.invalid}
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
         />
+        <div className="flex gap-3.5 max-sm:flex-col">
+          <Controller
+            name="address.firstName"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel
+                  className="text-sm font-normal"
+                  htmlFor="checkout-firstName"
+                >
+                  First Name
+                </FieldLabel>
+                <Input
+                  {...field}
+                  id="checkout-firstName"
+                  aria-invalid={fieldState.invalid}
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+          <Controller
+            name="address.lastName"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel
+                  className="text-sm font-normal"
+                  htmlFor="checkout-lastName"
+                >
+                  Last Name
+                </FieldLabel>
+                <Input
+                  {...field}
+                  id="checkout-lastName"
+                  aria-invalid={fieldState.invalid}
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+        </div>
         <Controller
-          name="address.lastName"
+          name="address.address"
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel
                 className="text-sm font-normal"
-                htmlFor="checkout-lastName"
+                htmlFor="checkout-address"
               >
-                Last Name
+                Address
               </FieldLabel>
               <Input
                 {...field}
-                id="checkout-lastName"
+                ref={(e) => {
+                  field.ref(e);
+                  if (e) {
+                    addressInputRef.current = e;
+                  }
+                }}
+                id="checkout-address"
+                aria-invalid={fieldState.invalid}
+                placeholder="Start typing your address..."
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+        <div className="flex gap-3.5 max-sm:flex-col">
+          <Controller
+            name="address.postalCode"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel
+                  className="text-sm font-normal"
+                  htmlFor="checkout-postalCode"
+                >
+                  Postal Code
+                </FieldLabel>
+                <Input
+                  {...field}
+                  id="checkout-postalCode"
+                  aria-invalid={fieldState.invalid}
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+          <Controller
+            name="address.city"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel
+                  className="text-sm font-normal"
+                  htmlFor="checkout-city"
+                >
+                  City
+                </FieldLabel>
+                <Input
+                  {...field}
+                  id="checkout-city"
+                  aria-invalid={fieldState.invalid}
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+        </div>
+        <Controller
+          name="address.phone"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel
+                className="text-sm font-normal"
+                htmlFor="checkout-phone"
+              >
+                Phone
+              </FieldLabel>
+              <Input
+                {...field}
+                id="checkout-phone"
                 aria-invalid={fieldState.invalid}
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
         />
-      </div>
-      <Controller
-        name="address.address"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel
-              className="text-sm font-normal"
-              htmlFor="checkout-address"
-            >
-              Address
-            </FieldLabel>
-            <Input
-              {...field}
-              id="checkout-address"
-              aria-invalid={fieldState.invalid}
-            />
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
-        )}
-      />
-      <div className="flex gap-3.5 max-sm:flex-col">
-        <Controller
-          name="address.postalCode"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel
-                className="text-sm font-normal"
-                htmlFor="checkout-postalCode"
-              >
-                Postal Code
-              </FieldLabel>
-              <Input
-                {...field}
-                id="checkout-postalCode"
-                aria-invalid={fieldState.invalid}
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-        <Controller
-          name="address.city"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel
-                className="text-sm font-normal"
-                htmlFor="checkout-city"
-              >
-                City
-              </FieldLabel>
-              <Input
-                {...field}
-                id="checkout-city"
-                aria-invalid={fieldState.invalid}
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-      </div>
-      <Controller
-        name="address.phone"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel
-              className="text-sm font-normal"
-              htmlFor="checkout-phone"
-            >
-              Phone
-            </FieldLabel>
-            <Input
-              {...field}
-              id="checkout-phone"
-              aria-invalid={fieldState.invalid}
-            />
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
-        )}
-      />
-    </FieldGroup>
+      </FieldGroup>
+    </>
   );
 };
 
