@@ -21,7 +21,6 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Heart,
-  Play,
   ChevronLeft,
   ChevronRight,
   Check,
@@ -34,7 +33,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import buyData from "../data/buy_data.json";
-import { addOns, getAllFilters, type AddOn } from "../data/addons";
+import { addOns, getAllFilters } from "../data/addons";
 import accessoryData from "@/app/data.json";
 import { isPriceOnDemand } from "@/lib/consultation-utils";
 
@@ -84,22 +83,32 @@ const convertGoogleDriveUrl = (
   }
 };
 
-// Helper function to get media items (images and videos) from Google Drive
-const getProductMedia = (item: any): { images: string[]; videos: string[] } => {
+// Helper function to get media items (images and videos) from Google Drive in original order
+const getProductMedia = (
+  item: any
+): {
+  images: string[];
+  videos: string[];
+  orderedMedia: Array<{ type: "image" | "video"; url: string }>;
+} => {
   const images: string[] = [];
   const videos: string[] = [];
+  const orderedMedia: Array<{ type: "image" | "video"; url: string }> = [];
 
   // If Images field exists and is an array, use it
   if (item.Images && Array.isArray(item.Images) && item.Images.length > 0) {
     item.Images.forEach((url: string) => {
-      if (isVideoUrl(url)) {
+      const isVideo = isVideoUrl(url);
+      if (isVideo) {
         videos.push(url);
+        orderedMedia.push({ type: "video", url });
       } else {
         images.push(url);
+        orderedMedia.push({ type: "image", url });
       }
     });
     if (images.length > 0 || videos.length > 0) {
-      return { images, videos };
+      return { images, videos, orderedMedia };
     }
   }
 
@@ -113,11 +122,13 @@ const getProductMedia = (item: any): { images: string[]; videos: string[] } => {
 
         if (isVideo) {
           videos.push(convertedUrl);
+          orderedMedia.push({ type: "video", url: convertedUrl });
         } else if (
           link.includes("drive.google.com") ||
           link.startsWith("http")
         ) {
           images.push(convertedUrl);
+          orderedMedia.push({ type: "image", url: convertedUrl });
         }
       } else if (typeof link === "object" && link !== null) {
         // Support object format: { url: "...", type: "video" | "image" }
@@ -129,14 +140,16 @@ const getProductMedia = (item: any): { images: string[]; videos: string[] } => {
 
         if (isVideo) {
           videos.push(convertedUrl);
+          orderedMedia.push({ type: "video", url: convertedUrl });
         } else {
           images.push(convertedUrl);
+          orderedMedia.push({ type: "image", url: convertedUrl });
         }
       }
     });
 
     if (images.length > 0 || videos.length > 0) {
-      return { images, videos };
+      return { images, videos, orderedMedia };
     }
   }
 
@@ -149,23 +162,30 @@ const getProductMedia = (item: any): { images: string[]; videos: string[] } => {
     const convertedUrl = convertGoogleDriveUrl(locationId, isVideo);
     if (isVideo) {
       videos.push(convertedUrl);
+      orderedMedia.push({ type: "video", url: convertedUrl });
     } else {
       images.push(convertedUrl);
+      orderedMedia.push({ type: "image", url: convertedUrl });
     }
     if (images.length > 0 || videos.length > 0) {
-      return { images, videos };
+      return { images, videos, orderedMedia };
     }
   }
 
   // Fallback to placeholder images
+  const fallbackImages = [
+    "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1200&q=80",
+    "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80",
+    "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80",
+    "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80",
+  ];
   return {
-    images: [
-      "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1200&q=80",
-      "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80",
-      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80",
-      "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80",
-    ],
+    images: fallbackImages,
     videos: [],
+    orderedMedia: fallbackImages.map((url) => ({
+      type: "image" as const,
+      url,
+    })),
   };
 };
 
@@ -176,8 +196,31 @@ const transformProductDetail = (item: any, index: number) => {
   const isNew = releaseYear >= 2024;
 
   // Get media (images and videos) from helper function
-  const { images: productImages, videos: productVideos } =
-    getProductMedia(item);
+  const {
+    images: productImages,
+    videos: productVideos,
+    orderedMedia,
+  } = getProductMedia(item);
+
+  // Add Video field if it exists and is not already in orderedMedia
+  const videoField = item.Video || item.video;
+  if (videoField && typeof videoField === "string" && videoField.trim()) {
+    const videoUrl = convertGoogleDriveUrl(videoField, true);
+    // Check if this video is not already in orderedMedia
+    if (
+      !orderedMedia.some(
+        (media) => media.url === videoUrl || media.url === videoField
+      )
+    ) {
+      orderedMedia.push({ type: "video", url: videoUrl });
+      if (
+        !productVideos.includes(videoUrl) &&
+        !productVideos.includes(videoField)
+      ) {
+        productVideos.push(videoUrl);
+      }
+    }
+  }
 
   // Parse specs from JSON
   const parseSpecs = (specsString: string) => {
@@ -264,18 +307,24 @@ const transformProductDetail = (item: any, index: number) => {
 
   // Get add-ons from "Add ons" field in buy_data.json and match with addons.ts
   const productAddOnNames = item["Add ons"] || [];
-  const matchedAddOns: Array<{ id: string; name: string; price: number; description: string }> = [];
+  const matchedAddOns: Array<{
+    id: string;
+    name: string;
+    price: number;
+    description: string;
+  }> = [];
   const preSelectedAddOnIds: string[] = [];
 
   if (Array.isArray(productAddOnNames) && productAddOnNames.length > 0) {
     productAddOnNames.forEach((addOnName: string) => {
       // Try to find matching add-on by name (case-insensitive, partial match)
       const matchedAddOn = addOns.find(
-        (a) => a.name.toLowerCase() === addOnName.toLowerCase() ||
-               a.name.toLowerCase().includes(addOnName.toLowerCase()) ||
-               addOnName.toLowerCase().includes(a.name.toLowerCase())
+        (a) =>
+          a.name.toLowerCase() === addOnName.toLowerCase() ||
+          a.name.toLowerCase().includes(addOnName.toLowerCase()) ||
+          addOnName.toLowerCase().includes(a.name.toLowerCase())
       );
-      
+
       if (matchedAddOn) {
         matchedAddOns.push({
           id: matchedAddOn.id,
@@ -315,6 +364,7 @@ const transformProductDetail = (item: any, index: number) => {
     images: productImages,
     videos: productVideos, // Array of video URLs
     video: productVideos.length > 0 ? productVideos[0] : item.Video || null, // First video or Video field
+    orderedMedia, // Preserve the original order of images and videos
     price: msrp,
     monthlyPrice: msrp > 0 ? msrp / 24 : 0,
     monthlyMonths: 24,
@@ -350,9 +400,18 @@ export default function ProductDetailPage() {
   const productId = parseInt(params.id as string);
   const product = allProducts.find((p) => p.id === productId);
 
-  // Combine images and videos into a single media array
+  // Use orderedMedia to preserve the original order of images and videos
   const allMedia = React.useMemo(() => {
     if (!product) return [];
+    // Use orderedMedia if available, otherwise fallback to combining images and videos
+    if (
+      product.orderedMedia &&
+      Array.isArray(product.orderedMedia) &&
+      product.orderedMedia.length > 0
+    ) {
+      return product.orderedMedia;
+    }
+    // Fallback: combine images and videos (images first, then videos)
     const media: Array<{ type: "image" | "video"; url: string }> = [];
     if (product.images && Array.isArray(product.images)) {
       product.images.forEach((url) => media.push({ type: "image", url }));
@@ -371,9 +430,10 @@ export default function ProductDetailPage() {
   const [selectedAddOns, setSelectedAddOns] = React.useState<Set<string>>(
     () => new Set(product?.preSelectedAddOnIds || [])
   );
-  const [isVideoPlaying, setIsVideoPlaying] = React.useState(false);
   const [mediaLoading, setMediaLoading] = React.useState(true);
-  const [thumbnailLoading, setThumbnailLoading] = React.useState<Set<number>>(new Set());
+  const [thumbnailLoading, setThumbnailLoading] = React.useState<Set<number>>(
+    new Set()
+  );
   const [showAllAddOns, setShowAllAddOns] = React.useState(false);
   const [showAllAccessories, setShowAllAccessories] = React.useState(false);
   const [selectedFilters, setSelectedFilters] = React.useState<Set<string>>(
@@ -391,11 +451,40 @@ export default function ProductDetailPage() {
     if (product) {
       setSelectedConfig(product.options.configurations[0].id);
       // Initialize selected add-ons with pre-selected ones
-      if (product.preSelectedAddOnIds && product.preSelectedAddOnIds.length > 0) {
+      if (
+        product.preSelectedAddOnIds &&
+        product.preSelectedAddOnIds.length > 0
+      ) {
         setSelectedAddOns(new Set(product.preSelectedAddOnIds));
       }
     }
   }, [product]);
+
+  // Check if consultation is required
+  const needsConsultation = React.useMemo(() => {
+    if (!product) return false;
+    // Check if price is on demand
+    if (isPriceOnDemand(product.price) || product.price === 0) {
+      return true;
+    }
+    // Check if any add-ons/accessories are selected
+    if (selectedAddOns.size > 0) {
+      return true;
+    }
+    return false;
+  }, [product, selectedAddOns.size]);
+
+  const handleToggleAddOn = React.useCallback((addOnId: string) => {
+    setSelectedAddOns((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(addOnId)) {
+        newSet.delete(addOnId);
+      } else {
+        newSet.add(addOnId);
+      }
+      return newSet;
+    });
+  }, []);
 
   if (!product) {
     return (
@@ -419,19 +508,6 @@ export default function ProductDetailPage() {
     return sum + (addOn?.price || 0);
   }, 0);
   const totalPrice = basePrice + addOnsTotal;
-
-  // Check if consultation is required
-  const needsConsultation = React.useMemo(() => {
-    // Check if price is on demand
-    if (isPriceOnDemand(product.price) || product.price === 0) {
-      return true;
-    }
-    // Check if any add-ons/accessories are selected
-    if (selectedAddOns.size > 0) {
-      return true;
-    }
-    return false;
-  }, [product.price, selectedAddOns.size]);
 
   const handleAddToCart = () => {
     // Get selected add-ons details (from accessories)
@@ -498,24 +574,10 @@ export default function ProductDetailPage() {
     }
   };
 
-  const handleToggleAddOn = React.useCallback((addOnId: string) => {
-    setSelectedAddOns((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(addOnId)) {
-        newSet.delete(addOnId);
-      } else {
-        newSet.add(addOnId);
-      }
-      return newSet;
-    });
-  }, []);
-
   const currentMedia = allMedia[selectedMediaIndex];
-  const isCurrentVideo = currentMedia?.type === "video";
 
   const nextMedia = () => {
     setSelectedMediaIndex((prev) => (prev + 1) % allMedia.length);
-    setIsVideoPlaying(false);
     setMediaLoading(true);
   };
 
@@ -523,7 +585,6 @@ export default function ProductDetailPage() {
     setSelectedMediaIndex(
       (prev) => (prev - 1 + allMedia.length) % allMedia.length
     );
-    setIsVideoPlaying(false);
     setMediaLoading(true);
   };
 
@@ -569,38 +630,18 @@ export default function ProductDetailPage() {
                 {mediaLoading && (
                   <Skeleton className="absolute inset-0 w-full h-full" />
                 )}
-                {isVideoPlaying && isCurrentVideo && currentMedia ? (
-                  <video
-                    src={currentMedia.url}
-                    controls
-                    autoPlay
-                    className="w-full h-full object-cover"
-                    onLoadedData={() => setMediaLoading(false)}
-                    onEnded={() => setIsVideoPlaying(false)}
-                  />
-                ) : currentMedia ? (
+                {currentMedia ? (
                   <>
                     {currentMedia.type === "video" ? (
-                      <div className="relative w-full h-full">
-                        <video
-                          src={currentMedia.url}
-                          className="w-full h-full object-cover"
-                          muted
-                          playsInline
-                          onLoadedData={() => setMediaLoading(false)}
-                        />
-                        <button
-                          onClick={() => setIsVideoPlaying(true)}
-                          className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors"
-                        >
-                          <div className="bg-white/90 rounded-full p-4">
-                            <Play
-                              className="size-12 text-black ml-1"
-                              fill="currentColor"
-                            />
-                          </div>
-                        </button>
-                      </div>
+                      <video
+                        src={currentMedia.url}
+                        className="w-full h-full object-cover"
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        onLoadedData={() => setMediaLoading(false)}
+                      />
                     ) : (
                       <Image
                         src={currentMedia.url}
@@ -649,7 +690,6 @@ export default function ProductDetailPage() {
                       key={index}
                       onClick={() => {
                         setSelectedMediaIndex(index);
-                        setIsVideoPlaying(false);
                         setMediaLoading(true);
                       }}
                       className={cn(
@@ -663,30 +703,26 @@ export default function ProductDetailPage() {
                         <Skeleton className="absolute inset-0 w-full h-full" />
                       )}
                       {media.type === "video" ? (
-                        <>
-                          <video
-                            src={media.url}
-                            className={cn(
-                              "w-full h-full object-cover transition-opacity duration-300",
-                              thumbnailLoading.has(index) ? "opacity-0" : "opacity-100"
-                            )}
-                            muted
-                            playsInline
-                            onLoadedData={() => {
-                              setThumbnailLoading((prev) => {
-                                const next = new Set(prev);
-                                next.delete(index);
-                                return next;
-                              });
-                            }}
-                          />
-                          <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                            <Play
-                              className="size-6 text-white"
-                              fill="currentColor"
-                            />
-                          </div>
-                        </>
+                        <video
+                          src={media.url}
+                          className={cn(
+                            "w-full h-full object-cover transition-opacity duration-300",
+                            thumbnailLoading.has(index)
+                              ? "opacity-0"
+                              : "opacity-100"
+                          )}
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                          onLoadedData={() => {
+                            setThumbnailLoading((prev) => {
+                              const next = new Set(prev);
+                              next.delete(index);
+                              return next;
+                            });
+                          }}
+                        />
                       ) : (
                         <Image
                           src={media.url}
@@ -694,7 +730,9 @@ export default function ProductDetailPage() {
                           fill
                           className={cn(
                             "object-cover transition-opacity duration-300",
-                            thumbnailLoading.has(index) ? "opacity-0" : "opacity-100"
+                            thumbnailLoading.has(index)
+                              ? "opacity-0"
+                              : "opacity-100"
                           )}
                           onLoad={() => {
                             setThumbnailLoading((prev) => {
@@ -762,11 +800,15 @@ export default function ProductDetailPage() {
                   <div className="flex flex-wrap gap-2">
                     {Array.from(selectedAddOns).map((addOnId) => {
                       // Try to find in product.addOns first (accessories)
-                      const addOn = product.addOns.find((a) => a.id === addOnId);
+                      const addOn = product.addOns.find(
+                        (a) => a.id === addOnId
+                      );
                       // If not found, try in comprehensive addOns from addons.ts
-                      const comprehensiveAddOn = !addOn ? addOns.find((a) => a.id === addOnId) : null;
+                      const comprehensiveAddOn = !addOn
+                        ? addOns.find((a) => a.id === addOnId)
+                        : null;
                       const displayAddOn = addOn || comprehensiveAddOn;
-                      
+
                       if (!displayAddOn) return null;
 
                       return (
@@ -853,19 +895,39 @@ export default function ProductDetailPage() {
                         />
                       </div>
                       <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium">{addOn.name}</span>
-                          <span className="text-sm font-semibold">
-                            {addOn.price > 0
-                              ? `$${addOn.price.toLocaleString()}`
-                              : "Contact for pricing"}
-                          </span>
+                        <div className="flex items-start gap-3">
+                          {[
+                            "MIP-EDGE-FACEREC",
+                            "MIP-EDGE-GESTURE",
+                            "MIP-EDGE-VIRTFENCE",
+                            "MIP-EDGE-FALL",
+                            "MIP-EDGE-FLOW",
+                            "MIP-EDGE-LPR",
+                          ].includes(addOn.id) && (
+                            <Image
+                              src="https://media.licdn.com/dms/image/v2/C560BAQFNlOYEJxbOlw/company-logo_200_200/company-logo_200_200/0/1644888184364/microip_inc_logo?e=1769040000&v=beta&t=ibP_jMm3UUJR472R9RR9iQiXRoJZgnVK9oRYnRzPtHE"
+                              alt="MicroIP Logo"
+                              width={48}
+                              height={48}
+                              className="rounded-sm object-contain shrink-0"
+                            />
+                          )}
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="font-medium">{addOn.name}</span>
+                              <span className="text-sm font-semibold shrink-0">
+                                {addOn.price > 0
+                                  ? `$${addOn.price.toLocaleString()}`
+                                  : "Contact for pricing"}
+                              </span>
+                            </div>
+                            {addOn.description && (
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {addOn.description}
+                              </p>
+                            )}
+                          </div>
                         </div>
-                        {addOn.description && (
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {addOn.description}
-                          </p>
-                        )}
                       </div>
                     </div>
                   ))}

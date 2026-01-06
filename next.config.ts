@@ -104,6 +104,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "d2cdo4blch85n8.cloudfront.net",
       },
+      {
+        protocol: "https",
+        hostname: "icon2.cleanpng.com",
+      },
     ],
   },
 };

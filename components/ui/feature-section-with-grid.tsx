@@ -68,8 +68,8 @@ function Feature() {
                 href: "/services/accessories",
                 name: "Accessories",
                 description: "Find the perfect accessory for your robot.",
-                image:
-                  "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&q=80",
+                video:
+                  "https://oss-global-cdn.unitree.com/2022/6/16/a9413497b2c34278a1f2ebab187d0059.mp4",
                 alt: "Accessories",
               },
               {
@@ -108,12 +108,25 @@ function Feature() {
                   className="flex flex-col gap-2 group cursor-pointer transition-all duration-300 hover:scale-105 "
                 >
                   <div className="relative rounded-md aspect-video mb-2 overflow-hidden bg-muted">
-                    <Image
-                      src={service.image}
-                      alt={service.alt}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
+                    {service.video ? (
+                      <video
+                        src={service.video}
+                        className="w-full h-full object-cover"
+                        muted
+                        loop
+                        playsInline
+                        autoPlay
+                      />
+                    ) : (
+                      service.image && (
+                        <Image
+                          src={service.image}
+                          alt={service.alt}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                      )
+                    )}
                   </div>
                   <h3 className="text-xl tracking-tight group-hover:text-primary transition-colors">
                     {service.name}

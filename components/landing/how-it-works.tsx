@@ -13,7 +13,7 @@ const steps = [
     description:
       "Browse our curated selection of production-ready robotics and AI systems. Select from our catalog or specify custom requirements.",
     image:
-      "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&auto=format&fit=crop&q=80",
+      "https://www.unitree.com/images/1155fcb4d7204146af8de1154c8160d4_2880x1470.jpg",
   },
   {
     number: "02",

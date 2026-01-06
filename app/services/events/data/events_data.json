@@ -15,11 +15,6 @@
     ],
     "hosts": [
       {
-        "name": "CES",
-        "title": "Venue",
-        "image": "https://webfiles.experientevent.com/ShowCES261/landing-banner.png"
-      },
-      {
         "name": "Benjamin Shlemis",
         "title": "Host",
         "image": "https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,anim=false,background=white,quality=75,width=112,height=112/avatars/iw/a62e6e02-1825-44b4-a119-83fe85e8a9e3.jpg"
