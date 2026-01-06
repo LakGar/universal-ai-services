@@ -53,8 +53,7 @@ const capabilities = [
       "Tailored robotic solutions and software features built to your specifications",
     hoverText:
       "Custom firmware, specialized algorithms, and proprietary features for unique use cases",
-    image:
-      "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&auto=format&fit=crop&q=80",
+    image: "/custom-dev.jpg",
   },
   {
     icon: Headphones,

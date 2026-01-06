@@ -59,6 +59,15 @@ const leadership = [
     image:
       "https://images.squarespace-cdn.com/content/v1/68c3b30180e4d46760cbd2a5/e4006c52-c8a0-4147-a6e3-4122fa57a7c9/Screenshot+2025-10-25+at+3.51.47%E2%80%AFPM.png?format=1500w",
   },
+  {
+    name: "John Doe",
+    title: "Marketing Director",
+
+    bio: "25+ Years of Experience in Business Marketing & Enterprise Partnerships, Leads global marketing strategy and partner engagement across vendors and manufacturing networks, supporting enterprise and international deployment of Physical AI and robotics systems.",
+    linkedin:
+      "https://www.linkedin.com/in/mark-cheng-a9a90a77?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app",
+    image: "/mark.jpg",
+  },
 ];
 
 export default function AboutPage() {
@@ -70,7 +79,7 @@ export default function AboutPage() {
     alt: "AI and Robotics Technology",
   };
   const secondaryImage = {
-    src: "https://images.unsplash.com/photo-1643199329419-1e46bbacf76c?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NTl8fHJvYm90aWNzfGVufDB8fDB8fHww",
+    src: "/about.jpg",
     alt: "Robotics Innovation",
   };
   const breakout = {

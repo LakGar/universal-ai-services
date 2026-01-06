@@ -1,6 +1,7 @@
 # Universal AI Services - Website Development Project
 
 ## Project Overview
+
 A comprehensive e-commerce marketplace and event management platform for Universal AI Services, featuring product catalog, rental services, event management, and integrated payment processing.
 
 ---
@@ -8,7 +9,9 @@ A comprehensive e-commerce marketplace and event management platform for Univers
 ## 🛍️ E-Commerce Features
 
 ### Product Catalog System
+
 - **Buy Page** with categorized product listings
+
   - Tab-based navigation (Quadruped Robots, Humanoid Robots)
   - Hero image/video slider with auto-play functionality
   - Dynamic content based on active category
@@ -16,6 +19,7 @@ A comprehensive e-commerce marketplace and event management platform for Univers
   - Mobile-responsive horizontal scrolling tabs
 
 - **Rent Page** with rental product listings
+
   - Category-based filtering (Events, Entertainment, Healthcare, Industrial, Retail)
   - Hero slider with category-specific content
   - Product cards with rental pricing
@@ -31,7 +35,9 @@ A comprehensive e-commerce marketplace and event management platform for Univers
   - Responsive media display
 
 ### Shopping Experience
+
 - **Shopping Cart**
+
   - Persistent cart across sessions
   - Quantity management
   - Item removal
@@ -48,7 +54,9 @@ A comprehensive e-commerce marketplace and event management platform for Univers
 ## 🎫 Event Management System
 
 ### Event Listings
+
 - **Events Page**
+
   - Event cards with images and details
   - Featured events display
   - Past and upcoming events
@@ -64,6 +72,7 @@ A comprehensive e-commerce marketplace and event management platform for Univers
   - Responsive layout
 
 ### Event Data Management
+
 - JSON-based event data structure
 - Support for multiple hosts and speakers
 - Event images and host avatars
@@ -75,6 +84,7 @@ A comprehensive e-commerce marketplace and event management platform for Univers
 ## 💳 Payment & Checkout System
 
 ### Stripe Integration
+
 - **Payment Processing**
   - Stripe Payment Intents integration
   - Secure payment handling
@@ -82,6 +92,7 @@ A comprehensive e-commerce marketplace and event management platform for Univers
   - Error handling
 
 ### Checkout Flow
+
 - **Multi-step Checkout Process**
   - Customer information form
   - Address fields with Google Places Autocomplete
@@ -92,6 +103,7 @@ A comprehensive e-commerce marketplace and event management platform for Univers
   - Responsive checkout forms
 
 ### Address Autocomplete
+
 - Google Places API integration
 - Real-time address suggestions
 - Automatic form field population
@@ -102,7 +114,9 @@ A comprehensive e-commerce marketplace and event management platform for Univers
 ## 🎨 User Interface & Design
 
 ### Landing Page
+
 - **Hero Section**
+
   - Configurable robot cards (up to 7 robots)
   - Support for both buy and rent products
   - Custom images and names per robot
@@ -115,7 +129,9 @@ A comprehensive e-commerce marketplace and event management platform for Univers
 - **Feature Highlights**
 
 ### Navigation
+
 - **Responsive Sidebar Navigation**
+
   - Collapsible sidebar
   - Mobile drawer menu
   - Breadcrumb navigation
@@ -128,6 +144,7 @@ A comprehensive e-commerce marketplace and event management platform for Univers
   - Dynamic positioning based on sidebar state
 
 ### UI Components
+
 - **Custom Components**
   - Product cards
   - Event cards
@@ -144,6 +161,7 @@ A comprehensive e-commerce marketplace and event management platform for Univers
 ## 📱 Responsive Design
 
 ### Mobile Optimization
+
 - **Mobile-First Approach**
   - Responsive layouts for all pages
   - Touch-friendly interactions
@@ -152,6 +170,7 @@ A comprehensive e-commerce marketplace and event management platform for Univers
   - Mobile-specific component variants
 
 ### Cross-Device Compatibility
+
 - Desktop (1024px+)
 - Tablet (768px - 1023px)
 - Mobile (< 768px)
@@ -162,7 +181,9 @@ A comprehensive e-commerce marketplace and event management platform for Univers
 ## 🎬 Media Handling
 
 ### Image & Video Support
+
 - **Image Carousel Component**
+
   - Mobile-friendly video display
   - Proper aspect ratio handling
   - No stretching or black bars
@@ -176,6 +197,7 @@ A comprehensive e-commerce marketplace and event management platform for Univers
   - Mobile video optimization
 
 ### Image Optimization
+
 - Next.js Image component integration
 - Lazy loading
 - Responsive image sizes
@@ -187,6 +209,7 @@ A comprehensive e-commerce marketplace and event management platform for Univers
 ## 🔧 Technical Features
 
 ### Data Management
+
 - **JSON-Based Data Structure**
   - Product data (buy_data.json)
   - Rental data (data.json)
@@ -195,6 +218,7 @@ A comprehensive e-commerce marketplace and event management platform for Univers
   - Easy content updates
 
 ### Performance Optimization
+
 - Code splitting
 - Lazy loading
 - Image optimization
@@ -202,6 +226,7 @@ A comprehensive e-commerce marketplace and event management platform for Univers
 - Optimized re-renders
 
 ### Type Safety
+
 - Full TypeScript implementation
 - Type-safe components
 - Interface definitions
@@ -212,6 +237,7 @@ A comprehensive e-commerce marketplace and event management platform for Univers
 ## 🎯 Key Functionalities
 
 ### Product Features
+
 - ✅ Product filtering and categorization
 - ✅ Search and browse products
 - ✅ Product comparisons
@@ -220,6 +246,7 @@ A comprehensive e-commerce marketplace and event management platform for Univers
 - ✅ Price calculations
 
 ### User Features
+
 - ✅ Shopping cart management
 - ✅ Wishlist functionality
 - ✅ Event registration
@@ -227,6 +254,7 @@ A comprehensive e-commerce marketplace and event management platform for Univers
 - ✅ Consultation booking (Calendly integration)
 
 ### Admin Features
+
 - ✅ Easy content updates via JSON
 - ✅ Product management
 - ✅ Event management
@@ -237,6 +265,7 @@ A comprehensive e-commerce marketplace and event management platform for Univers
 ## 📊 Project Statistics
 
 ### Pages Developed
+
 - Landing Page
 - Buy Page (with categories)
 - Rent Page (with categories)
@@ -248,12 +277,14 @@ A comprehensive e-commerce marketplace and event management platform for Univers
 - Services Pages
 
 ### Components Created/Modified
+
 - 30+ custom components
 - 10+ UI component libraries integrated
 - Multiple page layouts
 - Responsive navigation system
 
 ### Integrations
+
 - Stripe Payment Processing
 - Google Places API
 - Calendly (Consultation booking)
@@ -290,6 +321,7 @@ A comprehensive e-commerce marketplace and event management platform for Univers
 ## 💼 Project Value
 
 This project represents a comprehensive web application with:
+
 - **E-commerce functionality** comparable to major marketplaces
 - **Event management system** for business operations
 - **Payment integration** for revenue generation
@@ -302,5 +334,4 @@ This project represents a comprehensive web application with:
 
 ---
 
-*Document prepared for project delivery and pricing justification*
-
+_Document prepared for project delivery and pricing justification_

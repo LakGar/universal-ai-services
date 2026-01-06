@@ -54,16 +54,14 @@ function Feature() {
                 name: "Buy a robot",
                 description:
                   "We offer a wide range of robots to choose from, to suit your needs.",
-                image:
-                  "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80",
+                image: "/buy.jpg",
                 alt: "Buy a robot",
               },
               {
                 href: "/services/rent",
                 name: "Rent a robot",
                 description: "Find a robot to rent for any event or project.",
-                image:
-                  "https://images.unsplash.com/photo-1534723328310-e82dad3ee43f?w=800&q=80",
+                image: "/support.jpg",
                 alt: "Rent a robot",
               },
               {
@@ -78,8 +76,7 @@ function Feature() {
                 href: "/services/repairs",
                 name: "Repairs",
                 description: "Get your robot repaired by our experts.",
-                image:
-                  "https://images.unsplash.com/photo-1555255707-c07966088b7b?w=800&q=80",
+                image: "/support.jpg",
                 alt: "Repairs",
               },
               {
