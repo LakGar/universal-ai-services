@@ -2,7 +2,7 @@
   "rentals": [
     {
       "id": "UNITREE-GO2-PRO-RENT",
-      "name": "Unitree Go2 Pro",
+      "name": "Go2 Pro",
       "category": "Quadruped",
       "manufacturer": "Unitree Robotics",
       "model": "Go2 Pro",
@@ -50,7 +50,7 @@
     },
     {
       "id": "UNITREE-GO2-X-RENT",
-      "name": "Unitree Go2 X (Tracked)",
+      "name": "Go2 X (Tracked)",
       "category": "Quadruped",
       "manufacturer": "Unitree Robotics",
       "images": [
@@ -84,7 +84,7 @@
     },
     {
       "id": "UNITREE-G1-BASIC-RENT",
-      "name": "Unitree G1 Basic",
+      "name": "G1 Basic",
       "category": "Humanoid",
       "manufacturer": "Unitree Robotics",
       "year": 2024,
@@ -101,7 +101,7 @@
     },
     {
       "id": "UNITREE-G1-EDU-U3-RENT",
-      "name": "Unitree G1 EDU Ultimate A",
+      "name": "G1 EDU Ultimate A",
       "category": "Humanoid",
       "manufacturer": "Unitree Robotics",
       "year": 2025,
@@ -117,7 +117,7 @@
     },
     {
       "id": "UNITREE-R1-AIR-RENT",
-      "name": "Unitree R1 Air",
+      "name": "R1 Air",
       "category": "Humanoid",
       "manufacturer": "Unitree Robotics",
       "year": 2025,
@@ -139,7 +139,7 @@
     },
     {
       "id": "UNITREE-R1-STD-RENT",
-      "name": "Unitree R1 Standard",
+      "name": "R1 Standard",
       "category": "Humanoid",
       "manufacturer": "Unitree Robotics",
       "images": [
@@ -160,7 +160,7 @@
     },
     {
       "id": "UNITREE-H1-2-RENT",
-      "name": "Unitree H1-2",
+      "name": "H1-2",
       "category": "Humanoid",
       "manufacturer": "Unitree Robotics",
       "year": 2025,
@@ -190,7 +190,7 @@
         "https://drive.google.com/file/d/1U_KDu7gEiKgZB_h9eJFtP81SEiPah5Gn/view?usp=drive_link",
         "https://drive.google.com/file/d/1xS49PIu7uYu33LVC1-o1IT7ROVsGMWdj/view?usp=drive_link"
       ],
-      "name": "Unitree R1 EDU Standard (Rental)",
+      "name": "R1 EDU Standard (Rental)",
       "Product ID": "R1-EDU-STD-RENT-0001",
       "SKU": "UNITREE-R1-EDU-STD-RENT",
       "Manufacturer": "Unitree Robotics",
@@ -263,7 +263,7 @@
         "https://drive.google.com/file/d/1cldgMc4HmcELe4Hr-UcmPxgRSrnjlxTJ/view?usp=drive_link",
         "https://drive.google.com/file/d/18z1W_0U6Y5rJBdgYWGRauuQEq-zjO2ZT/view?usp=drive_link"
       ],
-      "name": "Unitree H1 Robotic Humanoid (Rental)",
+      "name": "H1 Robotic Humanoid (Rental)",
       "Product ID": "H1-RENT-0001",
       "SKU": "UNITREE-H1-RENT",
       "Manufacturer": "Unitree Robotics",
@@ -459,7 +459,7 @@
       "videos": [
         "https://drive.google.com/file/d/1MnpQvr-TbizNVvj-D_GvTN8fW7lapYa2/view?usp=drive_link"
       ],
-      "name": "OpenMind BrainPack (Rental)",
+      "name": "BrainPack (Rental)",
       "Product ID": "OM-BRAINPACK-RENT-0001",
       "SKU": "OPENMIND-BPACK",
       "Manufacturer": "OpenMind",
@@ -519,6 +519,7 @@
       "name": "Autonomous Airport Robotics System",
       "category": "Retail",
       "manufacturer": "Multiple Vendors / Integrators",
+      "Product ID": "UAIS-AIRPORT-ROBOT-0001",
       "model": "Enterprise",
       "year": 2025,
       "description": "Autonomous robotic systems for airport cleaning, security patrol, baggage handling, and passenger assistance in modern airport terminals.",
