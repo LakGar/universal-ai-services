@@ -1,7 +1,7 @@
 [
   {
     "Category": "Buy",
-    "Model Name": "Unitree Go2 Pro",
+    "Model Name": "Go2 Pro",
     "Product ID": "GO2-PRO-0001",
     "SKU": "UNITREE-GO2-PRO",
     "Manufacturer": "Unitree Robotics",
@@ -68,7 +68,7 @@
   },
   {
     "Category": "Buy",
-    "Model Name": "Unitree Go2  Construction",
+    "Model Name": "Go2 Construction",
     "Product ID": "GO2-PRO-0001-CONSTRUCTION",
     "SKU": "UNITREE-GO2-PRO-CONSTRUCTION",
     "Manufacturer": "Unitree Robotics",
@@ -156,7 +156,7 @@
   },
   {
     "Category": "Buy",
-    "Model Name": "Unitree Go2 EDU",
+    "Model Name": "Go2 EDU",
     "Product ID": "GO2-X-0001",
     "SKU": "UNITREE-GO2-X",
     "Manufacturer": "Unitree Robotics",
@@ -174,7 +174,7 @@
       "https://drive.google.com/file/d/1dQlge9LWX0VJ7VLfqNCtC_9OAlFnUQV2/view?usp=drive_link"
     ],
     "Short Description": "Tracked Go2 for extreme terrain",
-    "Description": "Unitree Go2 X is a ruggedized, tracked variant of the Go2 platform designed for extreme terrain traversal where wheels/legs struggle, such as sand, snow, gravel, rubble, and steep inclines. It trades peak legged agility for superior traction and stability while retaining Go2 perception, autonomy, and developer tooling.",
+    "Description": "  Go2 X is a ruggedized, tracked variant of the Go2 platform designed for extreme terrain traversal where wheels/legs struggle, such as sand, snow, gravel, rubble, and steep inclines. It trades peak legged agility for superior traction and stability while retaining Go2 perception, autonomy, and developer tooling.",
     "Features": "Tracked locomotion for high-traction terrain; enhanced stability on loose/soft ground; 4D LiDAR perception; visual navigation; SLAM mapping; remote teleoperation; programmable behaviors; app/remote control; wireless connectivity; payload mounting points; OTA updates.",
     "Specs": "Tracked mobility module; standing footprint similar to Go2; weight increased vs legged Go2; runtime dependent on terrain; payload comparable to Go2 Pro; speed optimized for torque/traction rather than sprinting; slope capability optimized for loose surfaces.",
     "Operating Environment": "Indoor/Outdoor (harsh terrain)",
@@ -222,7 +222,7 @@
   },
   {
     "Category": "Buy",
-    "Model Name": "Unitree G1",
+    "Model Name": "G1",
     "Product ID": "GO1-HUM-0001",
     "SKU": "UNITREE-G1",
     "Manufacturer": "Unitree Robotics",
@@ -283,7 +283,7 @@
   },
   {
     "Category": "Buy",
-    "Model Name": "Unitree G1 EDU Ultimate A",
+    "Model Name": "G1 EDU Ultimate A",
     "Product ID": "UNITREE-G1-EDU-U3-0001",
     "SKU": "UNITREE-G1-EDU-U3",
     "Manufacturer": "Unitree Robotics",
@@ -344,7 +344,7 @@
   },
   {
     "Category": "Buy",
-    "Model Name": "Unitree G1 EDU Ultimate B",
+    "Model Name": "G1 EDU Ultimate B",
     "Product ID": "UNITREE-G1-EDU-U4-0001",
     "SKU": "UNITREE-G1-EDU-U4",
     "Manufacturer": "Unitree Robotics",
@@ -405,7 +405,7 @@
   },
   {
     "Category": "Buy",
-    "Model Name": "Unitree G1 EDU Ultimate C",
+    "Model Name": "G1 EDU Ultimate C",
     "Product ID": "UNITREE-G1-EDU-U5-0001",
     "SKU": "UNITREE-G1-EDU-U5",
     "Manufacturer": "Unitree Robotics",
@@ -467,7 +467,7 @@
   },
   {
     "Category": "Buy",
-    "Model Name": "Unitree R1 Air",
+    "Model Name": "R1 Air",
     "Product ID": "UNTR1-AIR-0001",
     "SKU": "UNITREE-R1-AIR",
     "Manufacturer": "Unitree Robotics",
@@ -531,7 +531,7 @@
   },
   {
     "Category": "Buy",
-    "Model Name": "Unitree R1 Standard",
+    "Model Name": "R1 Standard",
     "Product ID": "UNTR1-STD-0001",
     "SKU": "UNITREE-R1-STD",
     "Manufacturer": "Unitree Robotics",
@@ -596,7 +596,7 @@
   },
   {
     "Category": "Buy",
-    "Model Name": "Unitree R1 EDU Standard",
+    "Model Name": "R1 EDU Standard",
     "Product ID": "UNTR1-EDU-STD-0001",
     "SKU": "UNITREE-R1-EDU-STD",
     "Manufacturer": "Unitree Robotics",
@@ -661,7 +661,7 @@
   },
   {
     "Category": "Buy",
-    "Model Name": "Unitree R1 EDU Smart",
+    "Model Name": "R1 EDU Smart",
     "Product ID": "UNTR1-EDU-SMART-0001",
     "SKU": "UNITREE-R1-EDU-SMART",
     "Manufacturer": "Unitree Robotics",
@@ -726,7 +726,7 @@
   },
   {
     "Category": "Buy",
-    "Model Name": "Unitree R1 EDU Pro A",
+    "Model Name": "R1 EDU Pro A",
     "Product ID": "UNTR1-EDU-PROA-0001",
     "SKU": "UNITREE-R1-EDU-PROA",
     "Manufacturer": "Unitree Robotics",
@@ -791,7 +791,7 @@
   },
   {
     "Category": "Buy",
-    "Model Name": "Unitree R1 EDU Pro B",
+    "Model Name": "R1 EDU Pro B",
     "Product ID": "UNTR1-EDU-PROB-0001",
     "SKU": "UNITREE-R1-EDU-PROB",
     "Manufacturer": "Unitree Robotics",
@@ -856,7 +856,7 @@
   },
   {
     "Category": "Buy",
-    "Model Name": "Unitree R1 EDU Pro C",
+    "Model Name": "R1 EDU Pro C",
     "Product ID": "UNTR1-EDU-PROC-0001",
     "SKU": "UNITREE-R1-EDU-PROC",
     "Manufacturer": "Unitree Robotics",
@@ -920,7 +920,7 @@
   },
   {
     "Category": "Buy",
-    "Model Name": "Unitree R1 EDU Pro D",
+    "Model Name": "R1 EDU Pro D",
     "Product ID": "UNTR1-EDU-PROD-0001",
     "SKU": "UNITREE-R1-EDU-PROD",
     "Manufacturer": "Unitree Robotics",
@@ -983,7 +983,7 @@
   },
   {
     "Category": "Buy",
-    "Model Name": "Unitree H1 Robotic Humanoid",
+    "Model Name": "H1 Robotic Humanoid",
     "Product ID": "turn0product1",
     "SKU": "UNITREE-H1",
     "Manufacturer": "Unitree Robotics",
@@ -1044,7 +1044,7 @@
   },
   {
     "Category": "Buy",
-    "Model Name": "Unitree H1-2 General Purpose Humanoid Robot",
+    "Model Name": "H1-2 General Purpose Humanoid Robot",
     "Product ID": "UNTR-H1-2-GP-0001",
     "SKU": "UNITREE-H1-2-GP",
     "Manufacturer": "Unitree Robotics",
@@ -1105,7 +1105,7 @@
   },
   {
     "Category": "Accessories+Add-ons",
-    "Model Name": "Inspire Robots RH56DFQ Dexterous Hands (Both)",
+    "Model Name": "RH56DFQ Dexterous Hands (Both)",
     "Product ID": "INSP-RH56DFQ-BOTH-0001",
     "SKU": "RH56DFQ-BOTH",
     "Manufacturer": "Inspire Robots",
