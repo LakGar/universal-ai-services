@@ -31,7 +31,7 @@ export function ConsultationModal({ isOpen, onClose }: ConsultationModalProps) {
   const [consultationScheduled, setConsultationScheduled] = useState(false);
   const [scriptLoaded, setScriptLoaded] = useState(false);
   const widgetRef = useRef<HTMLDivElement | null>(null);
-  const calendlyUrl = "https://calendly.com/lakgarg2002/advisory-meeting-1";
+  const calendlyUrl = "https://calendly.com/fernandolorenzo";
 
   // Reset consultation scheduled state when modal closes
   useEffect(() => {

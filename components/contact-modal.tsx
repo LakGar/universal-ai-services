@@ -21,7 +21,7 @@ export function ContactModal({
   const [consultationScheduled, setConsultationScheduled] = useState(false);
   const [scriptLoaded, setScriptLoaded] = useState(false);
   const widgetRef = useRef<HTMLDivElement | null>(null);
-  const calendlyUrl = "https://calendly.com/lakgarg2002/advisory-meeting-1";
+  const calendlyUrl = "https://calendly.com/fernandolorenzo";
 
   const handleClose = () => {
     onClose();

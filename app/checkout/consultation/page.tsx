@@ -56,7 +56,7 @@ export default function ConsultationPage() {
   };
 
   // Calendly embed URL
-  const calendlyUrl = "https://calendly.com/lakgarg2002/advisory-meeting-1";
+  const calendlyUrl = "https://calendly.com/fernandolorenzo";
 
   // Listen for Calendly event when consultation is scheduled
   React.useEffect(() => {
