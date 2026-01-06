@@ -64,8 +64,10 @@ const leadership = [
     title: "Marketing Director",
 
     bio: "25+ Years of Experience in Business Marketing & Enterprise Partnerships, Leads global marketing strategy and partner engagement across vendors and manufacturing networks, supporting enterprise and international deployment of Physical AI and robotics systems.",
-    linkedin: "mark.JPG",
-    image: "/mark.jpg",
+    linkedin:
+      "https://media.licdn.com/dms/image/v2/D5603AQHtgYds7HuXcQ/profile-displayphoto-scale_200_200/B56ZuMhAzzKgAY-/0/1767589023633?e=1769040000&v=beta&t=XdjQtoQZnp7r8f7-k0H8kZ-tEzgsVZsXkXt6uYHZzH0",
+    image:
+      "https://media.licdn.com/dms/image/v2/D5603AQHtgYds7HuXcQ/profile-displayphoto-crop_800_800/B56ZuMhAzzKgAI-/0/1767589023556?e=1769040000&v=beta&t=JJRVLiOkL81VjTxoxjy6ZIv5inwwb4jdH_UuKSxViIM",
   },
 ];
 
