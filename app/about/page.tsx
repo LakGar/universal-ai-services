@@ -60,7 +60,7 @@ const leadership = [
       "https://images.squarespace-cdn.com/content/v1/68c3b30180e4d46760cbd2a5/e4006c52-c8a0-4147-a6e3-4122fa57a7c9/Screenshot+2025-10-25+at+3.51.47%E2%80%AFPM.png?format=1500w",
   },
   {
-    name: "John Doe",
+    name: "Mark Cheng",
     title: "Marketing Director",
 
     bio: "25+ Years of Experience in Business Marketing & Enterprise Partnerships, Leads global marketing strategy and partner engagement across vendors and manufacturing networks, supporting enterprise and international deployment of Physical AI and robotics systems.",
