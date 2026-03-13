@@ -322,7 +322,7 @@ export default function AccessoriesPage() {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="/services">Services</BreadcrumbLink>
+                <BreadcrumbLink>Services</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem>

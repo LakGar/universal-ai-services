@@ -12,6 +12,8 @@ import {
   ToolCase,
   Gift,
   Receipt,
+  Calendar1,
+  Video
 } from "lucide-react";
 import { useContact } from "@/contexts/contact-context";
 
@@ -122,6 +124,12 @@ const Navbar = ({
           description: "Our terms and conditions for using our services",
           icon: <Book className="size-5 shrink-0" />,
           url: "/terms",
+        },
+        {
+          title: "Events",
+          description: "Our terms and conditions for using our services",
+          icon: <Calendar1 className="size-5 shrink-0" />,
+          url: "https://luma.com/user/UAIS",
         },
       ],
     },
