@@ -65,11 +65,6 @@ const servicesItems = [
     url: "/services/consultation",
     icon: Calendar,
   },
-  {
-    title: "Events",
-    url: "/services/events",
-    icon: Megaphone,
-  },
 ];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
