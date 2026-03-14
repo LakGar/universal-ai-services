@@ -1,0 +1,179 @@
+[
+  {
+    "id": "media-1",
+    "type": "image",
+    "url": "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1200&q=80",
+    "thumbnail": "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=400&q=80",
+    "title": "Robotics Innovation",
+    "description": "Cutting-edge robotics technology in action",
+    "category": "Robotics",
+    "width": 1200,
+    "height": 800
+  },
+  {
+    "id": "media-2",
+    "type": "video",
+    "url": "/carousel/video1.mp4",
+    "thumbnail": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=80",
+    "title": "Robot Demonstration",
+    "description": "Live demonstration of autonomous navigation",
+    "category": "Demo",
+    "width": 1920,
+    "height": 1080
+  },
+  {
+    "id": "media-3",
+    "type": "image",
+    "url": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80",
+    "thumbnail": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=80",
+    "title": "AI Systems",
+    "description": "Advanced AI integration in robotics",
+    "category": "AI",
+    "width": 1200,
+    "height": 1600
+  },
+  {
+    "id": "media-4",
+    "type": "video",
+    "url": "/carousel/video2.mp4",
+    "thumbnail": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80",
+    "title": "Manufacturing Automation",
+    "description": "Robots in industrial settings",
+    "category": "Manufacturing",
+    "width": 1920,
+    "height": 1080
+  },
+  {
+    "id": "media-5",
+    "type": "image",
+    "url": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80",
+    "thumbnail": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80",
+    "title": "Research Lab",
+    "description": "Robotics research and development",
+    "category": "Research",
+    "width": 1200,
+    "height": 900
+  },
+  {
+    "id": "media-6",
+    "type": "image",
+    "url": "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=1200&q=80",
+    "thumbnail": "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=400&q=80",
+    "title": "Humanoid Robot",
+    "description": "Next-generation humanoid robotics",
+    "category": "Humanoid",
+    "width": 1200,
+    "height": 1400
+  },
+  {
+    "id": "media-7",
+    "type": "video",
+    "url": "/carousel/video3.mp4",
+    "thumbnail": "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&q=80",
+    "title": "Quadruped Robot",
+    "description": "Agile quadruped robot in action",
+    "category": "Quadruped",
+    "width": 1920,
+    "height": 1080
+  },
+  {
+    "id": "media-8",
+    "type": "image",
+    "url": "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=1200&q=80",
+    "thumbnail": "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&q=80",
+    "title": "Autonomous Systems",
+    "description": "Self-navigating robotic systems",
+    "category": "Autonomous",
+    "width": 1200,
+    "height": 1000
+  },
+  {
+    "id": "media-9",
+    "type": "image",
+    "url": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80",
+    "thumbnail": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&q=80",
+    "title": "Tech Innovation",
+    "description": "Latest technological breakthroughs",
+    "category": "Innovation",
+    "width": 1200,
+    "height": 1200
+  },
+  {
+    "id": "media-10",
+    "type": "video",
+    "url": "/carousel/video4.mp4",
+    "thumbnail": "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&q=80",
+    "title": "Robot Assembly",
+    "description": "Precision assembly process",
+    "category": "Manufacturing",
+    "width": 1920,
+    "height": 1080
+  },
+  {
+    "id": "media-11",
+    "type": "image",
+    "url": "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80",
+    "thumbnail": "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&q=80",
+    "title": "Smart Factory",
+    "description": "Intelligent manufacturing systems",
+    "category": "Manufacturing",
+    "width": 1200,
+    "height": 1100
+  },
+  {
+    "id": "media-12",
+    "type": "image",
+    "url": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80",
+    "thumbnail": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=80",
+    "title": "Robotics Workshop",
+    "description": "Hands-on robotics training",
+    "category": "Education",
+    "width": 1200,
+    "height": 850
+  },
+  {
+    "id": "media-13",
+    "type": "video",
+    "url": "/carousel/video5.mp4",
+    "thumbnail": "https://images.unsplash.com/photo-1555255707-c07966088b7b?w=400&q=80",
+    "title": "Robot Testing",
+    "description": "Quality assurance and testing",
+    "category": "Testing",
+    "width": 1920,
+    "height": 1080
+  },
+  {
+    "id": "media-14",
+    "type": "image",
+    "url": "https://images.unsplash.com/photo-1555255707-c07966088b7b?w=1200&q=80",
+    "thumbnail": "https://images.unsplash.com/photo-1555255707-c07966088b7b?w=400&q=80",
+    "title": "Future Technology",
+    "description": "Next-generation robotics",
+    "category": "Innovation",
+    "width": 1200,
+    "height": 1300
+  },
+  {
+    "id": "media-15",
+    "type": "image",
+    "url": "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1200&q=80",
+    "thumbnail": "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=400&q=80",
+    "title": "Robotics Expo",
+    "description": "Industry showcase event",
+    "category": "Events",
+    "width": 1200,
+    "height": 950
+  },
+  {
+    "id": "media-16",
+    "type": "video",
+    "url": "/carousel/video6.mp4",
+    "thumbnail": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80",
+    "title": "Robot Performance",
+    "description": "High-performance robotics",
+    "category": "Performance",
+    "width": 1920,
+    "height": 1080
+  }
+]
+

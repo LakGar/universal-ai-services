@@ -66,11 +66,6 @@ const servicesItems = [
     icon: Calendar,
   },
   {
-    title: "Media",
-    url: "/services/media",
-    icon: Video,
-  },
-  {
     title: "Events",
     url: "/services/events",
     icon: Megaphone,

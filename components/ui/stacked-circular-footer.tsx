@@ -1,9 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import Image from "next/image";
+import Link from "next/link";
+
 import {
   Facebook,
   Instagram,
@@ -13,186 +13,145 @@ import {
   Phone,
   MapPin,
 } from "lucide-react";
-import Image from "next/image";
-import { useContact } from "@/contexts/contact-context";
 
 function Footer() {
-  const { openContact } = useContact();
-  const footerLinks = [
-    { href: "/", label: "Home" },
-    { href: "/about", label: "About" },
-    { href: "#services", label: "Services" },
-    { href: "/services/buy", label: "Products" },
-    { href: "#contact", label: "Contact" },
+  const navigation = [
+    { name: "Home", href: "/" },
+    { name: "About", href: "/about" },
+    { name: "Services", href: "#services" },
+    { name: "Products", href: "/services/buy" },
+    { name: "Contact", href: "#contact" },
   ];
 
-  const socialLinks = [
+  const social = [
     {
       icon: Linkedin,
-      label: "LinkedIn",
       href: "https://www.linkedin.com/company/universalaiservices/",
     },
+    { icon: Twitter, href: "#" },
+    { icon: Instagram, href: "#" },
+    { icon: Facebook, href: "#" },
   ];
 
   return (
-    <footer className="bg-background py-12">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="flex flex-col items-center">
+    <footer className="bg-black text-white">
+      <div className="max-w-7xl mx-auto px-6 py-16">
+
+        {/* GRID */}
+        <div className="grid md:grid-cols-3 gap-10">
+
+          {/* LOGO + DESCRIPTION */}
           <motion.div
-            className="mb-8 rounded-full  p-8"
-            initial={{ opacity: 0, scale: 0.5 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <Image
-              src="/logo.png"
-              alt="Universal AI Services"
-              width={62}
-              height={62}
-              className="dark:invert"
-            />
-          </motion.div>
-          <motion.nav
-            className="mb-8 flex flex-wrap justify-center gap-6 items-center"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
           >
-            {footerLinks.map((link, index) => {
-              if (link.href === "#contact") {
-                return (
-                  <motion.button
-                    key={link.label}
-                    onClick={openContact}
-                    className="hover:text-primary"
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.4, delay: 0.2 + index * 0.05 }}
-                  >
-                    {link.label}
-                  </motion.button>
-                );
-              }
-              return (
-                <motion.a
-                  key={link.label}
-                  href={link.href}
-                  className="hover:text-primary"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: 0.2 + index * 0.05 }}
-                >
-                  {link.label}
-                </motion.a>
-              );
-            })}
-          </motion.nav>
-          <motion.div
-            className="mb-8 flex space-x-4"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          >
-            {socialLinks.map((social, index) => {
-              const Icon = social.icon;
-              return (
-                <motion.div
-                  key={social.label}
-                  initial={{ opacity: 0, scale: 0 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.3, delay: 0.4 + index * 0.1 }}
-                >
-                  <a
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="rounded-full"
-                    >
-                      <Icon className="h-4 w-4" />
-                      <span className="sr-only">{social.label}</span>
-                    </Button>
-                  </a>
-                </motion.div>
-              );
-            })}
-          </motion.div>
-          <motion.div
-            className="mb-8 w-full max-w-md"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-          >
-            <form className="flex space-x-2">
-              <div className="grow">
-                <Label htmlFor="email" className="sr-only">
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  placeholder="Enter your email"
-                  type="email"
-                  className="rounded-full"
-                />
-              </div>
-              <Button type="submit" className="rounded-full">
-                Subscribe
-              </Button>
-            </form>
-          </motion.div>
-          <motion.div
-            className="text-center space-y-4"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.6 }}
-          >
-            <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
-              <a
-                href="mailto:contact@universalaiservices.com"
-                className="flex items-center gap-2 hover:text-primary transition-colors"
-              >
-                <Mail className="h-4 w-4" />
-                <span>contact@universalaiservices.com</span>
-              </a>
-              <a
-                href="tel:+16502604147"
-                className="flex items-center gap-2 hover:text-primary transition-colors"
-              >
-                <Phone className="h-4 w-4" />
-                <span>(650) 260-4147</span>
-              </a>
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                <span>450 Townsend St, San Francisco, CA</span>
-              </div>
+            <div className="flex items-center gap-3 mb-4">
+              <Image
+                src="/logo.png"
+                alt="Universal AI"
+                width={40}
+                height={40}
+                className="invert"
+              />
+              <h3 className="text-xl font-semibold">
+                Universal AI
+              </h3>
             </div>
-            <p className="text-sm text-muted-foreground">
-              © 2026 Universal AI Services. All rights reserved.
+
+            <p className="text-gray-400 text-sm leading-relaxed">
+              We help businesses transform using Artificial Intelligence,
+              automation, and modern digital solutions.
             </p>
-            <p className="text-xs text-muted-foreground/60 mt-3">
-              Website by{" "}
-              <a
-                href="https://www.theempowerweb.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Empower
-              </a>
-            </p>
+
+            {/* SOCIAL */}
+            <div className="flex gap-4 mt-6">
+              {social.map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <a
+                    key={index}
+                    href={item.href}
+                    target="_blank"
+                    className="p-2 rounded-full bg-gray-800 hover:bg-primary transition"
+                  >
+                    <Icon size={18} />
+                  </a>
+                );
+              })}
+            </div>
+          </motion.div>
+
+          {/* NAVIGATION */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h4 className="font-semibold mb-4">Navigation</h4>
+
+            <ul className="space-y-3 text-gray-400">
+              {navigation.map((item, i) => (
+                <li key={i}>
+                  <Link
+                    href={item.href}
+                    className="hover:text-white transition"
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          {/* CONTACT */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h4 className="font-semibold mb-4">Contact</h4>
+
+            <div className="space-y-4 text-gray-400 text-sm">
+
+              <div className="flex gap-3 items-start">
+                <Mail size={18} />
+                <span>contact@universalaiservices.com</span>
+              </div>
+
+              <div className="flex gap-3 items-start">
+                <Phone size={18} />
+                <span>(650) 260-4147</span>
+              </div>
+
+              <div className="flex gap-3 items-start">
+                <MapPin size={18} />
+                <span>995 Market St, San Francisco, CA</span>
+              </div>
+
+            </div>
           </motion.div>
         </div>
+
+        {/* BOTTOM BAR */}
+        <div className="border-t border-gray-800 mt-12 pt-6 flex flex-col md:flex-row items-center justify-between text-sm text-gray-500">
+
+          <p>
+            © 2026 Universal AI Services. All rights reserved.
+          </p>
+
+          <div className="flex gap-6 mt-3 md:mt-0">
+            {/* <Link href="/privacy-policy" className="hover:text-white transition">
+              Privacy Policy
+            </Link> */}
+
+            <Link href="/terms" className="hover:text-white transition">
+              Terms of Service | Privacy Policy
+            </Link>
+          </div>
+
+        </div>
+
       </div>
     </footer>
   );
