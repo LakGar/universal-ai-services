@@ -28,7 +28,7 @@ interface ProductData {
   image: string;
   alt: string;
   price: string;
-  monthlyPrice?: string;
+  // monthlyPrice?: string;
   category: string;
   isNew: boolean;
   manufacturer: string;
@@ -118,13 +118,13 @@ const transformProducts = (): ProductData[] => {
       msrp > 0 ? `From $${msrp.toLocaleString()}` : "Price on request";
 
     // Calculate monthly price (assuming 24 months)
-    const monthlyPrice =
-      msrp > 0
-        ? `or $${(msrp / 24).toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}/mo. for 24 mo.`
-        : undefined;
+    // const monthlyPrice =
+    //   msrp > 0
+    //     ? `or $${(msrp / 24).toLocaleString(undefined, {
+    //         minimumFractionDigits: 2,
+    //         maximumFractionDigits: 2,
+    //       })}/mo. for 24 mo.`
+    //     : undefined;
 
     // Determine if product is new (released in 2024 or 2025)
     const releaseYear = parseInt(item["Release Year"] || "0");
@@ -137,7 +137,7 @@ const transformProducts = (): ProductData[] => {
       image: getProductImage(item),
       alt: item["Short Description"] || item["Model Name"] || "Product",
       price,
-      monthlyPrice,
+      // monthlyPrice,
       category: item.Category || "Buy",
       isNew,
       manufacturer: item.Manufacturer || "",
@@ -526,7 +526,7 @@ export default function BuyPage() {
                           image={product.image}
                           alt={product.alt}
                           price={product.price}
-                          monthlyPrice={product.monthlyPrice}
+                          // monthlyPrice={product.monthlyPrice}
                           isNew={product.isNew}
                         />
                       ))}

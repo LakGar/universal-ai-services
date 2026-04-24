@@ -600,7 +600,7 @@ export default function ProductDetailPage() {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="/services">Services</BreadcrumbLink>
+                <BreadcrumbLink>Services</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem className="hidden md:block">
@@ -781,7 +781,7 @@ export default function ProductDetailPage() {
                     </span>
                   )}
                 </div>
-                {product.monthlyPrice > 0 && (
+                {/* {product.monthlyPrice > 0 && (
                   <p className="text-muted-foreground">
                     or $
                     {product.monthlyPrice.toLocaleString(undefined, {
@@ -790,7 +790,7 @@ export default function ProductDetailPage() {
                     })}
                     /mo. for {product.monthlyMonths} mo.*
                   </p>
-                )}
+                )} */}
               </div>
 
               {/* Selected Add-ons */}
