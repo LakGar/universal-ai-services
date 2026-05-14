@@ -60,14 +60,14 @@ const leadership = [
       "https://images.squarespace-cdn.com/content/v1/68c3b30180e4d46760cbd2a5/e4006c52-c8a0-4147-a6e3-4122fa57a7c9/Screenshot+2025-10-25+at+3.51.47%E2%80%AFPM.png?format=1500w",
   },
   {
-    name: "Mark Cheng",
-    title: "Marketing Director",
+    name: "Meet Panchal",
+    title: "Founding Engineer",
 
-    bio: "25+ Years of Experience in Business Marketing & Enterprise Partnerships, Leads global marketing strategy and partner engagement across vendors and manufacturing networks, supporting enterprise and international deployment of Physical AI and robotics systems.",
+    bio: "3+ years of experience and strategic problem-solver specializing in architecting elegant solutions for complex technical challenges across distributed full-stack systems and intelligent cloud-native applications",
     linkedin:
-      "https://media.licdn.com/dms/image/v2/D5603AQHtgYds7HuXcQ/profile-displayphoto-scale_200_200/B56ZuMhAzzKgAY-/0/1767589023633?e=1769040000&v=beta&t=XdjQtoQZnp7r8f7-k0H8kZ-tEzgsVZsXkXt6uYHZzH0",
+      "https://www.linkedin.com/in/meet-panchal-7175b521a/",
     image:
-      "https://media.licdn.com/dms/image/v2/D5603AQHtgYds7HuXcQ/profile-displayphoto-crop_800_800/B56ZuMhAzzKgAI-/0/1767589023556?e=1769040000&v=beta&t=JJRVLiOkL81VjTxoxjy6ZIv5inwwb4jdH_UuKSxViIM",
+      "https://images.squarespace-cdn.com/content/v2/namespaces/memberAccountAvatars/libraries/69b0d80e3d130f2d279257e5/1c2221f3-fade-4c30-9f89-f1441d714cc8/Gemini_Generated_Image_appot6appot6appo.png?format=300w",
   },
 ];
 
